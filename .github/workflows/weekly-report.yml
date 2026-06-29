@@ -1,0 +1,31 @@
+name: Weekly Panorama Economico
+
+on:
+  schedule:
+    - cron: '0 12 * * 1'  # Cada lunes a las 12pm UTC
+  workflow_dispatch:  # También permite correrlo manualmente
+
+jobs:
+  generate-report:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install requests jinja2
+
+      - name: Generate report
+        env:
+          FMP_API_KEY: ${{ secrets.FMP_API_KEY }}
+        run: python scripts/generate_report.py
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./output
