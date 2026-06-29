@@ -4,78 +4,126 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Panorama Económico — BCP Miami</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: 'Georgia', serif; background: #f8f7f4; color: #1a1a1a; }
-  header { background: #0a2342; color: white; padding: 2rem 3rem; display: flex; justify-content: space-between; align-items: center; }
-  header h1 { font-size: 1.6rem; letter-spacing: 0.05em; }
-  header span { font-size: 0.9rem; opacity: 0.7; }
-  .container { max-width: 1100px; margin: 0 auto; padding: 2rem; }
-  h2 { font-size: 1rem; text-transform: uppercase; letter-spacing: 0.1em; color: #0a2342; border-bottom: 2px solid #0a2342; padding-bottom: 0.4rem; margin: 2rem 0 1rem; }
-  .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
-  .card { background: white; border-radius: 8px; padding: 1.2rem 1.5rem; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
-  .card .pair { font-size: 0.8rem; color: #666; text-transform: uppercase; letter-spacing: 0.08em; }
-  .card .rate { font-size: 2rem; font-weight: bold; margin: 0.3rem 0; }
-  .card .change { font-size: 0.85rem; }
-  .up { color: #22c55e; } .down { color: #ef4444; }
-  .news-list { display: flex; flex-direction: column; gap: 1rem; }
-  .news-item { background: white; border-radius: 8px; padding: 1rem 1.5rem; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
-  .news-item a { font-weight: bold; color: #0a2342; text-decoration: none; font-size: 0.95rem; }
-  .news-item .meta { font-size: 0.78rem; color: #888; margin-top: 0.3rem; }
-  .report-box { background: white; border-radius: 8px; padding: 1.5rem 2rem; box-shadow: 0 1px 4px rgba(0,0,0,0.08); min-height: 200px; }
-  .report-box p { line-height: 1.8; color: #333; font-size: 0.95rem; white-space: pre-wrap; }
-  .editable { border: 1px dashed #ccc; border-radius: 4px; padding: 1rem; min-height: 120px; outline: none; line-height: 1.8; font-family: Georgia, serif; font-size: 0.95rem; color: #333; }
-  footer { text-align: center; padding: 2rem; font-size: 0.8rem; color: #999; margin-top: 3rem; }
+  body { font-family: 'Georgia', serif; background: #f4f3f0; color: #1a1a1a; }
+  header { background: #0a2342; color: white; padding: 1.8rem 3rem; display: flex; justify-content: space-between; align-items: center; }
+  header h1 { font-size: 1.5rem; letter-spacing: 0.08em; font-weight: bold; }
+  header span { font-size: 0.85rem; opacity: 0.75; }
+  .container { max-width: 1100px; margin: 0 auto; padding: 2rem 1.5rem; }
+  h2 { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.12em; color: #0a2342; border-bottom: 2px solid #0a2342; padding-bottom: 0.4rem; margin: 2.5rem 0 1.2rem; font-weight: bold; }
+  .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.2rem; }
+  .card { background: white; border-radius: 10px; padding: 1.2rem 1.5rem 1rem; box-shadow: 0 1px 6px rgba(0,0,0,0.07); }
+  .card .pair-label { font-size: 0.72rem; color: #888; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.3rem; }
+  .card .rate { font-size: 1.9rem; font-weight: bold; color: #0a2342; margin-bottom: 0.2rem; }
+  .card .change { font-size: 0.82rem; margin-bottom: 0.8rem; }
+  .card .meta { font-size: 0.72rem; color: #aaa; margin-top: 0.5rem; }
+  .up { color: #16a34a; } .down { color: #dc2626; }
+  .chart-wrap { margin-top: 0.5rem; }
+  .news-grid { display: flex; flex-direction: column; gap: 0.8rem; }
+  .news-item { background: white; border-radius: 8px; padding: 0.9rem 1.2rem; box-shadow: 0 1px 4px rgba(0,0,0,0.06); border-left: 3px solid #0a2342; }
+  .news-item a { font-weight: bold; color: #0a2342; text-decoration: none; font-size: 0.9rem; line-height: 1.4; }
+  .news-item a:hover { text-decoration: underline; }
+  .news-item .meta { font-size: 0.72rem; color: #999; margin-top: 0.3rem; }
+  .report-box { background: white; border-radius: 10px; padding: 1.5rem 2rem; box-shadow: 0 1px 6px rgba(0,0,0,0.07); }
+  .editable { border: 1.5px dashed #d0cfc9; border-radius: 6px; padding: 1rem 1.2rem; min-height: 130px; outline: none; line-height: 1.85; font-family: Georgia, serif; font-size: 0.92rem; color: #222; white-space: pre-wrap; }
+  .editable:empty:before { content: attr(data-placeholder); color: #bbb; font-style: italic; }
+  .editable:focus { border-color: #0a2342; }
+  footer { text-align: center; padding: 2.5rem; font-size: 0.75rem; color: #aaa; margin-top: 2rem; border-top: 1px solid #e5e5e5; }
 </style>
 </head>
 <body>
 <header>
   <h1>PANORAMA ECONÓMICO</h1>
-  <span>BCP Miami · Semana del {{ week }}</span>
+  <span>BCP Miami &nbsp;·&nbsp; Semana del {{ week }}</span>
 </header>
 <div class="container">
 
   <h2>Tendencia Semanal de Divisas</h2>
   <div class="cards">
-    {% for pair, data in pairs.items() %}
+    {% for key, d in pairs.items() %}
     <div class="card">
-      <div class="pair">{{ pair[:3] }}/{{ pair[3:] }}</div>
-      <div class="rate">{{ data.latest }}</div>
-      <div class="change {% if data.change >= 0 %}up{% else %}down{% endif %}">
-        {% if data.change >= 0 %}▲{% else %}▼{% endif %}
-        {{ data.change }} ({{ data.pct }}% semanal)
+      <div class="pair-label">{{ d.label }}</div>
+      <div class="rate">{{ d.latest }}</div>
+      <div class="change {% if d.change >= 0 %}up{% else %}down{% endif %}">
+        {% if d.change >= 0 %}▲{% else %}▼{% endif %}
+        {{ d.change }} &nbsp;({{ d.pct }}% semanal)
       </div>
-      <div style="margin-top:0.8rem">{{ data.sparkline }}</div>
+      <div class="chart-wrap">
+        <canvas id="chart-{{ key }}" height="70"></canvas>
+      </div>
+      <div class="meta">Apertura semana: {{ d.open }}</div>
     </div>
     {% endfor %}
   </div>
 
   <h2>Noticias Forex de la Semana</h2>
-  <div class="news-list">
-    {% for n in news %}
-    <div class="news-item">
-      <a href="{{ n.url }}" target="_blank">{{ n.title }}</a>
-      <div class="meta">{{ n.publishedDate[:10] }} · {{ n.site }}</div>
-    </div>
-    {% endfor %}
+  <div class="news-grid">
+    {% if news %}
+      {% for n in news %}
+      <div class="news-item">
+        <a href="{{ n.url }}" target="_blank">{{ n.title }}</a>
+        <div class="meta">{{ n.publishedDate[:10] if n.publishedDate else '' }} &nbsp;·&nbsp; {{ n.site if n.site else '' }}</div>
+      </div>
+      {% endfor %}
+    {% else %}
+      <div class="news-item"><a>No se encontraron noticias forex esta semana.</a></div>
+    {% endif %}
   </div>
 
   <h2>Sección 1 — Economía Global y Mercados</h2>
   <div class="report-box">
-    <div class="editable" contenteditable="true" placeholder="Pega aquí el texto de la Sección 1 redactado con Claude..."></div>
+    <div class="editable" contenteditable="true" data-placeholder="Pega aquí el texto de la Sección 1 redactado con Claude..."></div>
   </div>
 
   <h2>Sección 3 — Noticias Mundiales Importantes</h2>
   <div class="report-box">
-    <div class="editable" contenteditable="true" placeholder="Pega aquí el texto de la Sección 3 redactado con Claude..."></div>
+    <div class="editable" contenteditable="true" data-placeholder="Pega aquí el texto de la Sección 3 redactado con Claude..."></div>
   </div>
 
   <h2>Resumen Ejecutivo</h2>
   <div class="report-box">
-    <div class="editable" contenteditable="true" placeholder="Pega aquí el resumen ejecutivo..."></div>
+    <div class="editable" contenteditable="true" data-placeholder="Pega aquí el resumen ejecutivo..."></div>
   </div>
 
 </div>
-<footer>Panorama Económico · BCP Miami · Generado automáticamente cada lunes</footer>
+<footer>Panorama Económico &nbsp;·&nbsp; BCP Miami &nbsp;·&nbsp; Generado automáticamente cada lunes</footer>
+
+<script>
+const pairsData = {{ pairs | tojson }};
+const colors = { EURUSD: "#0a2342", USDPEN: "#b8860b", EURPEN: "#1a6b3a" };
+
+Object.entries(pairsData).forEach(([key, d]) => {
+  const ctx = document.getElementById("chart-" + key);
+  if (!ctx || !d.closes || d.closes.length < 2) return;
+  new Chart(ctx, {
+    type: "line",
+    data: {
+      labels: d.dates,
+      datasets: [{
+        data: d.closes,
+        borderColor: d.change >= 0 ? "#16a34a" : "#dc2626",
+        borderWidth: 2,
+        pointRadius: 2,
+        pointBackgroundColor: d.change >= 0 ? "#16a34a" : "#dc2626",
+        fill: true,
+        backgroundColor: d.change >= 0 ? "rgba(22,163,74,0.07)" : "rgba(220,38,38,0.07)",
+        tension: 0.3
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { display: false }, tooltip: {
+        callbacks: { label: ctx => " " + ctx.parsed.y.toFixed(4) }
+      }},
+      scales: {
+        x: { display: false },
+        y: { display: true, ticks: { font: { size: 9 }, maxTicksLimit: 4 }, grid: { color: "#f0f0f0" } }
+      }
+    }
+  });
+});
+</script>
 </body>
 </html>
