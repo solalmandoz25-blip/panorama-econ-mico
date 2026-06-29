@@ -44,21 +44,8 @@
   <div class="cards">
     
     <div class="card">
-      <div class="pair-label">EUR/USD</div>
-      <div class="rate">N/A</div>
-      <div class="change up">
-        ▲
-        0 &nbsp;(0% semanal)
-      </div>
-      <div class="chart-wrap">
-        <canvas id="chart-EURUSD" height="70"></canvas>
-      </div>
-      <div class="meta">Apertura semana: N/A</div>
-    </div>
-    
-    <div class="card">
       <div class="pair-label">USD/PEN</div>
-      <div class="rate">N/A</div>
+      <div class="rate">3.4141</div>
       <div class="change up">
         ▲
         0 &nbsp;(0% semanal)
@@ -66,12 +53,25 @@
       <div class="chart-wrap">
         <canvas id="chart-USDPEN" height="70"></canvas>
       </div>
-      <div class="meta">Apertura semana: N/A</div>
+      <div class="meta">Apertura semana: </div>
+    </div>
+    
+    <div class="card">
+      <div class="pair-label">EUR/USD</div>
+      <div class="rate">1.1386</div>
+      <div class="change up">
+        ▲
+        0 &nbsp;(0% semanal)
+      </div>
+      <div class="chart-wrap">
+        <canvas id="chart-EURUSD" height="70"></canvas>
+      </div>
+      <div class="meta">Apertura semana: </div>
     </div>
     
     <div class="card">
       <div class="pair-label">EUR/PEN</div>
-      <div class="rate">N/A</div>
+      <div class="rate">3.8873</div>
       <div class="change up">
         ▲
         0 &nbsp;(0% semanal)
@@ -79,7 +79,7 @@
       <div class="chart-wrap">
         <canvas id="chart-EURPEN" height="70"></canvas>
       </div>
-      <div class="meta">Apertura semana: N/A</div>
+      <div class="meta">Apertura semana: </div>
     </div>
     
   </div>
@@ -110,7 +110,7 @@
 <footer>Panorama Económico &nbsp;·&nbsp; BCP Miami &nbsp;·&nbsp; Generado automáticamente cada lunes</footer>
 
 <script>
-const pairsData = {"EURPEN": {"change": 0, "closes": [], "dates": [], "label": "EUR/PEN", "latest": "N/A", "open": "N/A", "pct": 0, "sparkline": ""}, "EURUSD": {"change": 0, "closes": [], "dates": [], "label": "EUR/USD", "latest": "N/A", "open": "N/A", "pct": 0, "sparkline": ""}, "USDPEN": {"change": 0, "closes": [], "dates": [], "label": "USD/PEN", "latest": "N/A", "open": "N/A", "pct": 0, "sparkline": ""}};
+const pairsData = {"EURPEN": {"change": 0, "label": "EUR/PEN", "latest": 3.8873, "pct": 0}, "EURUSD": {"change": 0, "label": "EUR/USD", "latest": 1.1386, "pct": 0}, "USDPEN": {"change": 0, "label": "USD/PEN", "latest": 3.4141, "pct": 0}};
 const colors = { EURUSD: "#0a2342", USDPEN: "#b8860b", EURPEN: "#1a6b3a" };
 
 Object.entries(pairsData).forEach(([key, d]) => {
