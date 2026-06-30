@@ -17,7 +17,6 @@ def get_rss_news():
     all_news = []
     keywords_high = ["fed", "rate", "inflation", "gdp", "bcrp", "bce", "ecb", "treasury", "monetary", "recession", "tasa", "inflación", "central bank", "powell", "interest rate", "yield", "bond", "dollar", "currency"]
     keywords_med = ["market", "economy", "trade", "oil", "stock", "earnings", "growth", "mercado", "economía", "petróleo"]
-
     for source, url in feeds:
         try:
             r = requests.get(url, timeout=8, headers={"User-Agent": "Mozilla/5.0"})
@@ -33,15 +32,9 @@ def get_rss_news():
                     relevance = "Media relevancia"
                 else:
                     continue
-                all_news.append({
-                    "source": source,
-                    "title": title,
-                    "link": link,
-                    "relevance": relevance
-                })
+                all_news.append({"source": source, "title": title, "link": link, "relevance": relevance})
         except Exception as e:
             print(f"Error {source}: {e}")
-
     high = [n for n in all_news if n["relevance"] == "Alta relevancia"][:4]
     med = [n for n in all_news if n["relevance"] == "Media relevancia"][:3]
     result = high + med
@@ -53,7 +46,6 @@ def get_rss_news():
             deduped.append(n)
     return deduped[:6]
 
-
 def get_calendar():
     url = "https://nfs.faireconomy.media/ff_calendar_thisweek.json"
     countries = {"USD": "🇺🇸 EE.UU.", "EUR": "🇪🇺 Europa"}
@@ -61,9 +53,8 @@ def get_calendar():
     try:
         r = requests.get(url, timeout=8)
         data = r.json()
-      print(f"DEBUG: total eventos recibidos = {len(data)}")
-            if data:
-                print(f"DEBUG: ejemplo evento = {data[0]}")
+        print("DEBUG total eventos:", len(data))
+        print("DEBUG ejemplo:", data[0] if data else "vacio")
         impact_stars = {"High": "★★★", "Medium": "★★", "Low": "★"}
         for level in ["High", "Medium", "Low"]:
             for event in data:
@@ -78,7 +69,6 @@ def get_calendar():
                 break
     except Exception as e:
         print(f"Error calendar: {e}")
-
     try:
         url_bcrp = "https://estadisticas.bcrp.gob.pe/estadisticas/series/api/PD04722MM/json"
         r2 = requests.get(url_bcrp, timeout=8)
@@ -94,9 +84,7 @@ def get_calendar():
     except Exception as e:
         print(f"Error BCRP: {e}")
         result["🇵🇪 Perú"] = []
-
     return result
-
 
 news = get_rss_news()
 calendar = get_calendar()
@@ -105,11 +93,7 @@ week_str = TODAY.strftime("%d de %B, %Y")
 with open("templates/dashboard.html") as f:
     template = Template(f.read())
 
-html = template.render(
-    week=week_str,
-    news=news,
-    calendar=calendar
-)
+html = template.render(week=week_str, news=news, calendar=calendar)
 
 os.makedirs("output", exist_ok=True)
 with open("output/index.html", "w") as f:
