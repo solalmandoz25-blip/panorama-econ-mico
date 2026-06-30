@@ -52,7 +52,7 @@
   <div class="news-list">
    {% for n in news %}
       <div class="news-item">
-        <span class="tag {% if n.relevance == 'Alta relevancia' %}tag-high{% else %}tag-med{% endif %}">{{ n.relevance }}</span>
+      <span class="tag {% if n.relevance == 'Alta relevancia' %}tag-high{% else %}tag-med{% endif %}">{{ n.relevance }}</span>
         <div class="title"><a href="{{ n.link }}" target="_blank">{{ n.title }}</a></div>
         <div class="source">{{ n.source }}</div>
       </div>
