@@ -4,33 +4,37 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Panorama Económico — BCP Miami</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: 'Georgia', serif; background: #f4f3f0; color: #1a1a1a; }
-  header { background: #0a2342; color: white; padding: 1.8rem 3rem; display: flex; justify-content: space-between; align-items: center; }
-  header h1 { font-size: 1.5rem; letter-spacing: 0.08em; font-weight: bold; }
-  header span { font-size: 0.85rem; opacity: 0.75; }
-  .container { max-width: 1100px; margin: 0 auto; padding: 2rem 1.5rem; }
-  h2 { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.12em; color: #0a2342; border-bottom: 2px solid #0a2342; padding-bottom: 0.4rem; margin: 2.5rem 0 1.2rem; font-weight: bold; }
-  .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.2rem; }
-  .card { background: white; border-radius: 10px; padding: 1.2rem 1.5rem 1rem; box-shadow: 0 1px 6px rgba(0,0,0,0.07); }
-  .card .pair-label { font-size: 0.72rem; color: #888; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.3rem; }
-  .card .rate { font-size: 1.9rem; font-weight: bold; color: #0a2342; margin-bottom: 0.2rem; }
-  .card .change { font-size: 0.82rem; margin-bottom: 0.8rem; }
-  .card .meta { font-size: 0.72rem; color: #aaa; margin-top: 0.5rem; }
-  .up { color: #16a34a; } .down { color: #dc2626; }
-  .chart-wrap { margin-top: 0.5rem; }
-  .news-grid { display: flex; flex-direction: column; gap: 0.8rem; }
-  .news-item { background: white; border-radius: 8px; padding: 0.9rem 1.2rem; box-shadow: 0 1px 4px rgba(0,0,0,0.06); border-left: 3px solid #0a2342; }
-  .news-item a { font-weight: bold; color: #0a2342; text-decoration: none; font-size: 0.9rem; line-height: 1.4; }
-  .news-item a:hover { text-decoration: underline; }
-  .news-item .meta { font-size: 0.72rem; color: #999; margin-top: 0.3rem; }
-  .report-box { background: white; border-radius: 10px; padding: 1.5rem 2rem; box-shadow: 0 1px 6px rgba(0,0,0,0.07); }
-  .editable { border: 1.5px dashed #d0cfc9; border-radius: 6px; padding: 1rem 1.2rem; min-height: 130px; outline: none; line-height: 1.85; font-family: Georgia, serif; font-size: 0.92rem; color: #222; white-space: pre-wrap; }
+  body { font-family: Georgia, serif; background: #f4f3f0; color: #1a1a1a; }
+  header { background: #0a2342; color: white; padding: 1.4rem 2.5rem; display: flex; justify-content: space-between; align-items: center; }
+  header h1 { font-size: 1.1rem; letter-spacing: 0.12em; font-weight: bold; color: white; }
+  header span { font-size: 0.8rem; opacity: 0.65; color: white; }
+  .container { max-width: 1000px; margin: 0 auto; padding: 1.8rem 1.5rem; }
+  .section-title { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.14em; color: #0a2342; border-bottom: 2px solid #0a2342; padding-bottom: 4px; margin: 2rem 0 1rem; font-weight: bold; display: flex; justify-content: space-between; align-items: center; }
+  .badge-auto { font-size: 0.65rem; background: #f0fdf4; color: #166534; border: 1px solid #86efac; border-radius: 20px; padding: 2px 10px; font-weight: normal; letter-spacing: 0; }
+  .badge-manual { font-size: 0.65rem; background: #eff6ff; color: #1e40af; border: 1px solid #93c5fd; border-radius: 20px; padding: 2px 10px; font-weight: normal; letter-spacing: 0; }
+  .news-list { display: flex; flex-direction: column; gap: 8px; }
+  .news-item { background: white; border: 0.5px solid #e5e5e5; border-left: 3px solid #0a2342; border-radius: 0 8px 8px 0; padding: 0.7rem 1rem; }
+  .news-item .source { font-size: 0.68rem; color: #999; margin-bottom: 3px; text-transform: uppercase; letter-spacing: 0.05em; }
+  .news-item .title { font-size: 0.88rem; color: #1a1a1a; font-weight: bold; line-height: 1.4; }
+  .news-item .title a { color: #0a2342; text-decoration: none; }
+  .news-item .title a:hover { text-decoration: underline; }
+  .tag { display: inline-block; font-size: 0.65rem; padding: 2px 8px; border-radius: 20px; margin-top: 5px; }
+  .tag-high { background: #fef2f2; color: #991b1b; border: 1px solid #fca5a5; }
+  .tag-med { background: #fffbeb; color: #92400e; border: 1px solid #fcd34d; }
+  .cal-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .cal-country { background: white; border: 0.5px solid #e5e5e5; border-radius: 8px; padding: 0.8rem 1rem; }
+  .cal-country-name { font-size: 0.72rem; font-weight: bold; color: #0a2342; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; padding-bottom: 6px; border-bottom: 1px solid #f0f0f0; }
+  .cal-event { font-size: 0.78rem; color: #444; padding: 5px 0; border-bottom: 0.5px solid #f5f5f5; display: flex; justify-content: space-between; align-items: center; }
+  .cal-event:last-child { border-bottom: none; }
+  .cal-event .stars { color: #b8860b; font-size: 0.7rem; }
+  .cal-empty { font-size: 0.78rem; color: #bbb; font-style: italic; }
+  .conclusion-box { background: white; border: 0.5px solid #e5e5e5; border-radius: 8px; padding: 1.2rem 1.5rem; }
+  .editable { border: 1.5px dashed #ddd; border-radius: 6px; padding: 1rem; min-height: 120px; outline: none; line-height: 1.85; font-family: Georgia, serif; font-size: 0.9rem; color: #222; white-space: pre-wrap; }
   .editable:empty:before { content: attr(data-placeholder); color: #bbb; font-style: italic; }
   .editable:focus { border-color: #0a2342; }
-  footer { text-align: center; padding: 2.5rem; font-size: 0.75rem; color: #aaa; margin-top: 2rem; border-top: 1px solid #e5e5e5; }
+  footer { text-align: center; padding: 2rem; font-size: 0.7rem; color: #bbb; border-top: 1px solid #eee; margin-top: 2rem; }
 </style>
 </head>
 <body>
@@ -40,90 +44,52 @@
 </header>
 <div class="container">
 
-  <h2>Tendencia Semanal de Divisas</h2>
-  <div class="cards">
-    {% for key, d in pairs.items() %}
-    <div class="card">
-      <div class="pair-label">{{ d.label }}</div>
-      <div class="rate">{{ d.latest }}</div>
-      <div class="change {% if d.change >= 0 %}up{% else %}down{% endif %}">
-        {% if d.change >= 0 %}▲{% else %}▼{% endif %}
-        {{ d.change }} &nbsp;({{ d.pct }}% semanal)
+  <div class="section-title">
+    Noticias económicas relevantes
+    <span class="badge-auto">✦ Automático</span>
+  </div>
+  <div class="news-list">
+    {% if news %}
+      {% for n in news %}
+      <div class="news-item">
+        <div class="source">{{ n.source }} &nbsp;·&nbsp; {{ n.pub }}</div>
+        <div class="title"><a href="{{ n.link }}" target="_blank">{{ n.title }}</a></div>
+        <span class="tag {% if n.relevance == 'Alta relevancia' %}tag-high{% else %}tag-med{% endif %}">{{ n.relevance }}</span>
       </div>
-      <div class="chart-wrap">
-        <canvas id="chart-{{ key }}" height="70"></canvas>
-      </div>
-      <div class="meta">Apertura semana: {{ d.open }}</div>
+      {% endfor %}
+    {% else %}
+      <div class="news-item"><div class="title" style="color:#bbb;font-style:italic">No se encontraron noticias esta semana.</div></div>
+    {% endif %}
+  </div>
+
+  <div class="section-title">
+    Calendario económico — eventos ★★★
+    <span class="badge-auto">✦ Automático</span>
+  </div>
+  <div class="cal-grid">
+    {% for country, events in calendar.items() %}
+    <div class="cal-country">
+      <div class="cal-country-name">{{ country }}</div>
+      {% if events %}
+        {% for event in events %}
+        <div class="cal-event"><span>{{ event }}</span><span class="stars">★★★</span></div>
+        {% endfor %}
+      {% else %}
+        <div class="cal-empty">Sin eventos de alto impacto</div>
+      {% endif %}
     </div>
     {% endfor %}
   </div>
 
-  <h2>Noticias Forex de la Semana</h2>
-  <div class="news-grid">
-    {% if news %}
-      {% for n in news %}
-      <div class="news-item">
-        <a href="{{ n.url }}" target="_blank">{{ n.title }}</a>
-        <div class="meta">{{ n.publishedDate[:10] if n.publishedDate else '' }} &nbsp;·&nbsp; {{ n.site if n.site else '' }}</div>
-      </div>
-      {% endfor %}
-    {% else %}
-      <div class="news-item"><a>No se encontraron noticias forex esta semana.</a></div>
-    {% endif %}
+  <div class="section-title">
+    Conclusiones — perspectiva de tesorería
+    <span class="badge-manual">✎ Pega aquí</span>
   </div>
-
-  <h2>Sección 1 — Economía Global y Mercados</h2>
-  <div class="report-box">
-    <div class="editable" contenteditable="true" data-placeholder="Pega aquí el texto de la Sección 1 redactado con Claude..."></div>
-  </div>
-
-  <h2>Sección 3 — Noticias Mundiales Importantes</h2>
-  <div class="report-box">
-    <div class="editable" contenteditable="true" data-placeholder="Pega aquí el texto de la Sección 3 redactado con Claude..."></div>
-  </div>
-
-  <h2>Resumen Ejecutivo</h2>
-  <div class="report-box">
-    <div class="editable" contenteditable="true" data-placeholder="Pega aquí el resumen ejecutivo..."></div>
+  <div class="conclusion-box">
+    <div class="editable" contenteditable="true" data-placeholder="Pega aquí las conclusiones redactadas con Claude..."></div>
   </div>
 
 </div>
 <footer>Panorama Económico &nbsp;·&nbsp; BCP Miami &nbsp;·&nbsp; Generado automáticamente cada lunes</footer>
-
-<script>
-const pairsData = {{ pairs | tojson }};
-const colors = { EURUSD: "#0a2342", USDPEN: "#b8860b", EURPEN: "#1a6b3a" };
-
-Object.entries(pairsData).forEach(([key, d]) => {
-  const ctx = document.getElementById("chart-" + key);
-  if (!ctx || !d.closes || d.closes.length < 2) return;
-  new Chart(ctx, {
-    type: "line",
-    data: {
-      labels: d.dates,
-      datasets: [{
-        data: d.closes,
-        borderColor: d.change >= 0 ? "#16a34a" : "#dc2626",
-        borderWidth: 2,
-        pointRadius: 2,
-        pointBackgroundColor: d.change >= 0 ? "#16a34a" : "#dc2626",
-        fill: true,
-        backgroundColor: d.change >= 0 ? "rgba(22,163,74,0.07)" : "rgba(220,38,38,0.07)",
-        tension: 0.3
-      }]
-    },
-    options: {
-      responsive: true,
-      plugins: { legend: { display: false }, tooltip: {
-        callbacks: { label: ctx => " " + ctx.parsed.y.toFixed(4) }
-      }},
-      scales: {
-        x: { display: false },
-        y: { display: true, ticks: { font: { size: 9 }, maxTicksLimit: 4 }, grid: { color: "#f0f0f0" } }
-      }
-    }
-  });
-});
-</script>
 </body>
 </html>
