@@ -58,7 +58,7 @@ def get_calendar():
     url = "https://nfs.faireconomy.media/ff_calendar_thisweek.json"
     countries = {"USD": "🇺🇸 EE.UU.", "EUR": "🇪🇺 Europa"}
     result = {"🇺🇸 EE.UU.": [], "🇪🇺 Europa": []}
-   try:
+    try:
         r = requests.get(url, timeout=8)
         data = r.json()
         impact_stars = {"High": "★★★", "Medium": "★★", "Low": "★"}
