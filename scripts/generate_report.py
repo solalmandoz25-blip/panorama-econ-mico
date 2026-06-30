@@ -8,24 +8,24 @@ TODAY = datetime.today()
 
 def get_rss_news():
     feeds = [
-        ("Reuters", "https://feeds.reuters.com/reuters/businessNews"),
         ("Bloomberg", "https://feeds.bloomberg.com/markets/news.rss"),
-        ("Financial Times", "https://www.ft.com/rss/home"),
-        ("El País", "https://feeds.elpais.com/mrss-s/pages/ep/site/elpais.com/section/economia/portada"),
+        ("Bloomberg Economics", "https://feeds.bloomberg.com/economics/news.rss"),
+        ("CNBC", "https://www.cnbc.com/id/100003114/device/rss/rss.html"),
+        ("MarketWatch", "https://feeds.content.dowjones.io/public/rss/mw_topstories"),
+        ("Investing.com", "https://www.investing.com/rss/news_25.rss"),
     ]
     all_news = []
-    keywords_high = ["fed", "bank", "rate", "inflation", "gdp", "bcrp", "bce", "ecb", "treasury", "monetary", "recession", "tasa", "inflación", "reserva federal", "banco central", "peru", "perú"]
-    keywords_med = ["market", "economy", "trade", "oil", "dollar", "euro", "mercado", "economía", "petróleo", "dólar"]
+    keywords_high = ["fed", "rate", "inflation", "gdp", "bcrp", "bce", "ecb", "treasury", "monetary", "recession", "tasa", "inflación", "central bank", "powell", "interest rate", "yield", "bond", "dollar", "currency"]
+    keywords_med = ["market", "economy", "trade", "oil", "stock", "earnings", "growth", "mercado", "economía", "petróleo"]
 
     for source, url in feeds:
         try:
             r = requests.get(url, timeout=8, headers={"User-Agent": "Mozilla/5.0"})
             root = ET.fromstring(r.content)
-            items = root.findall(".//item")[:5]
+            items = root.findall(".//item")[:8]
             for item in items:
                 title = item.findtext("title", "").strip()
                 link = item.findtext("link", "").strip()
-                pub = item.findtext("pubDate", "")[:16] if item.findtext("pubDate") else ""
                 title_lower = title.lower()
                 if any(k in title_lower for k in keywords_high):
                     relevance = "Alta relevancia"
@@ -37,15 +37,21 @@ def get_rss_news():
                     "source": source,
                     "title": title,
                     "link": link,
-                    "pub": pub,
                     "relevance": relevance
                 })
         except Exception as e:
             print(f"Error {source}: {e}")
 
     high = [n for n in all_news if n["relevance"] == "Alta relevancia"][:4]
-    med = [n for n in all_news if n["relevance"] == "Media relevancia"][:2]
-    return high + med
+    med = [n for n in all_news if n["relevance"] == "Media relevancia"][:3]
+    result = high + med
+    seen_titles = set()
+    deduped = []
+    for n in result:
+        if n["title"] not in seen_titles:
+            seen_titles.add(n["title"])
+            deduped.append(n)
+    return deduped[:6]
 
 def get_calendar():
     url = "https://nfs.faireconomy.media/ff_calendar_thisweek.json"
