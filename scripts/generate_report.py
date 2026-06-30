@@ -58,17 +58,21 @@ def get_calendar():
     url = "https://nfs.faireconomy.media/ff_calendar_thisweek.json"
     countries = {"USD": "🇺🇸 EE.UU.", "EUR": "🇪🇺 Europa"}
     result = {"🇺🇸 EE.UU.": [], "🇪🇺 Europa": []}
-    try:
+   try:
         r = requests.get(url, timeout=8)
         data = r.json()
-        for event in data:
-            currency = event.get("currency", "")
-            impact = event.get("impact", "")
-            title = event.get("title", "")
-            if currency in countries and impact == "High":
-                country_label = countries[currency]
-                if len(result[country_label]) < 4:
-                    result[country_label].append(title)
+        impact_stars = {"High": "★★★", "Medium": "★★", "Low": "★"}
+        for level in ["High", "Medium", "Low"]:
+            for event in data:
+                currency = event.get("currency", "")
+                impact = event.get("impact", "")
+                title = event.get("title", "")
+                if currency in countries and impact == level:
+                    country_label = countries[currency]
+                    if len(result[country_label]) < 4:
+                        result[country_label].append(f"{title} {impact_stars[level]}")
+            if all(len(result[c]) >= 1 for c in countries.values()):
+                break
     except Exception as e:
         print(f"Error calendar: {e}")
 
