@@ -15,12 +15,13 @@
   .badge-auto { font-size: 0.65rem; background: #f0fdf4; color: #166534; border: 1px solid #86efac; border-radius: 20px; padding: 2px 10px; font-weight: normal; letter-spacing: 0; }
   .badge-manual { font-size: 0.65rem; background: #eff6ff; color: #1e40af; border: 1px solid #93c5fd; border-radius: 20px; padding: 2px 10px; font-weight: normal; letter-spacing: 0; }
   .news-list { display: flex; flex-direction: column; gap: 8px; }
-  .news-item { background: white; border: 0.5px solid #e5e5e5; border-left: 3px solid #0a2342; border-radius: 0 8px 8px 0; padding: 0.7rem 1rem; }
-  .news-item .source { font-size: 0.68rem; color: #999; margin-bottom: 3px; text-transform: uppercase; letter-spacing: 0.05em; }
-  .news-item .title { font-size: 0.88rem; color: #1a1a1a; font-weight: bold; line-height: 1.4; }
+ .news-list { gap: 6px; }
+  .news-item { background: white; border: 0.5px solid #e5e5e5; border-left: 3px solid #0a2342; border-radius: 0 8px 8px 0; padding: 0.55rem 0.9rem; display: flex; align-items: center; gap: 10px; }
+  .news-item .source { font-size: 0.65rem; color: #999; text-transform: uppercase; letter-spacing: 0.04em; white-space: nowrap; }
+  .news-item .title { font-size: 0.85rem; color: #1a1a1a; font-weight: bold; line-height: 1.3; flex: 1; }
   .news-item .title a { color: #0a2342; text-decoration: none; }
   .news-item .title a:hover { text-decoration: underline; }
-  .tag { display: inline-block; font-size: 0.65rem; padding: 2px 8px; border-radius: 20px; margin-top: 5px; }
+  .tag { display: inline-block; font-size: 0.62rem; padding: 2px 8px; border-radius: 20px; white-space: nowrap; }
   .tag-high { background: #fef2f2; color: #991b1b; border: 1px solid #fca5a5; }
   .tag-med { background: #fffbeb; color: #92400e; border: 1px solid #fcd34d; }
   .cal-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
@@ -49,24 +50,18 @@
     <span class="badge-auto">✦ Automático</span>
   </div>
   <div class="news-list">
-    
-      
+  
+
       <div class="news-item">
-        <div class="source">Bloomberg &nbsp;·&nbsp; Tue, 30 Jun 2026</div>
-        <div class="title"><a href="https://www.bloomberg.com/news/articles/2026-06-30/german-inflation-eases-as-oil-s-retreat-tames-prices-in-europe" target="_blank">German Inflation Eases as Oil Retreat Tames Prices in Europe</a></div>
-        <span class="tag tag-high">Alta relevancia</span>
+      <span class="tag tag-med">Media relevancia</span>
+        <div class="title"><a href="https://www.bloomberg.com/news/videos/2026-06-30/oil-supply-won-t-come-back-quickly-babin-says-video" target="_blank">Oil Supply Won't Come Back as Quickly as Expected, Babin Says</a></div>
+        <div class="source">Bloomberg</div>
       </div>
       
       <div class="news-item">
-        <div class="source">Bloomberg &nbsp;·&nbsp; Mon, 29 Jun 2026</div>
-        <div class="title"><a href="https://www.bloomberg.com/news/articles/2026-06-29/latest-oil-market-news-and-analysis-for-june-30" target="_blank">Oil Set for Quarterly Drop as Morgan Stanley Warns of Glut Risks</a></div>
-        <span class="tag tag-med">Media relevancia</span>
-      </div>
-      
-      <div class="news-item">
-        <div class="source">Bloomberg &nbsp;·&nbsp; Tue, 30 Jun 2026</div>
-        <div class="title"><a href="https://www.bloomberg.com/news/articles/2026-06-30/hsbc-says-explosive-dollar-rally-is-among-biggest-pain-trades" target="_blank">HSBC Says ‘Explosive’ Dollar Rally Is Among Biggest Pain Trades</a></div>
-        <span class="tag tag-med">Media relevancia</span>
+      <span class="tag tag-med">Media relevancia</span>
+        <div class="title"><a href="https://www.bloomberg.com/news/articles/2026-06-29/japan-stocks-set-to-climb-as-yen-hits-40-year-low-markets-wrap" target="_blank">Stocks Fluctuate at End of Best Quarter Since 2020: Markets Wrap</a></div>
+        <div class="source">Bloomberg</div>
       </div>
       
     
