@@ -50,13 +50,10 @@ def get_rss_news():
     for n in result:
         if n["title"] not in seen_titles:
             seen_titles.add(n["title"])
-            deduped.append(n)
-    return deduped[:6]
-
-def get_calendar():
+   def get_calendar():
     url = "https://nfs.faireconomy.media/ff_calendar_thisweek.json"
-    countries = {"USD": "🇺🇸 EE.UU.", "EUR": "🇪🇺 Europa", "PEN": "🇵🇪 Perú"}
-    result = {"🇺🇸 EE.UU.": [], "🇪🇺 Europa": [], "🇵🇪 Perú": []}
+    countries = {"USD": "🇺🇸 EE.UU.", "EUR": "🇪🇺 Europa"}
+    result = {"🇺🇸 EE.UU.": [], "🇪🇺 Europa": []}
     try:
         r = requests.get(url, timeout=8)
         data = r.json()
@@ -70,6 +67,23 @@ def get_calendar():
                     result[country_label].append(title)
     except Exception as e:
         print(f"Error calendar: {e}")
+
+    try:
+        url_bcrp = "https://estadisticas.bcrp.gob.pe/estadisticas/series/api/PD04722MM/json"
+        r2 = requests.get(url_bcrp, timeout=8)
+        data2 = r2.json()
+        periods = data2.get("periods", [])
+        if periods:
+            last = periods[-1]
+            tasa_val = last["values"][0]
+            tasa_date = last["name"]
+            result["🇵🇪 Perú"] = [f"Tasa de referencia BCRP: {tasa_val}% ({tasa_date})"]
+        else:
+            result["🇵🇪 Perú"] = []
+    except Exception as e:
+        print(f"Error BCRP: {e}")
+        result["🇵🇪 Perú"] = []
+
     return result
 
 news = get_rss_news()
