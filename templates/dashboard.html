@@ -50,7 +50,8 @@
     <span class="badge-auto">✦ Automático</span>
   </div>
   <div class="news-list">
-   {% for n in news %}
+  {% if news %}
+{% for n in news %}
       <div class="news-item">
       <span class="tag {% if n.relevance == 'Alta relevancia' %}tag-high{% else %}tag-med{% endif %}">{{ n.relevance }}</span>
         <div class="title"><a href="{{ n.link }}" target="_blank">{{ n.title }}</a></div>
