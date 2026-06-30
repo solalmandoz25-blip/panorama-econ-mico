@@ -48,14 +48,14 @@
     Noticias económicas relevantes
     <span class="badge-auto">✦ Automático</span>
   </div>
-  <div class="news-list">
-  {% if news %}
-<div class="news-item">
+ <div class="news-list">
+        {% if news %}
+          {% for n in news %}
+          <div class="news-item">
             <span class="tag {% if n.relevance == 'Alta relevancia' %}tag-high{% else %}tag-med{% endif %}">{{ n.relevance }}</span>
             <div class="title"><a href="{{ n.link }}" target="_blank">{{ n.title }}</a></div>
           </div>
-      </div>
-      {% endfor %}
+          {% endfor %}
     {% else %}
       <div class="news-item"><div class="title" style="color:#bbb;font-style:italic">No se encontraron noticias esta semana.</div></div>
     {% endif %}
