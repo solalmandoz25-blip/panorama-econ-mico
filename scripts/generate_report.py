@@ -58,7 +58,7 @@ def get_calendar():
         impact_stars = {"High": "★★★", "Medium": "★★", "Low": "★"}
         for level in ["High", "Medium", "Low"]:
             for event in data:
-                currency = event.get("currency", "")
+                currency = event.get("country", "")
                 impact = event.get("impact", "")
                 title = event.get("title", "")
                 if currency in countries and impact == level:
