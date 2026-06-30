@@ -47,13 +47,14 @@ def get_rss_news():
     result = high + med
     seen_titles = set()
     deduped = []
-   for n in result:
-            if n["title"] not in seen_titles:
-                seen_titles.add(n["title"])
-                deduped.append(n)
-        return deduped[:6]
+    for n in result:
+        if n["title"] not in seen_titles:
+            seen_titles.add(n["title"])
+            deduped.append(n)
+    return deduped[:6]
 
-    def get_calendar():
+
+def get_calendar():
     url = "https://nfs.faireconomy.media/ff_calendar_thisweek.json"
     countries = {"USD": "🇺🇸 EE.UU.", "EUR": "🇪🇺 Europa"}
     result = {"🇺🇸 EE.UU.": [], "🇪🇺 Europa": []}
@@ -88,6 +89,7 @@ def get_rss_news():
         result["🇵🇪 Perú"] = []
 
     return result
+
 
 news = get_rss_news()
 calendar = get_calendar()
