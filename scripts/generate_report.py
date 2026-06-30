@@ -61,7 +61,7 @@ def get_calendar():
     try:
         r = requests.get(url, timeout=8)
         data = r.json()
-        print(f"DEBUG: total eventos recibidos = {len(data)}")
+      print(f"DEBUG: total eventos recibidos = {len(data)}")
             if data:
                 print(f"DEBUG: ejemplo evento = {data[0]}")
         impact_stars = {"High": "★★★", "Medium": "★★", "Low": "★"}
