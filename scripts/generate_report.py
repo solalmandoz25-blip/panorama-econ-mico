@@ -159,7 +159,7 @@ def get_macro_data():
         "pbi": [{"date": o["date"][:7], "value": o["value"]} for o in gdp],
     }
 
-    print(f"Macro OK — PE tasa:{len(macro['peru']['tasa'])} infl:{len(macro['peru']['inflacion'])} pbi:{len(macro['peru']['pbi'])}")
+   print(f"Macro OK — PE tasa:{len(macro['peru']['tasa'])} infl:{len(macro['peru']['inflacion'])} pbi:{len(macro['peru']['pbi'])}")
     print(f"Macro OK — US tasa:{len(macro['usa']['tasa'])} infl:{len(macro['usa']['inflacion'])} pbi:{len(macro['usa']['pbi'])}")
 
     # EUROPA (vía FRED, series armonizadas Eurostat/BCE)
@@ -169,7 +169,7 @@ def get_macro_data():
         "pbi": fred_monthly("NAEXKP01EZQ659S", 3),
     }
     print(f"Macro OK — EUROPA tasa:{len(macro['europa']['tasa'])} infl:{len(macro['europa']['inflacion'])} pbi:{len(macro['europa']['pbi'])}")
-  return macro
+    return macro 
 
 news = get_rss_news()
 calendar = get_calendar()
