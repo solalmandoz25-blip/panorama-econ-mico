@@ -170,15 +170,44 @@ def get_macro_data():
 
     return macro
 
+def _trend(vals):
+    nums = [float(v) for v in vals if v is not None]
+    if len(nums) < 2:
+        return "estable"
+    diff = nums[-1] - nums[0]
+    if abs(diff) < 0.05:
+        return "estable"
+    return "al alza" if diff > 0 else "a la baja"
+
+def generate_conclusiones(macro):
+    labels = [("peru", "🇵🇪 Perú"), ("usa", "🇺🇸 EE.UU."), ("europa", "🇪🇺 Europa")]
+    lineas = []
+    for key, label in labels:
+        data = macro.get(key, {})
+        tasa = [o["value"] for o in data.get("tasa", [])]
+        infl = [o["value"] for o in data.get("inflacion", [])]
+        pbi = [o["value"] for o in data.get("pbi", [])]
+        partes = []
+        if tasa:
+            partes.append(f"tasa de referencia en {tasa[-1]}% ({_trend(tasa)})")
+        if infl:
+            partes.append(f"inflación interanual en {infl[-1]}% ({_trend(infl)})")
+        if pbi:
+            partes.append(f"crecimiento del PBI en {pbi[-1]}% ({_trend(pbi)})")
+        if partes:
+            lineas.append(f"{label}: " + ", ".join(partes) + ".")
+    return lineas
+
 news = get_rss_news()
 calendar = get_calendar()
 macro = get_macro_data()
+conclusiones = generate_conclusiones(macro)
 week_str = TODAY.strftime("%d de %B, %Y")
 
 with open("templates/dashboard.html") as f:
     template = Template(f.read())
 
-html = template.render(week=week_str, news=news, calendar=calendar, macro=macro)
+html = template.render(week=week_str, news=news, calendar=calendar, macro=macro, conclusiones=conclusiones)
 
 os.makedirs("output", exist_ok=True)
 with open("output/index.html", "w") as f:
