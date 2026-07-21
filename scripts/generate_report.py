@@ -128,7 +128,7 @@ def get_macro_data():
 
     # EE.UU. (FRED)
     fedfunds = fred_get("FEDFUNDS", 3)
-    cpi_raw = fred_get("CPIAUCSL", 14)
+    cpi_raw = fred_get("CPIAUCSL", 16)
     gdp = fred_get("A191RL1Q225SBEA", 3)
 
     # CPI interanual = (CPI_actual / CPI_hace_12_meses - 1) * 100
