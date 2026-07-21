@@ -1,4 +1,5 @@
 import os
+import time
 import requests
 import xml.etree.ElementTree as ET
 from datetime import datetime, timedelta
@@ -103,15 +104,20 @@ def fred_get(series_id, limit=13):
         print(f"Error FRED {series_id}: {e}")
         return []
 
+import time
+
 def bcrp_get(series_id, limit=3):
     url = f"https://estadisticas.bcrp.gob.pe/estadisticas/series/api/{series_id}/json"
-    try:
-        r = requests.get(url, timeout=8)
-        periods = r.json().get("periods", [])
-        return periods[-limit:] if periods else []
-    except Exception as e:
-        print(f"Error BCRP {series_id}: {e}")
-        return []
+    for intento in range(3):
+        try:
+            r = requests.get(url, timeout=8)
+            periods = r.json().get("periods", [])
+            if periods:
+                return periods[-limit:]
+        except Exception as e:
+            print(f"Error BCRP {series_id} (intento {intento+1}): {e}")
+        time.sleep(2)
+    return []
 
 def get_macro_data():
     macro = {}
