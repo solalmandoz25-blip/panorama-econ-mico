@@ -107,19 +107,16 @@ function makeChart(id, data, label) {
   const ctx = document.getElementById(id);
   if (!ctx || !data) return;
 
-  // Eje X: solo fechas mensuales (tasa e inflación), que sí son consistentes
-  const labels = [...new Set([
-    ...(data.tasa || []).map(d => d.date),
-    ...(data.inflacion || []).map(d => d.date)
-  ])].sort().slice(-3);
+  // Eje X fijo: usa los meses de "tasa" (la serie más confiable/frecuente)
+  const labels = (data.tasa || []).map(d => d.date).sort().slice(-3);
 
   const getVals = (arr) => labels.map(l => {
-    const found = (arr || []).find(d => d.date === l || d.date.startsWith(l));
+    const found = (arr || []).find(d => d.date === l);
     return found ? parseFloat(found.value) : null;
   });
 
-  // PBI es trimestral: "rellena hacia adelante" con el último dato disponible
-  const getPbiVals = (arr) => {
+  // Inflación y PBI pueden publicarse con retraso: usa el último dato disponible
+  const getFillForwardVals = (arr) => {
     if (!arr || arr.length === 0) return labels.map(() => null);
     const sorted = [...arr].sort((a, b) => a.date.localeCompare(b.date));
     return labels.map(l => {
@@ -136,9 +133,9 @@ function makeChart(id, data, label) {
     data: {
       labels: labels,
       datasets: [
-        { label: 'Inflación %', data: getVals(data.inflacion), backgroundColor: '#0a2342' },
+        { label: 'Inflación %', data: getFillForwardVals(data.inflacion), backgroundColor: '#0a2342' },
         { label: 'Tasa %', data: getVals(data.tasa), backgroundColor: '#2e6fad' },
-        { label: 'PBI %', data: getPbiVals(data.pbi), backgroundColor: '#b0c4de' },
+        { label: 'PBI %', data: getFillForwardVals(data.pbi), backgroundColor: '#b0c4de' },
       ]
     },
     options: {
