@@ -52,6 +52,11 @@
       
       <div class="news-item">
         <span class="tag tag-high">Alta relevancia</span>
+        <div class="title"><a href="https://www.bloomberg.com/news/articles/2026-07-21/treasury-yields-hit-two-month-high-as-oil-sparks-inflation-risk" target="_blank">US Yields Hit Two-Month High as Oil Sparks Inflation Risk</a></div>
+      </div>
+      
+      <div class="news-item">
+        <span class="tag tag-high">Alta relevancia</span>
         <div class="title"><a href="https://www.bloomberg.com/news/articles/2026-07-20/gold-steady-as-traders-watch-middle-east-war-for-inflation-clues" target="_blank">Gold and Silver Rise on Dip-Buying as Traders Weigh Fed Strategy</a></div>
       </div>
       
@@ -66,18 +71,13 @@
       </div>
       
       <div class="news-item">
-        <span class="tag tag-high">Alta relevancia</span>
-        <div class="title"><a href="https://www.bloomberg.com/news/articles/2026-07-21/nigeria-holds-interest-rates-as-iran-war-stokes-inflation-fears" target="_blank">Nigeria Holds Interest Rates as War Stokes Inflation Fears</a></div>
-      </div>
-      
-      <div class="news-item">
         <span class="tag tag-med">Media relevancia</span>
         <div class="title"><a href="https://www.bloomberg.com/news/articles/2026-07-20/stock-market-today-dow-s-p-live-updates" target="_blank">Stocks Climb as Rebound in Chipmakers Gathers Pace: Markets Wrap</a></div>
       </div>
       
       <div class="news-item">
         <span class="tag tag-med">Media relevancia</span>
-        <div class="title"><a href="https://www.bloomberg.com/news/articles/2026-07-21/kenya-reveals-30-year-plan-to-reach-developed-economy-status" target="_blank">Kenya Reveals 30-Year Plan to Reach Developed-Economy Status</a></div>
+        <div class="title"><a href="https://www.bloomberg.com/news/articles/2026-07-20/latest-oil-market-news-and-analysis-for-july-20" target="_blank">Latest Oil Market News and Analysis for July 21</a></div>
       </div>
       
     
@@ -113,9 +113,7 @@
     <div class="cal-country">
       <div class="cal-country-name">🇵🇪 Perú</div>
       
-        
-        <div class="cal-event">Tasa de referencia BCRP: 4.25% (Jul.2026)</div>
-        
+        <div class="cal-empty">Sin eventos de alto impacto</div>
       
     </div>
     
@@ -152,19 +150,16 @@ function makeChart(id, data, label) {
   const ctx = document.getElementById(id);
   if (!ctx || !data) return;
 
-  // Eje X: solo fechas mensuales (tasa e inflación), que sí son consistentes
-  const labels = [...new Set([
-    ...(data.tasa || []).map(d => d.date),
-    ...(data.inflacion || []).map(d => d.date)
-  ])].sort().slice(-3);
+  // Eje X fijo: usa los meses de "tasa" (la serie más confiable/frecuente)
+  const labels = (data.tasa || []).map(d => d.date).sort().slice(-3);
 
   const getVals = (arr) => labels.map(l => {
-    const found = (arr || []).find(d => d.date === l || d.date.startsWith(l));
+    const found = (arr || []).find(d => d.date === l);
     return found ? parseFloat(found.value) : null;
   });
 
-  // PBI es trimestral: "rellena hacia adelante" con el último dato disponible
-  const getPbiVals = (arr) => {
+  // Inflación y PBI pueden publicarse con retraso: usa el último dato disponible
+  const getFillForwardVals = (arr) => {
     if (!arr || arr.length === 0) return labels.map(() => null);
     const sorted = [...arr].sort((a, b) => a.date.localeCompare(b.date));
     return labels.map(l => {
@@ -181,9 +176,9 @@ function makeChart(id, data, label) {
     data: {
       labels: labels,
       datasets: [
-        { label: 'Inflación %', data: getVals(data.inflacion), backgroundColor: '#0a2342' },
+        { label: 'Inflación %', data: getFillForwardVals(data.inflacion), backgroundColor: '#0a2342' },
         { label: 'Tasa %', data: getVals(data.tasa), backgroundColor: '#2e6fad' },
-        { label: 'PBI %', data: getPbiVals(data.pbi), backgroundColor: '#b0c4de' },
+        { label: 'PBI %', data: getFillForwardVals(data.pbi), backgroundColor: '#b0c4de' },
       ]
     },
     options: {
