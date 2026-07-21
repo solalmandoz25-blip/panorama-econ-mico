@@ -104,8 +104,6 @@ def fred_get(series_id, limit=13):
         print(f"Error FRED {series_id}: {e}")
         return []
 
-import time
-
 def fred_monthly(series_id, months=3, raw_limit=100):
     obs = fred_get(series_id, raw_limit)
     monthly = {}
@@ -159,17 +157,18 @@ def get_macro_data():
         "pbi": [{"date": o["date"][:7], "value": o["value"]} for o in gdp],
     }
 
-       print(f"Macro OK — PE tasa:{len(macro['peru']['tasa'])} infl:{len(macro['peru']['inflacion'])} pbi:{len(macro['peru']['pbi'])}")
-        print(f"Macro OK — US tasa:{len(macro['usa']['tasa'])} infl:{len(macro['usa']['inflacion'])} pbi:{len(macro['usa']['pbi'])}")
-    
-        # EUROPA (vía FRED, series armonizadas Eurostat/BCE)
-        macro["europa"] = {
-            "tasa": fred_monthly("ECBDFR", 3),
-            "inflacion": fred_monthly("CPHPTT01EZM659N", 3),
-            "pbi": fred_monthly("NAEXKP01EZQ659S", 3),
-        }
-        print(f"Macro OK — EUROPA tasa:{len(macro['europa']['tasa'])} infl:{len(macro['europa']['inflacion'])} pbi:{len(macro['europa']['pbi'])}")
-        return macro 
+    print(f"Macro OK — PE tasa:{len(macro['peru']['tasa'])} infl:{len(macro['peru']['inflacion'])} pbi:{len(macro['peru']['pbi'])}")
+    print(f"Macro OK — US tasa:{len(macro['usa']['tasa'])} infl:{len(macro['usa']['inflacion'])} pbi:{len(macro['usa']['pbi'])}")
+
+    # EUROPA (vía FRED, series armonizadas Eurostat/BCE)
+    macro["europa"] = {
+        "tasa": fred_monthly("ECBDFR", 3),
+        "inflacion": fred_monthly("CPHPTT01EZM659N", 3),
+        "pbi": fred_monthly("NAEXKP01EZQ659S", 3),
+    }
+    print(f"Macro OK — EUROPA tasa:{len(macro['europa']['tasa'])} infl:{len(macro['europa']['inflacion'])} pbi:{len(macro['europa']['pbi'])}")
+
+    return macro
 
 news = get_rss_news()
 calendar = get_calendar()
