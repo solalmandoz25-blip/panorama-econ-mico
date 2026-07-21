@@ -113,7 +113,7 @@ def fred_monthly(series_id, months=3, raw_limit=100):
         monthly[o["date"][:7]] = o["value"]
     keys = sorted(monthly.keys())[-months:]
     return [{"date": k, "value": monthly[k]} for k in keys]
-    
+
 def bcrp_get(series_id, limit=3):
     url = f"https://estadisticas.bcrp.gob.pe/estadisticas/series/api/{series_id}/json"
     for intento in range(3):
@@ -161,7 +161,7 @@ def get_macro_data():
 
     print(f"Macro OK — PE tasa:{len(macro['peru']['tasa'])} infl:{len(macro['peru']['inflacion'])} pbi:{len(macro['peru']['pbi'])}")
     print(f"Macro OK — US tasa:{len(macro['usa']['tasa'])} infl:{len(macro['usa']['inflacion'])} pbi:{len(macro['usa']['pbi'])}")
-    return macro
+
     # EUROPA (vía FRED, series armonizadas Eurostat/BCE)
     macro["europa"] = {
         "tasa": fred_monthly("ECBDFR", 3),
@@ -169,6 +169,7 @@ def get_macro_data():
         "pbi": fred_monthly("NAEXKP01EZQ659S", 3),
     }
     print(f"Macro OK — EUROPA tasa:{len(macro['europa']['tasa'])} infl:{len(macro['europa']['inflacion'])} pbi:{len(macro['europa']['pbi'])}")
+  return macro
 
 news = get_rss_news()
 calendar = get_calendar()
