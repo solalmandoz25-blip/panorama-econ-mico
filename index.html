@@ -4,20 +4,20 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Panorama Económico — BCP Miami</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: Georgia, serif; background: #f4f3f0; color: #1a1a1a; }
   header { background: #0a2342; color: white; padding: 1.4rem 2.5rem; display: flex; justify-content: space-between; align-items: center; }
   header h1 { font-size: 1.1rem; letter-spacing: 0.12em; font-weight: bold; color: white; }
   header span { font-size: 0.8rem; opacity: 0.65; color: white; }
-  .container { max-width: 1000px; margin: 0 auto; padding: 1.8rem 1.5rem; }
+  .container { max-width: 1100px; margin: 0 auto; padding: 1.8rem 1.5rem; }
   .section-title { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.14em; color: #0a2342; border-bottom: 2px solid #0a2342; padding-bottom: 4px; margin: 2rem 0 1rem; font-weight: bold; display: flex; justify-content: space-between; align-items: center; }
   .badge-auto { font-size: 0.65rem; background: #f0fdf4; color: #166534; border: 1px solid #86efac; border-radius: 20px; padding: 2px 10px; font-weight: normal; letter-spacing: 0; }
   .badge-manual { font-size: 0.65rem; background: #eff6ff; color: #1e40af; border: 1px solid #93c5fd; border-radius: 20px; padding: 2px 10px; font-weight: normal; letter-spacing: 0; }
-  .news-list { display: flex; flex-direction: column; gap: 8px; }
- .news-list { gap: 6px; }
+  .news-list { display: flex; flex-direction: column; gap: 6px; }
   .news-item { background: white; border: 0.5px solid #e5e5e5; border-left: 3px solid #0a2342; border-radius: 0 8px 8px 0; padding: 0.55rem 0.9rem; display: flex; align-items: center; gap: 10px; }
-.news-item .title { font-size: 0.85rem; color: #1a1a1a; font-weight: bold; line-height: 1.3; flex: 1; }
+  .news-item .title { font-size: 0.85rem; color: #1a1a1a; font-weight: bold; line-height: 1.3; flex: 1; }
   .news-item .title a { color: #0a2342; text-decoration: none; }
   .news-item .title a:hover { text-decoration: underline; }
   .tag { display: inline-block; font-size: 0.62rem; padding: 2px 8px; border-radius: 20px; white-space: nowrap; }
@@ -26,12 +26,14 @@
   .cal-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
   .cal-country { background: white; border: 0.5px solid #e5e5e5; border-radius: 8px; padding: 0.8rem 1rem; }
   .cal-country-name { font-size: 0.72rem; font-weight: bold; color: #0a2342; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; padding-bottom: 6px; border-bottom: 1px solid #f0f0f0; }
-  .cal-event { font-size: 0.78rem; color: #444; padding: 5px 0; border-bottom: 0.5px solid #f5f5f5; display: flex; justify-content: space-between; align-items: center; }
+  .cal-event { font-size: 0.78rem; color: #444; padding: 5px 0; border-bottom: 0.5px solid #f5f5f5; }
   .cal-event:last-child { border-bottom: none; }
-  .cal-event .stars { color: #b8860b; font-size: 0.7rem; }
   .cal-empty { font-size: 0.78rem; color: #bbb; font-style: italic; }
-  .conclusion-box { background: white; border: 0.5px solid #e5e5e5; border-radius: 8px; padding: 1.2rem 1.5rem; }
-  .editable { border: 1.5px dashed #ddd; border-radius: 6px; padding: 1rem; min-height: 120px; outline: none; line-height: 1.85; font-family: Georgia, serif; font-size: 0.9rem; color: #222; white-space: pre-wrap; }
+  .macro-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+  .macro-card { background: white; border-radius: 10px; padding: 1.2rem 1.5rem; box-shadow: 0 1px 6px rgba(0,0,0,0.07); }
+  .macro-card h3 { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.1em; color: #0a2342; margin-bottom: 0.8rem; font-weight: bold; }
+  .conclusion-box { background: white; border-radius: 10px; padding: 1.5rem 2rem; box-shadow: 0 1px 6px rgba(0,0,0,0.07); }
+  .editable { border: 1.5px dashed #ddd; border-radius: 6px; padding: 1rem; min-height: 130px; outline: none; line-height: 1.85; font-family: Georgia, serif; font-size: 0.92rem; color: #222; white-space: pre-wrap; }
   .editable:empty:before { content: attr(data-placeholder); color: #bbb; font-style: italic; }
   .editable:focus { border-color: #0a2342; }
   footer { text-align: center; padding: 2rem; font-size: 0.7rem; color: #bbb; border-top: 1px solid #eee; margin-top: 2rem; }
@@ -40,61 +42,55 @@
 <body>
 <header>
   <h1>PANORAMA ECONÓMICO</h1>
-  <span>BCP Miami &nbsp;·&nbsp; Semana del 20 de July, 2026</span>
+  <span>BCP Miami &nbsp;·&nbsp; Semana del 21 de July, 2026</span>
 </header>
 <div class="container">
 
-  <div class="section-title">
-    Noticias económicas relevantes
-    <span class="badge-auto">✦ Automático</span>
-  </div>
- <div class="news-list">
-        
-          
-          <div class="news-item">
-            <span class="tag tag-high">Alta relevancia</span>
-            <div class="title"><a href="https://www.bloomberg.com/news/articles/2026-07-20/money-funds-keep-cash-closer-as-fed-leaves-markets-guessing" target="_blank">Money Funds Keep Cash Closer as Fed Leaves Markets Guessing</a></div>
-          </div>
-          
-          <div class="news-item">
-            <span class="tag tag-high">Alta relevancia</span>
-            <div class="title"><a href="https://www.bloomberg.com/news/articles/2026-07-20/india-s-central-bank-says-forex-deposits-net-17-4-billion" target="_blank">India’s Central Bank Says Forex Deposits Net $17.4 Billion</a></div>
-          </div>
-          
-          <div class="news-item">
-            <span class="tag tag-high">Alta relevancia</span>
-            <div class="title"><a href="https://www.bloomberg.com/news/articles/2026-07-20/canada-inflation-rate-falls-to-2-8-core-measures-ease" target="_blank">Canada Inflation Falls to 2.8%, Core Measures Ease</a></div>
-          </div>
-          
-          <div class="news-item">
-            <span class="tag tag-high">Alta relevancia</span>
-            <div class="title"><a href="https://www.bloomberg.com/news/articles/2026-07-20/euro-area-firms-faced-rising-interest-rates-in-second-quarter" target="_blank">Euro-Area Firms Faced Rising Interest Rates in Second Quarter</a></div>
-          </div>
-          
-          <div class="news-item">
-            <span class="tag tag-med">Media relevancia</span>
-            <div class="title"><a href="https://www.bloomberg.com/news/articles/2026-07-20/us-stocks-rebound-from-selloff-as-nvidia-other-chipmakers-rise" target="_blank">US Stocks Rebound From Selloff as Nvidia, Other Chipmakers Rise</a></div>
-          </div>
-          
-          <div class="news-item">
-            <span class="tag tag-med">Media relevancia</span>
-            <div class="title"><a href="https://www.bloomberg.com/news/articles/2026-07-19/oil-climbs-as-middle-east-conflict-escalates-markets-wrap" target="_blank">Stocks Get Lift From Chipmakers as Oil Rally Wanes: Markets Wrap</a></div>
-          </div>
-          
+  <div class="section-title">Noticias económicas relevantes<span class="badge-auto">✦ Automático</span></div>
+  <div class="news-list">
+    
+      
+      <div class="news-item">
+        <span class="tag tag-high">Alta relevancia</span>
+        <div class="title"><a href="https://www.bloomberg.com/news/articles/2026-07-21/hungary-cuts-rates-for-second-month-as-inflation-stays-muted" target="_blank">Hungary Cuts Rates for Second Month as Inflation Stays Soft</a></div>
+      </div>
+      
+      <div class="news-item">
+        <span class="tag tag-high">Alta relevancia</span>
+        <div class="title"><a href="https://www.bloomberg.com/news/articles/2026-07-21/iran-war-risk-set-to-keep-african-interest-rates-higher-for-longer" target="_blank">Iran War Risk Set to Keep African Interest Rates Higher for Longer</a></div>
+      </div>
+      
+      <div class="news-item">
+        <span class="tag tag-high">Alta relevancia</span>
+        <div class="title"><a href="https://www.cnbc.com/2026/07/21/jpmorgan-chase-ceo-jamie-dimon-market-risk.html" target="_blank">Jamie Dimon says markets underestimate risks and he wouldn't buy stocks or Treasurys at current prices</a></div>
+      </div>
+      
+      <div class="news-item">
+        <span class="tag tag-med">Media relevancia</span>
+        <div class="title"><a href="https://www.bloomberg.com/news/articles/2026-07-21/biotech-ipos-outperform-ai-listings-leading-us-market-in-2026" target="_blank">Biotech IPOs Outperform AI Listings, Leading US Market in 2026</a></div>
+      </div>
+      
+      <div class="news-item">
+        <span class="tag tag-med">Media relevancia</span>
+        <div class="title"><a href="https://www.bloomberg.com/news/articles/2026-07-20/stock-market-today-dow-s-p-live-updates" target="_blank">Stocks Rise as Rebound in Chipmakers Gathers Pace: Markets Wrap</a></div>
+      </div>
+      
+      <div class="news-item">
+        <span class="tag tag-med">Media relevancia</span>
+        <div class="title"><a href="https://www.bloomberg.com/news/articles/2026-07-21/us-stock-futures-rise-as-chipmaker-rebound-overshadows-iran-war" target="_blank">US Stock Futures Rise as Chipmaker Rebound Overshadows Iran War</a></div>
+      </div>
+      
     
   </div>
 
-  <div class="section-title">
-    Calendario económico — eventos ★★★
-    <span class="badge-auto">✦ Automático</span>
-  </div>
+  <div class="section-title">Calendario económico — eventos ★★★<span class="badge-auto">✦ Automático</span></div>
   <div class="cal-grid">
     
     <div class="cal-country">
       <div class="cal-country-name">🇺🇸 EE.UU.</div>
       
         
-      <div class="cal-event"><span>Unemployment Claims ★★</span></div>
+        <div class="cal-event">Unemployment Claims ★★</div>
         
       
     </div>
@@ -103,13 +99,13 @@
       <div class="cal-country-name">🇪🇺 Europa</div>
       
         
-      <div class="cal-event"><span>Main Refinancing Rate ★★★</span></div>
+        <div class="cal-event">Main Refinancing Rate ★★★</div>
         
-      <div class="cal-event"><span>Monetary Policy Statement ★★★</span></div>
+        <div class="cal-event">Monetary Policy Statement ★★★</div>
         
-      <div class="cal-event"><span>ECB Press Conference ★★★</span></div>
+        <div class="cal-event">ECB Press Conference ★★★</div>
         
-      <div class="cal-event"><span>French Flash Manufacturing PMI ★★</span></div>
+        <div class="cal-event">French Flash Manufacturing PMI ★★</div>
         
       
     </div>
@@ -118,22 +114,73 @@
       <div class="cal-country-name">🇵🇪 Perú</div>
       
         
-      <div class="cal-event"><span>Tasa de referencia BCRP: 4.25% (Jul.2026)</span></div>
+        <div class="cal-event">Tasa de referencia BCRP: 4.25% (Jul.2026)</div>
         
       
     </div>
     
   </div>
 
-  <div class="section-title">
-    Conclusiones — perspectiva de tesorería
-    <span class="badge-manual">✎ Pega aquí</span>
+  <div class="section-title">Indicadores Macroeconómicos<span class="badge-auto">✦ Automático</span></div>
+  <div class="macro-grid">
+    <div class="macro-card">
+      <h3>🇵🇪 Perú</h3>
+      <canvas id="chart-peru" height="160"></canvas>
+    </div>
+    <div class="macro-card">
+      <h3>🇺🇸 EE.UU.</h3>
+      <canvas id="chart-usa" height="160"></canvas>
+    </div>
   </div>
+
+  <div class="section-title">Conclusiones — perspectiva de tesorería<span class="badge-manual">✎ Pega aquí</span></div>
   <div class="conclusion-box">
     <div class="editable" contenteditable="true" data-placeholder="Pega aquí las conclusiones redactadas con Claude..."></div>
   </div>
 
 </div>
 <footer>Panorama Económico &nbsp;·&nbsp; BCP Miami &nbsp;·&nbsp; Generado automáticamente cada lunes</footer>
+
+<script>
+const macro = {"peru": {"inflacion": [{"date": "Abr.2026", "value": "4.01414363472928"}, {"date": "May.2026", "value": "3.90505240621645"}, {"date": "Jun.2026", "value": "4.00890965651766"}], "pbi": [{"date": "Mar.2026", "value": "3.21376281023424"}, {"date": "Abr.2026", "value": "3.72734991620123"}, {"date": "May.2026", "value": "1.7975875771524"}], "tasa": [{"date": "May.2026", "value": "4.25"}, {"date": "Jun.2026", "value": "4.25"}, {"date": "Jul.2026", "value": "4.25"}]}, "usa": {"inflacion": [], "pbi": [], "tasa": []}};
+
+function makeChart(id, data, label) {
+  const ctx = document.getElementById(id);
+  if (!ctx || !data) return;
+  const labels = [...new Set([
+    ...(data.tasa || []).map(d => d.date),
+    ...(data.inflacion || []).map(d => d.date),
+    ...(data.pbi || []).map(d => d.date)
+  ])].sort().slice(-3);
+
+  const getVals = (arr) => labels.map(l => {
+    const found = (arr || []).find(d => d.date === l || d.date.startsWith(l));
+    return found ? parseFloat(found.value) : null;
+  });
+
+  new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: labels,
+      datasets: [
+        { label: 'Inflación %', data: getVals(data.inflacion), backgroundColor: '#0a2342' },
+        { label: 'Tasa %', data: getVals(data.tasa), backgroundColor: '#2e6fad' },
+        { label: 'PBI %', data: getVals(data.pbi), backgroundColor: '#b0c4de' },
+      ]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { position: 'bottom', labels: { font: { size: 10 } } } },
+      scales: {
+        x: { ticks: { font: { size: 9 } } },
+        y: { ticks: { font: { size: 9 } }, grid: { color: '#f0f0f0' } }
+      }
+    }
+  });
+}
+
+makeChart('chart-peru', macro.peru, 'Perú');
+makeChart('chart-usa', macro.usa, 'EE.UU.');
+</script>
 </body>
 </html>
