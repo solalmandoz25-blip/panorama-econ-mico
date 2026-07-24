@@ -15,6 +15,24 @@ def _clean_html(text):
     text = " ".join(text.split())
     return text
 
+def _fetch_feed_items(url, limit=8):
+    items_out = []
+    try:
+        r = requests.get(url, timeout=8, headers={"User-Agent": "Mozilla/5.0"})
+        root = ET.fromstring(r.content)
+        items = root.findall(".//item")[:limit]
+        for item in items:
+            title = item.findtext("title", "").strip()
+            link = item.findtext("link", "").strip()
+            desc_raw = item.findtext("description", "") or item.findtext("summary", "")
+            description = _clean_html(desc_raw)
+            if len(description) > 180:
+                description = description[:177].rsplit(" ", 1)[0] + "..."
+            items_out.append({"title": title, "link": link, "description": description})
+    except Exception as e:
+        print(f"Error feed {url}: {e}")
+    return items_out
+
 def get_rss_news():
     feeds = [
         ("Bloomberg", "https://feeds.bloomberg.com/markets/news.rss"),
@@ -27,27 +45,15 @@ def get_rss_news():
     keywords_high = ["fed", "rate", "inflation", "gdp", "bcrp", "bce", "ecb", "treasury", "monetary", "recession", "tasa", "inflación", "central bank", "powell", "interest rate", "yield", "bond", "dollar", "currency"]
     keywords_med = ["market", "economy", "trade", "oil", "stock", "earnings", "growth", "mercado", "economía", "petróleo"]
     for source, url in feeds:
-        try:
-            r = requests.get(url, timeout=8, headers={"User-Agent": "Mozilla/5.0"})
-            root = ET.fromstring(r.content)
-            items = root.findall(".//item")[:8]
-            for item in items:
-                title = item.findtext("title", "").strip()
-                link = item.findtext("link", "").strip()
-                desc_raw = item.findtext("description", "") or item.findtext("summary", "")
-                description = _clean_html(desc_raw)
-                if len(description) > 180:
-                    description = description[:177].rsplit(" ", 1)[0] + "..."
-                title_lower = title.lower()
-                if any(k in title_lower for k in keywords_high):
-                    relevance = "Alta relevancia"
-                elif any(k in title_lower for k in keywords_med):
-                    relevance = "Media relevancia"
-                else:
-                    continue
-                all_news.append({"source": source, "title": title, "link": link, "relevance": relevance, "description": description})
-        except Exception as e:
-            print(f"Error {source}: {e}")
+        for item in _fetch_feed_items(url, limit=8):
+            title_lower = item["title"].lower()
+            if any(k in title_lower for k in keywords_high):
+                relevance = "Alta relevancia"
+            elif any(k in title_lower for k in keywords_med):
+                relevance = "Media relevancia"
+            else:
+                continue
+            all_news.append({"source": source, "title": item["title"], "link": item["link"], "relevance": relevance, "description": item["description"]})
     high = [n for n in all_news if n["relevance"] == "Alta relevancia"][:4]
     med = [n for n in all_news if n["relevance"] == "Media relevancia"][:3]
     result = high + med
@@ -193,17 +199,25 @@ def _trend(vals):
     return "al alza" if diff > 0 else "a la baja"
 
 REGION_KEYWORDS = {
-    "peru": ["peru", "perú", "bcrp", "lima", "sol peruano", "sunat", "andean", "latam", "latin america"],
-    "usa": ["fed", "powell", "treasury", "washington", "u.s.", "us economy", "dollar", "united states", "america", "yield", "rate cut", "rate hike", "recession", "jobs report", "unemployment"],
-    "europa": ["ecb", "bce", "euro", "europe", "european", "eurozone", "germany", "france", "eu ", "lagarde"],
+    "peru": [r"\bperu\b", r"\bperú\b", r"\bbcrp\b", r"\blima\b", "sol peruano", "sunat", "andean", "latam", "latin america"],
+    "usa": [r"\bfed\b", "powell", "treasury", "washington", r"\bus\b", r"\bu\.s\.", "dollar", "united states", r"\bamerica", "yield", "rate cut", "rate hike", "recession", "jobs report", "unemployment", "wall street", "s&p", "nasdaq", "dow "],
+    "europa": [r"\becb\b", r"\bbce\b", "euro", "europe", "european", "eurozone", "germany", "france", r"\beu\b", "lagarde"],
 }
 
 def find_relevant_news(region_key, news_list):
-    keywords = REGION_KEYWORDS.get(region_key, [])
+    patterns = REGION_KEYWORDS.get(region_key, [])
     for n in news_list:
         title_lower = n["title"].lower()
-        if any(k in title_lower for k in keywords):
+        if any(re.search(p, title_lower) for p in patterns):
             return n
+    return None
+
+def get_peru_fallback_news():
+    """Fuente dedicada de Perú, ya que los feeds internacionales rara vez cubren Perú."""
+    feed_url = "https://gestion.pe/arc/outboundfeeds/rss/category/economia/?outputType=xml"
+    items = _fetch_feed_items(feed_url, limit=5)
+    if items:
+        return items[0]
     return None
 
 def generate_conclusiones(macro, news_list):
@@ -222,7 +236,11 @@ def generate_conclusiones(macro, news_list):
         if pbi:
             partes.append(f"crecimiento del PBI en {_fmt(pbi[-1])}% ({_trend(pbi)})")
         resumen = ", ".join(partes) + "." if partes else "sin datos disponibles esta semana."
+
         noticia = find_relevant_news(key, news_list)
+        if not noticia and key == "peru":
+            noticia = get_peru_fallback_news()
+
         lineas.append({
             "label": label,
             "resumen": f"{label}: {resumen}",
