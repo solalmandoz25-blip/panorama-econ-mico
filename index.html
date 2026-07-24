@@ -246,7 +246,7 @@ function makeChart(id, data, label) {
     },
     options: {
       responsive: true,
-      layout: { padding: { top: 28 } },
+      layout: { padding: { top: 10 } },
       plugins: {
         legend: {
           position: 'bottom',
@@ -254,10 +254,11 @@ function makeChart(id, data, label) {
         },
         datalabels: {
           anchor: 'end',
-          align: 'end',
-          offset: 2,
-          color: '#0a2342',
+          align: 'start',
+          offset: 4,
+          color: 'white',
           font: { size: 8, weight: 'bold', family: MONO_FONT },
+          rotation: -90,
           formatter: (value) => value === null || value === undefined ? '' : value.toFixed(2) + '%'
         }
       },
