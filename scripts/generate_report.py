@@ -256,7 +256,8 @@ news = get_rss_news()
 calendar = get_calendar()
 macro = get_macro_data()
 conclusiones = generate_conclusiones(macro, news)
-week_str = TODAY.strftime("%d de %B, %Y")
+MESES_ES = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"]
+week_str = f"{TODAY.day} de {MESES_ES[TODAY.month - 1]}, {TODAY.year}"
 
 with open("templates/dashboard.html") as f:
     template = Template(f.read())
