@@ -257,6 +257,13 @@ REGION_KEYWORDS = {
     "europa": [r"\becb\b", r"\bbce\b", "euro", "europe", "european", "eurozone", "germany", "france", r"\beu\b", "lagarde"],
 }
 
+# Filtro de relevancia para las noticias de respaldo (Perú, Europa): solo política monetaria/inflación/geopolítica
+FALLBACK_KEYWORDS_ES = [
+    "tasa", "inflación", "inflacion", "banco central", "política monetaria",
+    "recesión", "recesion", "arancel", "guerra", "conflicto", "sanciones",
+    "dólar", "dolar", "euro", "pbi", "crecimiento económico", "crecimiento economico",
+]
+
 def find_relevant_news(region_key, news_list):
     patterns = REGION_KEYWORDS.get(region_key, [])
     for n in news_list:
@@ -270,6 +277,17 @@ def get_peru_fallback_news():
     items = _fetch_feed_items(feed_url, limit=5)
     if items:
         return items[0]
+    return None
+
+def get_europa_fallback_news():
+    feed_url = "https://feeds.feedburner.com/euronews/en/business/"
+    items = _fetch_feed_items(feed_url, limit=8)
+    for item in items:
+        title_lower = item["title"].lower()
+        if any(k in title_lower for k in FALLBACK_KEYWORDS_ES) or any(re.search(p, title_lower) for p in REGION_KEYWORDS["europa"]):
+            item["title"] = translate_es(item["title"])
+            item["description"] = translate_es(item["description"])
+            return item
     return None
 
 def generate_conclusiones(macro, news_list):
@@ -289,12 +307,11 @@ def generate_conclusiones(macro, news_list):
             partes.append(f"crecimiento del PBI en {_fmt(pbi[-1])}% ({_trend(pbi)})")
         resumen = ", ".join(partes) + "." if partes else "sin datos disponibles esta semana."
 
-        # Solo asigna noticia si hay coincidencia GENUINA con la región.
-        # Perú tiene fuente propia como respaldo (Gestión). EE.UU./Europa: solo si calza,
-        # nunca se le da a una región la noticia "sobrante" de otra.
         noticia = find_relevant_news(key, news_list)
         if not noticia and key == "peru":
             noticia = get_peru_fallback_news()
+        if not noticia and key == "europa":
+            noticia = get_europa_fallback_news()
 
         lineas.append({
             "label": label,
