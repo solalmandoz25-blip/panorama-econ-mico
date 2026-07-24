@@ -21,7 +21,7 @@
   .news-item .title { font-size: 0.85rem; color: #1a1a1a; font-weight: bold; line-height: 1.3; flex: 1; }
   .news-item .title a { color: #0a2342; text-decoration: none; }
   .news-item .title a:hover { text-decoration: underline; }
-  .tag { display: inline-block; font-size: 0.62rem; padding: 2px 8px; border-radius: 20px; white-space: nowrap; }
+  .tag { display: inline-flex; align-items: center; justify-content: center; font-size: 0.62rem; padding: 2px 8px; border-radius: 20px; white-space: nowrap; min-width: 108px; flex-shrink: 0; }
   .tag-high { background: #fef2f2; color: #991b1b; border: 1px solid #fca5a5; }
   .tag-med { background: #fffbeb; color: #92400e; border: 1px solid #fcd34d; }
   .cal-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
@@ -126,7 +126,6 @@ if (window.ChartDataLabels) {
   Chart.register(window.ChartDataLabels);
 }
 
-// Meses fijos y uniformes para los 3 gráficos: los últimos 3 meses calendario
 function getUniformLabels() {
   const now = new Date();
   const labels = [];
@@ -145,7 +144,6 @@ function makeChart(id, data, label) {
 
   const labels = UNIFORM_LABELS;
 
-  // Relleno hacia atrás: usa el último dato disponible hasta ese mes (o el más antiguo si no hay ninguno anterior)
   const getFillForwardVals = (arr) => {
     if (!arr || arr.length === 0) return labels.map(() => null);
     const sorted = [...arr].sort((a, b) => a.date.localeCompare(b.date));
