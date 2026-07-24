@@ -142,6 +142,13 @@ function getUniformLabels() {
 }
 const UNIFORM_LABELS = getUniformLabels();
 
+// Umbral: si la barra es menor al 20% del máximo del eje, la etiqueta sale afuera (arriba, oscura, sin rotar)
+function isShortBar(context) {
+  const v = context.dataset.data[context.dataIndex];
+  const max = context.chart.scales.y.max;
+  return v === null || v === undefined || v < max * 0.22;
+}
+
 function makeChart(id, data, label) {
   const ctx = document.getElementById(id);
   if (!ctx || !data) return;
@@ -173,7 +180,7 @@ function makeChart(id, data, label) {
     },
     options: {
       responsive: true,
-      layout: { padding: { top: 10 } },
+      layout: { padding: { top: 24 } },
       plugins: {
         legend: {
           position: 'bottom',
@@ -181,11 +188,12 @@ function makeChart(id, data, label) {
         },
         datalabels: {
           anchor: 'end',
-          align: 'start',
+          align: (context) => isShortBar(context) ? 'end' : 'start',
           offset: 4,
-          color: 'white',
+          clamp: true,
+          color: (context) => isShortBar(context) ? '#0a2342' : 'white',
+          rotation: (context) => isShortBar(context) ? 0 : -90,
           font: { size: 8, weight: 'bold', family: MONO_FONT },
-          rotation: -90,
           formatter: (value) => value === null || value === undefined ? '' : value.toFixed(2) + '%'
         }
       },
