@@ -10,6 +10,9 @@ from deep_translator import GoogleTranslator
 TODAY = datetime.today()
 FRED_KEY = os.environ.get("FRED_API_KEY", "")
 
+DIAS_ES = ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"]
+MESES_ABR_ES = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"]
+
 def translate_es(text):
     if not text:
         return text
@@ -100,6 +103,17 @@ def get_rss_news():
 
     return deduped
 
+def _fmt_event_date(date_str):
+    if not date_str:
+        return ""
+    try:
+        dt = datetime.fromisoformat(date_str)
+        dia = DIAS_ES[dt.weekday()]
+        mes = MESES_ABR_ES[dt.month - 1]
+        return f"{dia} {dt.day} {mes}, {dt.strftime('%H:%M')}"
+    except Exception:
+        return ""
+
 def get_calendar():
     url = "https://nfs.faireconomy.media/ff_calendar_thisweek.json"
     countries = {"USD": "🇺🇸 EE.UU.", "EUR": "🇪🇺 Europa"}
@@ -113,11 +127,14 @@ def get_calendar():
                 currency = event.get("country", "")
                 impact = event.get("impact", "")
                 title = event.get("title", "")
+                date_str = event.get("date", "")
                 if currency in countries and impact == level:
                     country_label = countries[currency]
                     if len(result[country_label]) < 4:
                         title_es = translate_es(title)
-                        result[country_label].append(f"{title_es} {impact_stars[level]}")
+                        fecha = _fmt_event_date(date_str)
+                        prefijo = f"{fecha} — " if fecha else ""
+                        result[country_label].append(f"{prefijo}{title_es} {impact_stars[level]}")
             if all(len(result[c]) >= 1 for c in countries.values()):
                 break
     except Exception as e:
