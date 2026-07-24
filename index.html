@@ -154,9 +154,9 @@
         🇵🇪 Perú: tasa de referencia en 4.25% (estable), inflación interanual en 4.01% (estable), crecimiento del PBI en 1.80% (a la baja).
         
         <div class="conclusion-news">
-          <div class="news-title"><a href="https://gestion.pe/economia/balcazar-busca-empoderar-a-la-autoridad-portuaria-nacional-antes-de-irse-senal-a-chancay-noticia/" target="_blank">Balcázar busca empoderar a la Autoridad Portuaria Nacional antes de irse: ¿señal a Chancay?</a></div>
+          <div class="news-title"><a href="https://gestion.pe/economia/empresas/inca-kola-y-el-turron-impulsan-las-exportaciones-de-productos-nostalgicos-con-crecimientos-de-132-y-447-noticia/" target="_blank">Inca Kola y el turrón lideran las exportaciones de productos nostálgicos peruanos en 2026</a></div>
           
-          <div class="news-desc">Un proyecto de ley del Ejecutivo saliente busca darle nuevas herramientas a la APN para cobrar multas. Especialistas analizan su impacto, incluido el caso del puerto de Chancay.</div>
+          <div class="news-desc">Los envíos de Inca Kola aumentaron 13,2% y los del turrón 44,7%, reflejando el mayor interés por los productos nostálgicos peruanos en el mercado internacional.</div>
           
         </div>
         
@@ -192,17 +192,26 @@ if (window.ChartDataLabels) {
   Chart.register(window.ChartDataLabels);
 }
 
+// Meses fijos y uniformes para los 3 gráficos: los últimos 3 meses calendario
+function getUniformLabels() {
+  const now = new Date();
+  const labels = [];
+  for (let i = 2; i >= 0; i--) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    labels.push(`${d.getFullYear()}-${mm}`);
+  }
+  return labels;
+}
+const UNIFORM_LABELS = getUniformLabels();
+
 function makeChart(id, data, label) {
   const ctx = document.getElementById(id);
   if (!ctx || !data) return;
 
-  const labels = (data.tasa || []).map(d => d.date).sort().slice(-3);
+  const labels = UNIFORM_LABELS;
 
-  const getVals = (arr) => labels.map(l => {
-    const found = (arr || []).find(d => d.date === l);
-    return found ? parseFloat(found.value) : null;
-  });
-
+  // Relleno hacia atrás: usa el último dato disponible hasta ese mes (o el más antiguo si no hay ninguno anterior)
   const getFillForwardVals = (arr) => {
     if (!arr || arr.length === 0) return labels.map(() => null);
     const sorted = [...arr].sort((a, b) => a.date.localeCompare(b.date));
@@ -211,6 +220,7 @@ function makeChart(id, data, label) {
       for (const o of sorted) {
         if (o.date <= l) last = o;
       }
+      if (last === null) last = sorted[0];
       return last ? parseFloat(last.value) : null;
     });
   };
@@ -221,7 +231,7 @@ function makeChart(id, data, label) {
       labels: labels,
       datasets: [
         { label: 'Inflación %', data: getFillForwardVals(data.inflacion), backgroundColor: '#0a2342' },
-        { label: 'Tasa %', data: getVals(data.tasa), backgroundColor: '#2e6fad' },
+        { label: 'Tasa %', data: getFillForwardVals(data.tasa), backgroundColor: '#2e6fad' },
         { label: 'PBI %', data: getFillForwardVals(data.pbi), backgroundColor: '#b0c4de' },
       ]
     },
