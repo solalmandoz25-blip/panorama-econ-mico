@@ -144,21 +144,56 @@ def get_calendar():
                 break
     except Exception as e:
         print(f"Error calendar: {e}")
-    try:
-        url_bcrp = "https://estadisticas.bcrp.gob.pe/estadisticas/series/api/PD04722MM/json"
-        r2 = requests.get(url_bcrp, timeout=8)
-        data2 = r2.json()
-        periods = data2.get("periods", [])
-        if periods:
-            last = periods[-1]
-            tasa_val = last["values"][0]
-            tasa_date = last["name"]
-            result["🇵🇪 Perú"] = [f"Tasa de referencia BCRP: {tasa_val}% ({tasa_date})"]
-        else:
-            result["🇵🇪 Perú"] = []
-    except Exception as e:
-        print(f"Error BCRP: {e}")
-        result["🇵🇪 Perú"] = []
+   peru_events = []
+    series_pe = [
+        ("PD04722MM", "Tasa de referencia BCRP", "★★★"),
+        ("PN01273PM", "Inflación interanual (IPC)", "★★★"),
+        ("PN01728AM", "Crecimiento del PBI", "★★"),
+    ]
+    for series_id, nombre, estrellas in series_pe:
+        try:
+            r2 = requests.get(f"https://estadisticas.bcrp.gob.pe/estadisticas/series/api/{series_id}/json", timeout=8)
+            periods = r2.json().get("periods", [])
+            if periods:
+                last = periods[-1]
+                val = last["values"][0]
+                fecha = last["name"]
+                peru_events.append(f"Publicado — {nombre}: {val}% ({fecha}) {estrellas}")
+        except Exception as e:
+            print(f"Error BCRP {series_id}: {e}")
+
+    def next_weekday(base_date, weekday, n=1):
+        d = base_date.replace(day=1)
+        count = 0
+        while True:
+            if d.weekday() == weekday:
+                count += 1
+                if count == n:
+                    return d
+            d += timedelta(days=1)
+
+    hoy = TODAY
+    mes_actual = hoy.replace(day=1)
+    mes_siguiente = (mes_actual + timedelta(days=32)).replace(day=1)
+
+    decision_tasa = next_weekday(mes_actual, 3, 1)
+    if decision_tasa < hoy:
+        decision_tasa = next_weekday(mes_siguiente, 3, 1)
+
+    ipc_release = mes_siguiente + timedelta(days=2)
+    pbi_release = mes_siguiente.replace(day=15)
+
+    proximos = [
+        (decision_tasa, "Decisión de tasa de referencia BCRP", "★★★"),
+        (ipc_release, "Publicación IPC (inflación) INEI", "★★★"),
+        (pbi_release, "Publicación PBI mensual INEI", "★★"),
+    ]
+    for fecha_dt, nombre, estrellas in sorted(proximos):
+        dia = DIAS_ES[fecha_dt.weekday()]
+        mes = MESES_ABR_ES[fecha_dt.month - 1]
+        peru_events.append(f"Próximo — {dia} {fecha_dt.day} {mes} — {nombre} {estrellas}")
+
+    result["🇵🇪 Perú"] = peru_events
     return result
 
 def fred_get(series_id, limit=13):
