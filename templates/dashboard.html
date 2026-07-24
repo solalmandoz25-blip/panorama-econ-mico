@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Panorama Económico — BCP Miami</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-datalabels/2.2.0/chartjs-plugin-datalabels.min.js"></script>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: Georgia, serif; background: #f4f3f0; color: #1a1a1a; }
@@ -121,6 +122,10 @@
 <script>
 const macro = {{ macro | tojson }};
 
+if (window.ChartDataLabels) {
+  Chart.register(window.ChartDataLabels);
+}
+
 function makeChart(id, data, label) {
   const ctx = document.getElementById(id);
   if (!ctx || !data) return;
@@ -156,7 +161,18 @@ function makeChart(id, data, label) {
     },
     options: {
       responsive: true,
-      plugins: { legend: { position: 'bottom', labels: { font: { size: 10 } } } },
+      layout: { padding: { top: 20 } },
+      plugins: {
+        legend: { position: 'bottom', labels: { font: { size: 10 } } },
+        datalabels: {
+          anchor: 'end',
+          align: 'end',
+          offset: 2,
+          color: '#0a2342',
+          font: { size: 9, weight: 'bold' },
+          formatter: (value) => value === null || value === undefined ? '' : value.toFixed(2) + '%'
+        }
+      },
       scales: {
         x: { ticks: { font: { size: 9 } } },
         y: { ticks: { font: { size: 9 } }, grid: { color: '#f0f0f0' } }
