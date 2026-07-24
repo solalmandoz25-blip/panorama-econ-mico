@@ -8,115 +8,115 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-datalabels/2.2.0/chartjs-plugin-datalabels.min.js"></script>
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: Georgia, serif; background: #f4f3f0; color: #1a1a1a; }
-  header { background: #0a2342; color: white; padding: 1.4rem 2.5rem; display: flex; justify-content: space-between; align-items: center; }
-  header h1 { font-size: 1.1rem; letter-spacing: 0.12em; font-weight: bold; color: white; }
-  header span { font-size: 0.8rem; opacity: 0.65; color: white; }
-  .container { max-width: 1100px; margin: 0 auto; padding: 1.8rem 1.5rem; }
-  .section-title { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.14em; color: #0a2342; border-bottom: 2px solid #0a2342; padding-bottom: 4px; margin: 2rem 0 1rem; font-weight: bold; display: flex; justify-content: space-between; align-items: center; }
-  .badge-auto { font-size: 0.65rem; background: #f0fdf4; color: #166534; border: 1px solid #86efac; border-radius: 20px; padding: 2px 10px; font-weight: normal; letter-spacing: 0; }
-  .badge-manual { font-size: 0.65rem; background: #eff6ff; color: #1e40af; border: 1px solid #93c5fd; border-radius: 20px; padding: 2px 10px; font-weight: normal; letter-spacing: 0; }
-  .news-list { display: flex; flex-direction: column; gap: 6px; }
-  .news-item { background: white; border: 0.5px solid #e5e5e5; border-left: 3px solid #0a2342; border-radius: 0 8px 8px 0; padding: 0.55rem 0.9rem; display: flex; align-items: center; gap: 10px; }
-  .news-item .title { font-size: 0.85rem; color: #1a1a1a; font-weight: bold; line-height: 1.3; flex: 1; }
-  .news-item .title a { color: #0a2342; text-decoration: none; }
-  .news-item .title a:hover { text-decoration: underline; }
-  .tag { display: inline-flex; align-items: center; justify-content: center; font-size: 0.62rem; padding: 2px 8px; border-radius: 20px; white-space: nowrap; min-width: 108px; flex-shrink: 0; }
-  .tag-high { background: #fef2f2; color: #991b1b; border: 1px solid #fca5a5; }
-  .tag-med { background: #fffbeb; color: #92400e; border: 1px solid #fcd34d; }
-  .cal-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
-  .cal-country { background: white; border: 0.5px solid #e5e5e5; border-radius: 8px; padding: 0.8rem 1rem; }
-  .cal-country-name { font-size: 0.72rem; font-weight: bold; color: #0a2342; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; padding-bottom: 6px; border-bottom: 1px solid #f0f0f0; }
-  .cal-event { font-size: 0.78rem; color: #444; padding: 5px 0; border-bottom: 0.5px solid #f5f5f5; }
-  .cal-event:last-child { border-bottom: none; }
-  .cal-empty { font-size: 0.78rem; color: #bbb; font-style: italic; }
-  .macro-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
-  .macro-card { background: white; border-radius: 6px; padding: 1.1rem 1.3rem 1.3rem; box-shadow: 0 1px 6px rgba(0,0,0,0.07); position: relative; overflow: hidden; }
-  .macro-card::before { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: #0a2342; }
-  .macro-card h3 { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.12em; color: #0a2342; margin-bottom: 0.9rem; font-weight: bold; font-family: 'IBM Plex Mono', monospace; }
-  .conclusion-box { background: white; border-radius: 10px; padding: 1.5rem 2rem; box-shadow: 0 1px 6px rgba(0,0,0,0.07); }
-  .conclusion-list { list-style: none; display: flex; flex-direction: column; gap: 14px; }
-  .conclusion-list li { font-size: 0.9rem; line-height: 1.6; padding-left: 1rem; border-left: 3px solid #0a2342; }
-  .conclusion-news { margin-top: 6px; font-size: 0.82rem; color: #444; }
-  .conclusion-news .news-title { font-weight: bold; color: #0a2342; }
-  .conclusion-news .news-title a { color: #0a2342; text-decoration: none; }
-  .conclusion-news .news-title a:hover { text-decoration: underline; }
-  .conclusion-news .news-desc { color: #555; margin-top: 2px; }
-  footer { text-align: center; padding: 2rem; font-size: 0.7rem; color: #bbb; border-top: 1px solid #eee; margin-top: 2rem; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: Georgia, serif; background: #f4f3f0; color: #1a1a1a; }
+header { background: #0a2342; color: white; padding: 1.4rem 2.5rem; display: flex; justify-content: space-between; align-items: center; }
+header h1 { font-size: 1.1rem; letter-spacing: 0.12em; font-weight: bold; color: white; }
+header span { font-size: 0.8rem; opacity: 0.65; color: white; }
+.container { max-width: 1100px; margin: 0 auto; padding: 1.8rem 1.5rem; }
+.section-title { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.14em; color: #0a2342; border-bottom: 2px solid #0a2342; padding-bottom: 4px; margin: 2rem 0 1rem; font-weight: bold; display: flex; justify-content: space-between; align-items: center; }
+.badge-auto { font-size: 0.65rem; background: #f0fdf4; color: #166534; border: 1px solid #86efac; border-radius: 20px; padding: 2px 10px; font-weight: normal; letter-spacing: 0; }
+.badge-manual { font-size: 0.65rem; background: #eff6ff; color: #1e40af; border: 1px solid #93c5fd; border-radius: 20px; padding: 2px 10px; font-weight: normal; letter-spacing: 0; }
+.news-list { display: flex; flex-direction: column; gap: 6px; }
+.news-item { background: white; border: 0.5px solid #e5e5e5; border-left: 3px solid #0a2342; border-radius: 0 8px 8px 0; padding: 0.55rem 0.9rem; display: flex; align-items: center; gap: 10px; }
+.news-item .title { font-size: 0.85rem; color: #1a1a1a; font-weight: bold; line-height: 1.3; flex: 1; }
+.news-item .title a { color: #0a2342; text-decoration: none; }
+.news-item .title a:hover { text-decoration: underline; }
+.tag { display: inline-flex; align-items: center; justify-content: center; font-size: 0.62rem; padding: 2px 8px; border-radius: 20px; white-space: nowrap; min-width: 108px; flex-shrink: 0; }
+.tag-high { background: #fef2f2; color: #991b1b; border: 1px solid #fca5a5; }
+.tag-med { background: #fffbeb; color: #92400e; border: 1px solid #fcd34d; }
+.cal-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.cal-country { background: white; border: 0.5px solid #e5e5e5; border-radius: 8px; padding: 0.8rem 1rem; }
+.cal-country-name { font-size: 0.72rem; font-weight: bold; color: #0a2342; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; padding-bottom: 6px; border-bottom: 1px solid #f0f0f0; }
+.cal-event { font-size: 0.78rem; color: #444; padding: 5px 0; border-bottom: 0.5px solid #f5f5f5; }
+.cal-event:last-child { border-bottom: none; }
+.cal-empty { font-size: 0.78rem; color: #bbb; font-style: italic; }
+.macro-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.macro-card { background: white; border-radius: 6px; padding: 1.1rem 1.3rem 1.3rem; box-shadow: 0 1px 6px rgba(0,0,0,0.07); position: relative; overflow: hidden; }
+.macro-card::before { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: #0a2342; }
+.macro-card h3 { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.12em; color: #0a2342; margin-bottom: 0.9rem; font-weight: bold; font-family: 'IBM Plex Mono', monospace; }
+.conclusion-box { background: white; border-radius: 10px; padding: 1.5rem 2rem; box-shadow: 0 1px 6px rgba(0,0,0,0.07); }
+.conclusion-list { list-style: none; display: flex; flex-direction: column; gap: 14px; }
+.conclusion-list li { font-size: 0.9rem; line-height: 1.6; padding-left: 1rem; border-left: 3px solid #0a2342; }
+.conclusion-news { margin-top: 6px; font-size: 0.82rem; color: #444; }
+.conclusion-news .news-title { font-weight: bold; color: #0a2342; }
+.conclusion-news .news-title a { color: #0a2342; text-decoration: none; }
+.conclusion-news .news-title a:hover { text-decoration: underline; }
+.conclusion-news .news-desc { color: #555; margin-top: 2px; }
+footer { text-align: center; padding: 2rem; font-size: 0.7rem; color: #bbb; border-top: 1px solid #eee; margin-top: 2rem; }
 </style>
 </head>
 <body>
 <header>
-  <h1>PANORAMA ECONÓMICO</h1>
-  <span>BCP Miami &nbsp;·&nbsp; Semana del {{ week }}</span>
+<h1>PANORAMA ECONÓMICO</h1>
+<span>BCP Miami &nbsp;·&nbsp; Semana del {{ week }}</span>
 </header>
 <div class="container">
 
-  <div class="section-title">Noticias económicas relevantes<span class="badge-auto">✦ Automático</span></div>
-  <div class="news-list">
-    {% if news %}
-      {% for n in news %}
-      <div class="news-item">
-        <span class="tag {% if n.relevance == 'Alta relevancia' %}tag-high{% else %}tag-med{% endif %}">{{ n.relevance }}</span>
-        <div class="title"><a href="{{ n.link }}" target="_blank">{{ n.title }}</a></div>
-      </div>
-      {% endfor %}
-    {% else %}
-      <div class="news-item"><div class="title" style="color:#bbb;font-style:italic">No se encontraron noticias esta semana.</div></div>
-    {% endif %}
-  </div>
+<div class="section-title">Noticias económicas relevantes<span class="badge-auto">✦ Automático</span></div>
+<div class="news-list">
+{% if news %}
+{% for n in news %}
+<div class="news-item">
+<span class="tag {% if n.relevance == 'Alta relevancia' %}tag-high{% else %}tag-med{% endif %}">{{ n.relevance }}</span>
+<div class="title"><a href="{{ n.link }}" target="_blank">{{ n.title }}</a></div>
+</div>
+{% endfor %}
+{% else %}
+<div class="news-item"><div class="title" style="color:#bbb;font-style:italic">No se encontraron noticias esta semana.</div></div>
+{% endif %}
+</div>
 
-  <div class="section-title">Calendario económico — eventos ★★★<span class="badge-auto">✦ Automático</span></div>
-  <div class="cal-grid">
-    {% for country, events in calendar.items() %}
-    <div class="cal-country">
-      <div class="cal-country-name">{{ country }}</div>
-      {% if events %}
-        {% for event in events %}
-        <div class="cal-event">{{ event }}</div>
-        {% endfor %}
-      {% else %}
-        <div class="cal-empty">Sin eventos de alto impacto</div>
-      {% endif %}
-    </div>
-    {% endfor %}
-  </div>
+<div class="section-title">Calendario económico — eventos ★★★<span class="badge-auto">✦ Automático</span></div>
+<div class="cal-grid">
+{% for country, events in calendar.items() %}
+<div class="cal-country">
+<div class="cal-country-name">{{ country }}</div>
+{% if events %}
+{% for event in events %}
+<div class="cal-event">{{ event }}</div>
+{% endfor %}
+{% else %}
+<div class="cal-empty">Sin eventos de alto impacto</div>
+{% endif %}
+</div>
+{% endfor %}
+</div>
 
-  <div class="section-title">Indicadores Macroeconómicos<span class="badge-auto">✦ Automático</span></div>
-  <div class="macro-grid">
-    <div class="macro-card">
-      <h3>🇵🇪 Perú</h3>
-      <canvas id="chart-peru" height="200"></canvas>
-    </div>
-    <div class="macro-card">
-      <h3>🇺🇸 EE.UU.</h3>
-      <canvas id="chart-usa" height="200"></canvas>
-    </div>
-    <div class="macro-card">
-      <h3>🇪🇺 Europa</h3>
-      <canvas id="chart-europa" height="200"></canvas>
-    </div>
-  </div>
+<div class="section-title">Indicadores Macroeconómicos<span class="badge-auto">✦ Automático</span></div>
+<div class="macro-grid">
+<div class="macro-card">
+<h3>🇵🇪 Perú</h3>
+<canvas id="chart-peru" height="200"></canvas>
+</div>
+<div class="macro-card">
+<h3>🇺🇸 EE.UU.</h3>
+<canvas id="chart-usa" height="200"></canvas>
+</div>
+<div class="macro-card">
+<h3>🇪🇺 Europa</h3>
+<canvas id="chart-europa" height="200"></canvas>
+</div>
+</div>
 
-  <div class="section-title">Perspectiva de tesorería<span class="badge-auto">✦ Automático</span></div>
-  <div class="conclusion-box">
-    <ul class="conclusion-list">
-      {% for c in conclusiones %}
-      <li>
-        {{ c.resumen }}
-        {% if c.noticia_titulo %}
-        <div class="conclusion-news">
-          <div class="news-title"><a href="{{ c.noticia_link }}" target="_blank">{{ c.noticia_titulo }}</a></div>
-          {% if c.noticia_desc %}
-          <div class="news-desc">{{ c.noticia_desc }}</div>
-          {% endif %}
-        </div>
-        {% endif %}
-      </li>
-      {% endfor %}
-    </ul>
-  </div>
+<div class="section-title">Perspectiva de tesorería<span class="badge-auto">✦ Automático</span></div>
+<div class="conclusion-box">
+<ul class="conclusion-list">
+{% for c in conclusiones %}
+<li>
+{{ c.resumen }}
+{% if c.noticia_titulo %}
+<div class="conclusion-news">
+<div class="news-title"><a href="{{ c.noticia_link }}" target="_blank">{{ c.noticia_titulo }}</a></div>
+{% if c.noticia_desc %}
+<div class="news-desc">{{ c.noticia_desc }}</div>
+{% endif %}
+</div>
+{% endif %}
+</li>
+{% endfor %}
+</ul>
+</div>
 
 </div>
 <footer>Panorama Económico &nbsp;·&nbsp; BCP Miami &nbsp;·&nbsp; Generado automáticamente cada lunes</footer>
@@ -125,276 +125,84 @@
 const macro = {{ macro | tojson }};
 
 if (window.ChartDataLabels) {
-  Chart.register(window.ChartDataLabels);
+Chart.register(window.ChartDataLabels);
 }
 
 const MONO_FONT = "'IBM Plex Mono', 'Courier New', monospace";
 
 function getUniformLabels() {
-  const now = new Date();
-  const labels = [];
-  for (let i = 2; i >= 0; i--) {
-    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-    const mm = String(d.getMonth() + 1).padStart(2, '0');
-    labels.push(`${d.getFullYear()}-${mm}`);
-  }
-  return labels;
+const now = new Date();
+const labels = [];
+for (let i = 2; i >= 0; i--) {
+const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+const mm = String(d.getMonth() + 1).padStart(2, '0');
+labels.push(`${d.getFullYear()}-${mm}`);
+}
+return labels;
 }
 const UNIFORM_LABELS = getUniformLabels();
 
-// Umbral: si la barra es menor al 20% del máximo del eje, la etiqueta sale afuera (arriba, oscura, sin rotar)
-function isShortBar(context) {
-  const v = context.dataset.data[context.dataIndex];
-  const max = context.chart.scales.y.max;
-  return v === null || v === undefined || v < max * 0.22;
-}
-
 function makeChart(id, data, label) {
-  const ctx = document.getElementById(id);
-  if (!ctx || !data) return;
+const ctx = document.getElementById(id);
+if (!ctx || !data) return;
 
-  const labels = UNIFORM_LABELS;
+const labels = UNIFORM_LABELS;
 
-  const getFillForwardVals = (arr) => {
-    if (!arr || arr.length === 0) return labels.map(() => null);
-    const sorted = [...arr].sort((a, b) => a.date.localeCompare(b.date));
-    return labels.map(l => {
-      let last = null;
-      for (const o of sorted) {
-        if (o.date <= l) last = o;
-      }
-      if (last === null) last = sorted[0];
-      return last ? parseFloat(last.value) : null;
-    });
-  };
-
-  new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels: labels,
-      datasets: [
-        { label: 'Inflación %', data: getFillForwardVals(data.inflacion), backgroundColor: '#0a2342', borderRadius: 1, categoryPercentage: 0.78, barPercentage: 0.82 },
-        { label: 'Tasa %', data: getFillForwardVals(data.tasa), backgroundColor: '#2e6fad', borderRadius: 1, categoryPercentage: 0.78, barPercentage: 0.82 },
-        { label: 'PBI %', data: getFillForwardVals(data.pbi), backgroundColor: '#b0c4de', borderRadius: 1, categoryPercentage: 0.78, barPercentage: 0.82 },
-      ]
-    },
-    options: {
-      responsive: true,
-      layout: { padding: { top: 24 } },
-      plugins: {
-        legend: {
-          position: 'bottom',
-          labels: { font: { size: 9, family: MONO_FONT }, color: '#555', boxWidth: 10, boxHeight: 10, usePointStyle: false }
-        },
-        datalabels: {
-          anchor: 'end',
-          align: (context) => isShortBar(context) ? 'end' : 'start',
-          offset: 4,
-          clamp: true,
-          color: (context) => isShortBar(context) ? '#0a2342' : 'white',
-          rotation: (context) => isShortBar(context) ? 0 : -90,
-          font: { size: 8, weight: 'bold', family: MONO_FONT },
-          formatter: (value) => value === null || value === undefined ? '' : value.toFixed(2) + '%'
-        }
-      },
-      scales: {
-        x: {
-          ticks: { font: { size: 9, family: MONO_FONT }, color: '#777' },
-          grid: { display: false },
-          border: { color: '#ccc' }
-        },
-        y: {
-          ticks: { font: { size: 9, family: MONO_FONT }, color: '#aaa' },
-          grid: { color: '#eeeeee', lineWidth: 1 },
-          border: { display: false }
-        }
-      }
-    }
-  });
+const getFillForwardVals = (arr) => {
+if (!arr || arr.length === 0) return labels.map(() => null);
+const sorted = [...arr].sort((a, b) => a.date.localeCompare(b.date));
+return labels.map(l => {
+let last = null;
+for (const o of sorted) {
+if (o.date <= l) last = o;
 }
+if (last === null) last = sorted[0];
+return last ? parseFloat(last.value) : null;
+});
+};
 
-makeChart('chart-peru', macro.peru, 'Perú');
-makeChart('chart-usa', macro.usa, 'EE.UU.');
-makeChart('chart-europa', macro.europa, 'Europa');
-</script>
-</body>
-</html>  .macro-card h3 { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.12em; color: #0a2342; margin-bottom: 0.9rem; font-weight: bold; font-family: 'IBM Plex Mono', monospace; }
-  .conclusion-box { background: white; border-radius: 10px; padding: 1.5rem 2rem; box-shadow: 0 1px 6px rgba(0,0,0,0.07); }
-  .conclusion-list { list-style: none; display: flex; flex-direction: column; gap: 14px; }
-  .conclusion-list li { font-size: 0.9rem; line-height: 1.6; padding-left: 1rem; border-left: 3px solid #0a2342; }
-  .conclusion-news { margin-top: 6px; font-size: 0.82rem; color: #444; }
-  .conclusion-news .news-title { font-weight: bold; color: #0a2342; }
-  .conclusion-news .news-title a { color: #0a2342; text-decoration: none; }
-  .conclusion-news .news-title a:hover { text-decoration: underline; }
-  .conclusion-news .news-desc { color: #555; margin-top: 2px; }
-  footer { text-align: center; padding: 2rem; font-size: 0.7rem; color: #bbb; border-top: 1px solid #eee; margin-top: 2rem; }
-</style>
-</head>
-<body>
-<header>
-  <h1>PANORAMA ECONÓMICO</h1>
-  <span>BCP Miami &nbsp;·&nbsp; Semana del {{ week }}</span>
-</header>
-<div class="container">
-
-  <div class="section-title">Noticias económicas relevantes<span class="badge-auto">✦ Automático</span></div>
-  <div class="news-list">
-    {% if news %}
-      {% for n in news %}
-      <div class="news-item">
-        <span class="tag {% if n.relevance == 'Alta relevancia' %}tag-high{% else %}tag-med{% endif %}">{{ n.relevance }}</span>
-        <div class="title"><a href="{{ n.link }}" target="_blank">{{ n.title }}</a></div>
-      </div>
-      {% endfor %}
-    {% else %}
-      <div class="news-item"><div class="title" style="color:#bbb;font-style:italic">No se encontraron noticias esta semana.</div></div>
-    {% endif %}
-  </div>
-
-  <div class="section-title">Calendario económico — eventos ★★★<span class="badge-auto">✦ Automático</span></div>
-  <div class="cal-grid">
-    {% for country, events in calendar.items() %}
-    <div class="cal-country">
-      <div class="cal-country-name">{{ country }}</div>
-      {% if events %}
-        {% for event in events %}
-        <div class="cal-event">{{ event }}</div>
-        {% endfor %}
-      {% else %}
-        <div class="cal-empty">Sin eventos de alto impacto</div>
-      {% endif %}
-    </div>
-    {% endfor %}
-  </div>
-
-  <div class="section-title">Indicadores Macroeconómicos<span class="badge-auto">✦ Automático</span></div>
-  <div class="macro-grid">
-    <div class="macro-card">
-      <h3>🇵🇪 Perú</h3>
-      <canvas id="chart-peru" height="200"></canvas>
-    </div>
-    <div class="macro-card">
-      <h3>🇺🇸 EE.UU.</h3>
-      <canvas id="chart-usa" height="200"></canvas>
-    </div>
-    <div class="macro-card">
-      <h3>🇪🇺 Europa</h3>
-      <canvas id="chart-europa" height="200"></canvas>
-    </div>
-  </div>
-
-  <div class="section-title">Perspectiva de tesorería<span class="badge-auto">✦ Automático</span></div>
-  <div class="conclusion-box">
-    <ul class="conclusion-list">
-      {% for c in conclusiones %}
-      <li>
-        {{ c.resumen }}
-        {% if c.noticia_titulo %}
-        <div class="conclusion-news">
-          <div class="news-title"><a href="{{ c.noticia_link }}" target="_blank">{{ c.noticia_titulo }}</a></div>
-          {% if c.noticia_desc %}
-          <div class="news-desc">{{ c.noticia_desc }}</div>
-          {% endif %}
-        </div>
-        {% endif %}
-      </li>
-      {% endfor %}
-    </ul>
-  </div>
-
-</div>
-<footer>Panorama Económico &nbsp;·&nbsp; BCP Miami &nbsp;·&nbsp; Generado automáticamente cada lunes</footer>
-
-<script>
-const macro = {{ macro | tojson }};
-
-if (window.ChartDataLabels) {
-  Chart.register(window.ChartDataLabels);
+new Chart(ctx, {
+type: 'bar',
+data: {
+labels: labels,
+datasets: [
+{ label: 'Inflación %', data: getFillForwardVals(data.inflacion), backgroundColor: '#0a2342', borderRadius: 1, categoryPercentage: 0.78, barPercentage: 0.82 },
+{ label: 'Tasa %', data: getFillForwardVals(data.tasa), backgroundColor: '#2e6fad', borderRadius: 1, categoryPercentage: 0.78, barPercentage: 0.82 },
+{ label: 'PBI %', data: getFillForwardVals(data.pbi), backgroundColor: '#b0c4de', borderRadius: 1, categoryPercentage: 0.78, barPercentage: 0.82 },
+]
+},
+options: {
+responsive: true,
+layout: { padding: { top: 20 } },
+plugins: {
+legend: {
+position: 'bottom',
+labels: { font: { size: 9, family: MONO_FONT }, color: '#555', boxWidth: 10, boxHeight: 10, usePointStyle: false }
+},
+datalabels: {
+anchor: 'end',
+align: 'end',
+offset: 2,
+clamp: true,
+color: '#0a2342',
+font: { size: 7, weight: 'bold', family: MONO_FONT },
+formatter: (value) => value === null || value === undefined ? '' : value.toFixed(1) + '%'
 }
-
-const MONO_FONT = "'IBM Plex Mono', 'Courier New', monospace";
-
-function getUniformLabels() {
-  const now = new Date();
-  const labels = [];
-  for (let i = 2; i >= 0; i--) {
-    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-    const mm = String(d.getMonth() + 1).padStart(2, '0');
-    labels.push(`${d.getFullYear()}-${mm}`);
-  }
-  return labels;
+},
+scales: {
+x: {
+ticks: { font: { size: 9, family: MONO_FONT }, color: '#777' },
+grid: { display: false },
+border: { color: '#ccc' }
+},
+y: {
+ticks: { font: { size: 9, family: MONO_FONT }, color: '#aaa' },
+grid: { color: '#eeeeee', lineWidth: 1 },
+border: { display: false }
 }
-const UNIFORM_LABELS = getUniformLabels();
-
-// Umbral: si la barra es menor al 20% del máximo del eje, la etiqueta sale afuera (arriba, oscura, sin rotar)
-function isShortBar(context) {
-  const v = context.dataset.data[context.dataIndex];
-  const max = context.chart.scales.y.max;
-  return v === null || v === undefined || v < max * 0.22;
 }
-
-function makeChart(id, data, label) {
-  const ctx = document.getElementById(id);
-  if (!ctx || !data) return;
-
-  const labels = UNIFORM_LABELS;
-
-  const getFillForwardVals = (arr) => {
-    if (!arr || arr.length === 0) return labels.map(() => null);
-    const sorted = [...arr].sort((a, b) => a.date.localeCompare(b.date));
-    return labels.map(l => {
-      let last = null;
-      for (const o of sorted) {
-        if (o.date <= l) last = o;
-      }
-      if (last === null) last = sorted[0];
-      return last ? parseFloat(last.value) : null;
-    });
-  };
-
-  new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels: labels,
-      datasets: [
-        { label: 'Inflación %', data: getFillForwardVals(data.inflacion), backgroundColor: '#0a2342', borderRadius: 1, categoryPercentage: 0.78, barPercentage: 0.82 },
-        { label: 'Tasa %', data: getFillForwardVals(data.tasa), backgroundColor: '#2e6fad', borderRadius: 1, categoryPercentage: 0.78, barPercentage: 0.82 },
-        { label: 'PBI %', data: getFillForwardVals(data.pbi), backgroundColor: '#b0c4de', borderRadius: 1, categoryPercentage: 0.78, barPercentage: 0.82 },
-      ]
-    },
-    options: {
-      responsive: true,
-      layout: { padding: { top: 24 } },
-      plugins: {
-        legend: {
-          position: 'bottom',
-          labels: { font: { size: 9, family: MONO_FONT }, color: '#555', boxWidth: 10, boxHeight: 10, usePointStyle: false }
-        },
-        datalabels: {
-          anchor: 'end',
-          align: (context) => isShortBar(context) ? 'end' : 'start',
-          offset: 4,
-          clamp: true,
-          color: (context) => isShortBar(context) ? '#0a2342' : 'white',
-          rotation: (context) => isShortBar(context) ? 0 : -90,
-          font: { size: 8, weight: 'bold', family: MONO_FONT },
-          formatter: (value) => value === null || value === undefined ? '' : value.toFixed(2) + '%'
-        }
-      },
-      scales: {
-        x: {
-          ticks: { font: { size: 9, family: MONO_FONT }, color: '#777' },
-          grid: { display: false },
-          border: { color: '#ccc' }
-        },
-        y: {
-          ticks: { font: { size: 9, family: MONO_FONT }, color: '#aaa' },
-          grid: { color: '#eeeeee', lineWidth: 1 },
-          border: { display: false }
-        }
-      }
-    }
-  });
+}
+});
 }
 
 makeChart('chart-peru', macro.peru, 'Perú');
