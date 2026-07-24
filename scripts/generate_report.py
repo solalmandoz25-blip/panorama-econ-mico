@@ -95,7 +95,10 @@ def get_rss_news():
             deduped.append(n)
     deduped = deduped[:6]
 
+    # Guarda el título/descripción originales en inglés ANTES de traducir, para poder
+    # hacer el matching por región con las palabras clave (que están en inglés)
     for n in deduped:
+        n["title_en"] = n["title"]
         original_title = n["title"]
         n["title"] = translate_es(n["title"])
         n["description"] = translate_es(n["description"])
@@ -257,17 +260,11 @@ REGION_KEYWORDS = {
     "europa": [r"\becb\b", r"\bbce\b", "euro", "europe", "european", "eurozone", "germany", "france", r"\beu\b", "lagarde"],
 }
 
-# Filtro de relevancia para las noticias de respaldo (Perú, Europa): solo política monetaria/inflación/geopolítica
-FALLBACK_KEYWORDS_ES = [
-    "tasa", "inflación", "inflacion", "banco central", "política monetaria",
-    "recesión", "recesion", "arancel", "guerra", "conflicto", "sanciones",
-    "dólar", "dolar", "euro", "pbi", "crecimiento económico", "crecimiento economico",
-]
-
 def find_relevant_news(region_key, news_list):
     patterns = REGION_KEYWORDS.get(region_key, [])
     for n in news_list:
-        title_lower = n["title"].lower()
+        # Usa el título en INGLÉS (title_en) para el matching, no el ya traducido
+        title_lower = n.get("title_en", n["title"]).lower()
         if any(re.search(p, title_lower) for p in patterns):
             return n
     return None
@@ -282,9 +279,12 @@ def get_peru_fallback_news():
 def get_europa_fallback_news():
     feed_url = "https://feeds.feedburner.com/euronews/en/business/"
     items = _fetch_feed_items(feed_url, limit=8)
+    fallback_patterns_en = REGION_KEYWORDS["europa"] + [
+        r"\brate\b", "inflation", "monetary", "central bank", "recession", "war", "conflict", "tariff",
+    ]
     for item in items:
         title_lower = item["title"].lower()
-        if any(k in title_lower for k in FALLBACK_KEYWORDS_ES) or any(re.search(p, title_lower) for p in REGION_KEYWORDS["europa"]):
+        if any(re.search(p, title_lower) for p in fallback_patterns_en):
             item["title"] = translate_es(item["title"])
             item["description"] = translate_es(item["description"])
             return item
