@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Panorama Económico — BCP Miami</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-datalabels/2.2.0/chartjs-plugin-datalabels.min.js"></script>
 <style>
@@ -31,8 +32,9 @@
   .cal-event:last-child { border-bottom: none; }
   .cal-empty { font-size: 0.78rem; color: #bbb; font-style: italic; }
   .macro-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
-  .macro-card { background: white; border-radius: 10px; padding: 1.2rem 1.5rem; box-shadow: 0 1px 6px rgba(0,0,0,0.07); }
-  .macro-card h3 { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.1em; color: #0a2342; margin-bottom: 0.8rem; font-weight: bold; }
+  .macro-card { background: white; border-radius: 6px; padding: 1.1rem 1.3rem 1.3rem; box-shadow: 0 1px 6px rgba(0,0,0,0.07); position: relative; overflow: hidden; }
+  .macro-card::before { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: #0a2342; }
+  .macro-card h3 { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.12em; color: #0a2342; margin-bottom: 0.9rem; font-weight: bold; font-family: 'IBM Plex Mono', monospace; }
   .conclusion-box { background: white; border-radius: 10px; padding: 1.5rem 2rem; box-shadow: 0 1px 6px rgba(0,0,0,0.07); }
   .conclusion-list { list-style: none; display: flex; flex-direction: column; gap: 14px; }
   .conclusion-list li { font-size: 0.9rem; line-height: 1.6; padding-left: 1rem; border-left: 3px solid #0a2342; }
@@ -77,12 +79,12 @@
       
       <div class="news-item">
         <span class="tag tag-med">Media relevancia</span>
-        <div class="title"><a href="https://www.bloomberg.com/news/articles/2026-07-24/momentum-crash-hits-yolo-traders-returns-by-most-in-four-years" target="_blank">La caída del impulso afecta más a los rendimientos de los comerciantes de YOLO en cuatro años</a></div>
+        <div class="title"><a href="https://www.bloomberg.com/news/articles/2026-07-23/php-usd-philippines-peso-weakness-oil-surges" target="_blank">PHP/USD: Filipinas traza una línea en la arena para la debilidad del peso a medida que aumenta el petróleo</a></div>
       </div>
       
       <div class="news-item">
         <span class="tag tag-med">Media relevancia</span>
-        <div class="title"><a href="https://www.bloomberg.com/news/articles/2026-07-23/php-usd-philippines-peso-weakness-oil-surges" target="_blank">PHP/USD: Filipinas traza una línea en la arena para la debilidad del peso a medida que aumenta el petróleo</a></div>
+        <div class="title"><a href="https://www.bloomberg.com/news/articles/2026-07-24/mauritius-eyes-50-billion-gdp-to-reach-high-income-status" target="_blank">Mauricio prevé un PIB de 50.000 millones de dólares para alcanzar la categoría de ingresos altos</a></div>
       </div>
       
     
@@ -154,9 +156,9 @@
         🇵🇪 Perú: tasa de referencia en 4.25% (estable), inflación interanual en 4.01% (estable), crecimiento del PBI en 1.80% (a la baja).
         
         <div class="conclusion-news">
-          <div class="news-title"><a href="https://gestion.pe/economia/empresas/cerro-verde-duplica-utilidades-a-us-5015-mlls-pero-produce-menos-cobre-y-frena-capex-noticia/" target="_blank">Cerro Verde gana el doble con menos cobre: US$ 501.5 millones y capex a la baja en Arequipa</a></div>
+          <div class="news-title"><a href="https://gestion.pe/economia/empresas/austral-group-reduce-su-produccion-pero-cierra-el-semestre-con-una-utilidad-de-s-99-millones-noticia/" target="_blank">Austral Group resiste el desplome de capturas y producción de harina y aceite de pescado</a></div>
           
-          <div class="news-desc">Cerro Verde duplicó su utilidad neta a US$ 501.5 millones en el segundo trimestre, impulsada por un cobre a US$ 6.55 la libra. Pero produjo 6% menos y recortó su capex: la...</div>
+          <div class="news-desc">Austral Group cerró el primer semestre de 2026 con una utilidad neta de S/ 9.9 millones, pese a la caída de 76% en sus capturas de anchoveta y la menor producción de harina y...</div>
           
         </div>
         
@@ -199,6 +201,8 @@ if (window.ChartDataLabels) {
   Chart.register(window.ChartDataLabels);
 }
 
+const MONO_FONT = "'IBM Plex Mono', 'Courier New', monospace";
+
 function getUniformLabels() {
   const now = new Date();
   const labels = [];
@@ -235,28 +239,39 @@ function makeChart(id, data, label) {
     data: {
       labels: labels,
       datasets: [
-        { label: 'Inflación %', data: getFillForwardVals(data.inflacion), backgroundColor: '#0a2342' },
-        { label: 'Tasa %', data: getFillForwardVals(data.tasa), backgroundColor: '#2e6fad' },
-        { label: 'PBI %', data: getFillForwardVals(data.pbi), backgroundColor: '#b0c4de' },
+        { label: 'Inflación %', data: getFillForwardVals(data.inflacion), backgroundColor: '#0a2342', borderRadius: 1, categoryPercentage: 0.78, barPercentage: 0.82 },
+        { label: 'Tasa %', data: getFillForwardVals(data.tasa), backgroundColor: '#2e6fad', borderRadius: 1, categoryPercentage: 0.78, barPercentage: 0.82 },
+        { label: 'PBI %', data: getFillForwardVals(data.pbi), backgroundColor: '#b0c4de', borderRadius: 1, categoryPercentage: 0.78, barPercentage: 0.82 },
       ]
     },
     options: {
       responsive: true,
       layout: { padding: { top: 28 } },
       plugins: {
-        legend: { position: 'bottom', labels: { font: { size: 10 } } },
+        legend: {
+          position: 'bottom',
+          labels: { font: { size: 9, family: MONO_FONT }, color: '#555', boxWidth: 10, boxHeight: 10, usePointStyle: false }
+        },
         datalabels: {
           anchor: 'end',
           align: 'end',
           offset: 2,
           color: '#0a2342',
-          font: { size: 8, weight: 'bold' },
+          font: { size: 8, weight: 'bold', family: MONO_FONT },
           formatter: (value) => value === null || value === undefined ? '' : value.toFixed(2) + '%'
         }
       },
       scales: {
-        x: { ticks: { font: { size: 9 } } },
-        y: { ticks: { font: { size: 9 } }, grid: { color: '#f0f0f0' } }
+        x: {
+          ticks: { font: { size: 9, family: MONO_FONT }, color: '#777' },
+          grid: { display: false },
+          border: { color: '#ccc' }
+        },
+        y: {
+          ticks: { font: { size: 9, family: MONO_FONT }, color: '#aaa' },
+          grid: { color: '#eeeeee', lineWidth: 1 },
+          border: { display: false }
+        }
       }
     }
   });
