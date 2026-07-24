@@ -1,4 +1,5 @@
 import os
+import re
 import time
 import requests
 import xml.etree.ElementTree as ET
@@ -7,6 +8,12 @@ from jinja2 import Template
 
 TODAY = datetime.today()
 FRED_KEY = os.environ.get("FRED_API_KEY", "")
+
+def _clean_html(text):
+    text = re.sub(r"<[^>]+>", "", text or "")
+    text = text.replace("&amp;", "&").replace("&quot;", '"').replace("&#39;", "'").replace("&nbsp;", " ")
+    text = " ".join(text.split())
+    return text
 
 def get_rss_news():
     feeds = [
@@ -27,6 +34,10 @@ def get_rss_news():
             for item in items:
                 title = item.findtext("title", "").strip()
                 link = item.findtext("link", "").strip()
+                desc_raw = item.findtext("description", "") or item.findtext("summary", "")
+                description = _clean_html(desc_raw)
+                if len(description) > 180:
+                    description = description[:177].rsplit(" ", 1)[0] + "..."
                 title_lower = title.lower()
                 if any(k in title_lower for k in keywords_high):
                     relevance = "Alta relevancia"
@@ -34,7 +45,7 @@ def get_rss_news():
                     relevance = "Media relevancia"
                 else:
                     continue
-                all_news.append({"source": source, "title": title, "link": link, "relevance": relevance})
+                all_news.append({"source": source, "title": title, "link": link, "relevance": relevance, "description": description})
         except Exception as e:
             print(f"Error {source}: {e}")
     high = [n for n in all_news if n["relevance"] == "Alta relevancia"][:4]
@@ -128,7 +139,6 @@ def bcrp_get(series_id, limit=3):
 def get_macro_data():
     macro = {}
 
-    # PERÚ
     tasa_pe = bcrp_get("PD04722MM", 3)
     infl_pe = bcrp_get("PN01273PM", 3)
     pbi_pe = bcrp_get("PN01728AM", 3)
@@ -138,7 +148,6 @@ def get_macro_data():
         "pbi": [{"date": p["name"], "value": p["values"][0]} for p in pbi_pe],
     }
 
-    # EE.UU. (FRED)
     fedfunds = fred_get("FEDFUNDS", 3)
     cpi_raw = fred_get("CPIAUCSL", 16)
     gdp = fred_get("A191RL1Q225SBEA", 3)
@@ -159,7 +168,6 @@ def get_macro_data():
     print(f"Macro OK — PE tasa:{len(macro['peru']['tasa'])} infl:{len(macro['peru']['inflacion'])} pbi:{len(macro['peru']['pbi'])}")
     print(f"Macro OK — US tasa:{len(macro['usa']['tasa'])} infl:{len(macro['usa']['inflacion'])} pbi:{len(macro['usa']['pbi'])}")
 
-    # EUROPA (vía FRED, series armonizadas Eurostat/BCE)
     macro["europa"] = {
         "tasa": fred_monthly("ECBDFR", 3),
         "inflacion": fred_monthly("CPHPTT01EZM659N", 3),
@@ -168,6 +176,12 @@ def get_macro_data():
     print(f"Macro OK — EUROPA tasa:{len(macro['europa']['tasa'])} infl:{len(macro['europa']['inflacion'])} pbi:{len(macro['europa']['pbi'])}")
 
     return macro
+
+def _fmt(val):
+    try:
+        return f"{float(val):.2f}"
+    except (TypeError, ValueError):
+        return str(val)
 
 def _trend(vals):
     nums = [float(v) for v in vals if v is not None]
@@ -179,9 +193,9 @@ def _trend(vals):
     return "al alza" if diff > 0 else "a la baja"
 
 REGION_KEYWORDS = {
-    "peru": ["peru", "perú", "bcrp", "lima", "sol peruano", "sunat"],
-    "usa": ["fed", "powell", "treasury", "washington", "u.s.", "us ", "dollar", "united states", "america"],
-    "europa": ["ecb", "bce", "euro", "europe", "european", "eurozone", "germany", "france", "eu "],
+    "peru": ["peru", "perú", "bcrp", "lima", "sol peruano", "sunat", "andean", "latam", "latin america"],
+    "usa": ["fed", "powell", "treasury", "washington", "u.s.", "us economy", "dollar", "united states", "america", "yield", "rate cut", "rate hike", "recession", "jobs report", "unemployment"],
+    "europa": ["ecb", "bce", "euro", "europe", "european", "eurozone", "germany", "france", "eu ", "lagarde"],
 }
 
 def find_relevant_news(region_key, news_list):
@@ -189,7 +203,7 @@ def find_relevant_news(region_key, news_list):
     for n in news_list:
         title_lower = n["title"].lower()
         if any(k in title_lower for k in keywords):
-            return n["title"]
+            return n
     return None
 
 def generate_conclusiones(macro, news_list):
@@ -202,16 +216,20 @@ def generate_conclusiones(macro, news_list):
         pbi = [o["value"] for o in data.get("pbi", [])]
         partes = []
         if tasa:
-            partes.append(f"tasa de referencia en {tasa[-1]}% ({_trend(tasa)})")
+            partes.append(f"tasa de referencia en {_fmt(tasa[-1])}% ({_trend(tasa)})")
         if infl:
-            partes.append(f"inflación interanual en {infl[-1]}% ({_trend(infl)})")
+            partes.append(f"inflación interanual en {_fmt(infl[-1])}% ({_trend(infl)})")
         if pbi:
-            partes.append(f"crecimiento del PBI en {pbi[-1]}% ({_trend(pbi)})")
-        linea = f"{label}: " + ", ".join(partes) + "." if partes else f"{label}: sin datos disponibles esta semana."
+            partes.append(f"crecimiento del PBI en {_fmt(pbi[-1])}% ({_trend(pbi)})")
+        resumen = ", ".join(partes) + "." if partes else "sin datos disponibles esta semana."
         noticia = find_relevant_news(key, news_list)
-        if noticia:
-            linea += f" Noticia relevante: \"{noticia}\"."
-        lineas.append(linea)
+        lineas.append({
+            "label": label,
+            "resumen": f"{label}: {resumen}",
+            "noticia_titulo": noticia["title"] if noticia else None,
+            "noticia_desc": noticia["description"] if noticia else None,
+            "noticia_link": noticia["link"] if noticia else None,
+        })
     return lineas
 
 news = get_rss_news()
