@@ -21,7 +21,7 @@
   .news-item .title { font-size: 0.85rem; color: #1a1a1a; font-weight: bold; line-height: 1.3; flex: 1; }
   .news-item .title a { color: #0a2342; text-decoration: none; }
   .news-item .title a:hover { text-decoration: underline; }
-  .tag { display: inline-block; font-size: 0.62rem; padding: 2px 8px; border-radius: 20px; white-space: nowrap; }
+  .tag { display: inline-flex; align-items: center; justify-content: center; font-size: 0.62rem; padding: 2px 8px; border-radius: 20px; white-space: nowrap; min-width: 108px; flex-shrink: 0; }
   .tag-high { background: #fef2f2; color: #991b1b; border: 1px solid #fca5a5; }
   .tag-med { background: #fffbeb; color: #92400e; border: 1px solid #fcd34d; }
   .cal-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
@@ -57,7 +57,12 @@
       
       <div class="news-item">
         <span class="tag tag-high">Alta relevancia</span>
-        <div class="title"><a href="https://www.bloomberg.com/news/articles/2026-07-23/gold-holds-decline-as-surging-energy-costs-raise-rate-hike-bets" target="_blank">El oro sube mientras los operadores sopesan el conflicto en Medio Oriente y la trayectoria de las tasas de la Fed</a></div>
+        <div class="title"><a href="https://www.bloomberg.com/news/articles/2026-07-24/russia-s-top-black-sea-oil-port-halts-loadings-amid-safety-fears" target="_blank">El principal puerto petrolero ruso del Mar Negro detiene las cargas por temor a la seguridad</a></div>
+      </div>
+      
+      <div class="news-item">
+        <span class="tag tag-high">Alta relevancia</span>
+        <div class="title"><a href="https://www.bloomberg.com/news/articles/2026-07-24/euro-zone-resilience-and-more-inflation-seen-in-first-data-for-ecb" target="_blank">Resiliencia de la zona euro y más inflación se ven en los primeros datos del BCE</a></div>
       </div>
       
       <div class="news-item">
@@ -68,21 +73,6 @@
       <div class="news-item">
         <span class="tag tag-high">Alta relevancia</span>
         <div class="title"><a href="https://www.bloomberg.com/news/articles/2026-07-24/trump-tariffs-how-us-is-maintaining-import-duties-using-section-301" target="_blank">Aranceles de Trump: cómo Estados Unidos mantiene los derechos de importación utilizando la sección 301</a></div>
-      </div>
-      
-      <div class="news-item">
-        <span class="tag tag-high">Alta relevancia</span>
-        <div class="title"><a href="https://www.bloomberg.com/news/articles/2026-07-24/russia-cuts-key-rate-to-14-as-drone-strikes-batter-economy" target="_blank">Rusia recorta tipos clave mientras un dron de Kyiv ataca a la economía</a></div>
-      </div>
-      
-      <div class="news-item">
-        <span class="tag tag-med">Media relevancia</span>
-        <div class="title"><a href="https://www.bloomberg.com/news/articles/2026-07-24/momentum-crash-hits-yolo-traders-returns-by-most-in-four-years" target="_blank">La caída del impulso afecta más a los rendimientos de los comerciantes de YOLO en cuatro años</a></div>
-      </div>
-      
-      <div class="news-item">
-        <span class="tag tag-med">Media relevancia</span>
-        <div class="title"><a href="https://www.marketwatch.com/story/u-s-economy-began-to-speed-up-until-iran-peace-talks-failed-and-oil-prices-surged-again-3fce66b2?mod=mw_rss_topstories" target="_blank">La economía estadounidense había comenzado a acelerarse, hasta que las conversaciones de paz con Irán fracasaron y los precios del petróleo volvieron a subir.</a></div>
       </div>
       
     
@@ -154,9 +144,9 @@
         🇵🇪 Perú: tasa de referencia en 4.25% (estable), inflación interanual en 4.01% (estable), crecimiento del PBI en 1.80% (a la baja).
         
         <div class="conclusion-news">
-          <div class="news-title"><a href="https://gestion.pe/economia/el-nino-fuerte-pondria-en-peligro-al-83-de-la-superficie-agricola-nacional-noticia/" target="_blank">El Niño “fuerte” pondría en peligro más del 80% de superficie agrícola nacional: ¿en qué regiones?</a></div>
+          <div class="news-title"><a href="https://gestion.pe/videos/empleo-management/empresas-advierten-perdida-de-habilidades-entre-trabajadores-por-uso-intensivo-de-ia-afirma-estudio-noticia/" target="_blank">Empresas advierten pérdida de habilidades entre trabajadores por uso intensivo de IA</a></div>
           
-          <div class="news-desc">Gobierno identifica zonas de siembra que podrían ser dañadas por huaicos e inundaciones. ¿Qué regiones están más propensas a ello? Sépalo aquí.</div>
+          <div class="news-desc">El uso cada vez más extendido de la inteligencia artificial (IA) está ayudando a las empresas a ganar velocidad y eficiencia, pero también empieza a generar una preocupación...</div>
           
         </div>
         
@@ -165,22 +155,15 @@
       <li>
         🇺🇸 EE.UU.: tasa de referencia en 3.63% (estable), inflación interanual en 3.73% (a la baja), crecimiento del PBI en 2.10% (a la baja).
         
-        <div class="conclusion-news">
-          <div class="news-title"><a href="https://www.bloomberg.com/news/articles/2026-07-23/gold-holds-decline-as-surging-energy-costs-raise-rate-hike-bets" target="_blank">El oro sube mientras los operadores sopesan el conflicto en Medio Oriente y la trayectoria de las tasas de la Fed</a></div>
-          
-          <div class="news-desc">El oro subió, manteniéndose firmemente por encima del punto de resistencia clave de 4.000 dólares la onza, incluso cuando el creciente conflicto en el Medio Oriente alimenta expectativas de una política monetaria más estricta.</div>
-          
-        </div>
-        
       </li>
       
       <li>
         🇪🇺 Europa: tasa de referencia en 2.25% (al alza), inflación interanual en 8.70% (a la baja), crecimiento del PBI en 1.00% (a la baja).
         
         <div class="conclusion-news">
-          <div class="news-title"><a href="http://www.euronews.com/my-europe/2026/07/24/expect-more-action-from-the-us-after-the-google-fine-top-eu-lawmaker-says" target="_blank">"Esperemos más acciones por parte de EE.UU. después de la multa a Google", dice un alto legislador de la UE</a></div>
+          <div class="news-title"><a href="https://www.bloomberg.com/news/articles/2026-07-24/euro-zone-resilience-and-more-inflation-seen-in-first-data-for-ecb" target="_blank">Resiliencia de la zona euro y más inflación se ven en los primeros datos del BCE</a></div>
           
-          <div class="news-desc">El eurodiputado socialista alemán Bernd Lange, jefe de Comercio del Parlamento Europeo, dijo a Euronews que espera que los nuevos aranceles estadounidenses sean impugnados en los tribunales estadounidenses y dijo que apuntar...</div>
+          <div class="news-desc">Se pronostica que el lote inicial de datos de la zona euro para los funcionarios que consideran otro aumento de las tasas de interés muestre una expansión resistente y una inflación más rápida.</div>
           
         </div>
         
@@ -199,7 +182,6 @@ if (window.ChartDataLabels) {
   Chart.register(window.ChartDataLabels);
 }
 
-// Meses fijos y uniformes para los 3 gráficos: los últimos 3 meses calendario
 function getUniformLabels() {
   const now = new Date();
   const labels = [];
@@ -218,7 +200,6 @@ function makeChart(id, data, label) {
 
   const labels = UNIFORM_LABELS;
 
-  // Relleno hacia atrás: usa el último dato disponible hasta ese mes (o el más antiguo si no hay ninguno anterior)
   const getFillForwardVals = (arr) => {
     if (!arr || arr.length === 0) return labels.map(() => null);
     const sorted = [...arr].sort((a, b) => a.date.localeCompare(b.date));
