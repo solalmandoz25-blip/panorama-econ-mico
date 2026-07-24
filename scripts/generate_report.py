@@ -52,11 +52,29 @@ def get_rss_news():
         ("Investing.com", "https://www.investing.com/rss/news_25.rss"),
     ]
     all_news = []
-    keywords_high = ["fed", "rate", "inflation", "gdp", "bcrp", "bce", "ecb", "treasury", "monetary", "recession", "tasa", "inflación", "central bank", "powell", "interest rate", "yield", "bond", "dollar", "currency"]
-    keywords_med = ["market", "economy", "trade", "oil", "stock", "earnings", "growth", "mercado", "economía", "petróleo"]
+
+    # Solo: política monetaria, tasas, inflación, y factores geopolíticos/guerra
+    keywords_high = [
+        "fed", "rate cut", "rate hike", "interest rate", "monetary policy", "central bank",
+        "inflation", "bcrp", "bce", "ecb", "powell", "lagarde", "treasury yield",
+        "recession", "tasa de interés", "inflación", "política monetaria",
+        "war", "conflict", "sanctions", "geopolit", "military", "invasion",
+        "drone", "ukraine", "russia", "middle east", "ceasefire", "tariff", "trade war",
+    ]
+    keywords_med = [
+        "gdp", "economy", "trade", "growth", "economía", "crecimiento", "pbi",
+    ]
+    # Excluir explícitamente contenido centrado en mercado bursátil/acciones
+    exclude_keywords = [
+        "stock", "stocks", "shares", "equity", "equities", "earnings", "nasdaq",
+        "s&p", "dow jones", "ipo", "buyback", "dividend", "wall street", "markets wrap",
+    ]
+
     for source, url in feeds:
         for item in _fetch_feed_items(url, limit=8):
             title_lower = item["title"].lower()
+            if any(k in title_lower for k in exclude_keywords):
+                continue
             if any(k in title_lower for k in keywords_high):
                 relevance = "Alta relevancia"
             elif any(k in title_lower for k in keywords_med):
@@ -64,6 +82,7 @@ def get_rss_news():
             else:
                 continue
             all_news.append({"source": source, "title": item["title"], "link": item["link"], "relevance": relevance, "description": item["description"]})
+
     high = [n for n in all_news if n["relevance"] == "Alta relevancia"][:4]
     med = [n for n in all_news if n["relevance"] == "Media relevancia"][:3]
     result = high + med
@@ -75,7 +94,6 @@ def get_rss_news():
             deduped.append(n)
     deduped = deduped[:6]
 
-    # Traducir títulos y descripciones al español
     for n in deduped:
         original_title = n["title"]
         n["title"] = translate_es(n["title"])
@@ -219,7 +237,7 @@ def _trend(vals):
 
 REGION_KEYWORDS = {
     "peru": [r"\bperu\b", r"\bperú\b", r"\bbcrp\b", r"\blima\b", "sol peruano", "sunat", "andean", "latam", "latin america"],
-    "usa": [r"\bfed\b", "powell", "treasury", "washington", r"\bus\b", r"\bu\.s\.", "dollar", "united states", r"\bamerica", "yield", "rate cut", "rate hike", "recession", "jobs report", "unemployment", "wall street", "s&p", "nasdaq", "dow "],
+    "usa": [r"\bfed\b", "powell", "treasury", "washington", r"\bus\b", r"\bu\.s\.", "dollar", "united states", r"\bamerica", "yield", "rate cut", "rate hike", "recession", "jobs report", "unemployment"],
     "europa": [r"\becb\b", r"\bbce\b", "euro", "europe", "european", "eurozone", "germany", "france", r"\beu\b", "lagarde"],
 }
 
