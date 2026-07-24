@@ -85,15 +85,15 @@
   <div class="macro-grid">
     <div class="macro-card">
       <h3>🇵🇪 Perú</h3>
-      <canvas id="chart-peru" height="160"></canvas>
+      <canvas id="chart-peru" height="200"></canvas>
     </div>
     <div class="macro-card">
       <h3>🇺🇸 EE.UU.</h3>
-      <canvas id="chart-usa" height="160"></canvas>
+      <canvas id="chart-usa" height="200"></canvas>
     </div>
     <div class="macro-card">
       <h3>🇪🇺 Europa</h3>
-      <canvas id="chart-europa" height="160"></canvas>
+      <canvas id="chart-europa" height="200"></canvas>
     </div>
   </div>
 
@@ -161,7 +161,7 @@ function makeChart(id, data, label) {
     },
     options: {
       responsive: true,
-      layout: { padding: { top: 20 } },
+      layout: { padding: { top: 28 } },
       plugins: {
         legend: { position: 'bottom', labels: { font: { size: 10 } } },
         datalabels: {
@@ -169,7 +169,7 @@ function makeChart(id, data, label) {
           align: 'end',
           offset: 2,
           color: '#0a2342',
-          font: { size: 9, weight: 'bold' },
+          font: { size: 8, weight: 'bold' },
           formatter: (value) => value === null || value === undefined ? '' : value.toFixed(2) + '%'
         }
       },
