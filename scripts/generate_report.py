@@ -157,7 +157,7 @@ def get_calendar():
             periods = r2.json().get("periods", [])
             if periods:
                 last = periods[-1]
-                val = last["values"][0]
+                val = round(float(last["values"][0]), 2)
                 fecha = last["name"]
                 peru_events.append(f"Publicado — {nombre}: {val}% ({fecha}) {estrellas}")
         except Exception as e:
@@ -189,7 +189,9 @@ def get_calendar():
         (ipc_release, "Publicación IPC (inflación) INEI", "★★★"),
         (pbi_release, "Publicación PBI mensual INEI", "★★"),
     ]
-    for fecha_dt, nombre, estrellas in sorted(proximos):
+    proximos_futuros = sorted([p for p in proximos if p[0] >= hoy])
+    if proximos_futuros:
+        fecha_dt, nombre, estrellas = proximos_futuros[0]
         dia = DIAS_ES[fecha_dt.weekday()]
         mes = MESES_ABR_ES[fecha_dt.month - 1]
         peru_events.append(f"Próximo — {dia} {fecha_dt.day} {mes} — {nombre} {estrellas}")
