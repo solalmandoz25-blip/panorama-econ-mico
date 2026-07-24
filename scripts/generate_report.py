@@ -64,7 +64,11 @@ def get_rss_news():
         "drone", "ukraine", "russia", "middle east", "ceasefire", "tariff", "trade war",
     ]
     keywords_med = [
-        "gdp", "economy", "trade", "growth", "economía", "crecimiento", "pbi",
+        "gdp", "economy", "economic", "trade", "growth", "economía", "crecimiento", "pbi",
+        "jobs report", "unemployment", "employment", "consumer prices", "cpi", "ppi",
+        "budget", "deficit", "debt ceiling", "stimulus", "exports", "imports",
+        "supply chain", "manufacturing", "housing market", "oil prices", "energy prices",
+        "currency", "exchange rate", "bond market", "sovereign debt", "credit rating",
     ]
     exclude_keywords = [
         "stock", "stocks", "shares", "equity", "equities", "earnings", "nasdaq",
@@ -72,7 +76,7 @@ def get_rss_news():
     ]
 
     for source, url in feeds:
-        for item in _fetch_feed_items(url, limit=8):
+        for item in _fetch_feed_items(url, limit=15):
             title_lower = item["title"].lower()
             if any(k in title_lower for k in exclude_keywords):
                 continue
@@ -151,3 +155,37 @@ def get_calendar():
             tasa_date = last["name"]
             result["🇵🇪 Perú"] = [f"Tasa de referencia BCRP: {tasa_val}% ({tasa_date})"]
         else:
+            result["🇵🇪 Perú"] = []
+    except Exception as e:
+        print(f"Error BCRP: {e}")
+        result["🇵🇪 Perú"] = []
+    return result
+
+def fred_get(series_id, limit=13):
+    url = "https://api.stlouisfed.org/fred/series/observations"
+    params = {
+        "series_id": series_id,
+        "api_key": FRED_KEY,
+        "file_type": "json",
+        "sort_order": "desc",
+        "limit": limit
+    }
+    try:
+        r = requests.get(url, params=params, timeout=10)
+        obs = r.json().get("observations", [])
+        obs = [o for o in obs if o["value"] != "."]
+        return obs[::-1]
+    except Exception as e:
+        print(f"Error FRED {series_id}: {e}")
+        return []
+
+def fred_monthly(series_id, months=3, raw_limit=100):
+    obs = fred_get(series_id, raw_limit)
+    monthly = {}
+    for o in obs:
+        monthly[o["date"][:7]] = o["value"]
+    keys = sorted(monthly.keys())[-months:]
+    return [{"date": k, "value": monthly[k]} for k in keys]
+
+def bcrp_get(series_id, limit=3):
+    url = f"https://estadisticas.bcrp.gob.pe/estadisticas/series/api/{series_id}/json"
