@@ -189,3 +189,171 @@ def fred_monthly(series_id, months=3, raw_limit=100):
 
 def bcrp_get(series_id, limit=3):
     url = f"https://estadisticas.bcrp.gob.pe/estadisticas/series/api/{series_id}/json"
+    for intento in range(3):
+        try:
+            r = requests.get(url, timeout=8)
+            periods = r.json().get("periods", [])
+            if periods:
+                return periods[-limit:]
+        except Exception as e:
+            print(f"Error BCRP {series_id} (intento {intento+1}): {e}")
+        time.sleep(2)
+    return []
+
+def get_macro_data():
+    macro = {}
+
+    tasa_pe = bcrp_get("PD04722MM", 3)
+    infl_pe = bcrp_get("PN01273PM", 3)
+    pbi_pe = bcrp_get("PN01728AM", 3)
+    macro["peru"] = {
+        "tasa": [{"date": p["name"], "value": p["values"][0]} for p in tasa_pe],
+        "inflacion": [{"date": p["name"], "value": p["values"][0]} for p in infl_pe],
+        "pbi": [{"date": p["name"], "value": p["values"][0]} for p in pbi_pe],
+    }
+
+    fedfunds = fred_get("FEDFUNDS", 3)
+    cpi_raw = fred_get("CPIAUCSL", 16)
+    gdp = fred_get("A191RL1Q225SBEA", 3)
+
+    infl_us = []
+    if len(cpi_raw) >= 13:
+        for i in range(12, len(cpi_raw)):
+            val = round((float(cpi_raw[i]["value"]) / float(cpi_raw[i-12]["value"]) - 1) * 100, 2)
+            infl_us.append({"date": cpi_raw[i]["date"][:7], "value": str(val)})
+    infl_us = infl_us[-3:]
+
+    macro["usa"] = {
+        "tasa": [{"date": o["date"][:7], "value": o["value"]} for o in fedfunds],
+        "inflacion": infl_us,
+        "pbi": [{"date": o["date"][:7], "value": o["value"]} for o in gdp],
+    }
+
+    print(f"Macro OK — PE tasa:{len(macro['peru']['tasa'])} infl:{len(macro['peru']['inflacion'])} pbi:{len(macro['peru']['pbi'])}")
+    print(f"Macro OK — US tasa:{len(macro['usa']['tasa'])} infl:{len(macro['usa']['inflacion'])} pbi:{len(macro['usa']['pbi'])}")
+
+    macro["europa"] = {
+        "tasa": fred_monthly("ECBDFR", 3),
+        "inflacion": fred_monthly("CPHPTT01EZM659N", 3),
+        "pbi": fred_monthly("NAEXKP01EZQ659S", 3),
+    }
+    print(f"Macro OK — EUROPA tasa:{len(macro['europa']['tasa'])} infl:{len(macro['europa']['inflacion'])} pbi:{len(macro['europa']['pbi'])}")
+
+    return macro
+
+def _fmt(val):
+    try:
+        return f"{float(val):.2f}"
+    except (TypeError, ValueError):
+        return str(val)
+
+def _trend(vals):
+    nums = [float(v) for v in vals if v is not None]
+    if len(nums) < 2:
+        return "estable"
+    diff = nums[-1] - nums[0]
+    if abs(diff) < 0.05:
+        return "estable"
+    return "al alza" if diff > 0 else "a la baja"
+
+REGION_KEYWORDS = {
+    "peru": [r"\bperu\b", r"\bperú\b", r"\bbcrp\b", r"\blima\b", "sol peruano", "sunat", "andean", "latam", "latin america"],
+    "usa": [r"\bfed\b", "powell", "treasury", "washington", r"\bus\b", r"\bu\.s\.", "dollar", "united states", r"\bamerica", "yield", "rate cut", "rate hike", "recession", "jobs report", "unemployment"],
+    "europa": [r"\becb\b", r"\bbce\b", "euro", "europe", "european", "eurozone", "germany", "france", r"\beu\b", "lagarde"],
+}
+
+FALLBACK_KEYWORDS_EN = [
+    r"\brate\b", "inflation", "monetary", "central bank", "recession", "war", "conflict", "tariff",
+]
+
+def find_relevant_news(region_key, news_list):
+    patterns = REGION_KEYWORDS.get(region_key, [])
+    for n in news_list:
+        title_lower = n.get("title_en", n["title"]).lower()
+        if any(re.search(p, title_lower) for p in patterns):
+            return n
+    return None
+
+def get_peru_fallback_news():
+    feed_url = "https://gestion.pe/arc/outboundfeeds/rss/category/economia/?outputType=xml"
+    items = _fetch_feed_items(feed_url, limit=5)
+    if items:
+        return items[0]
+    return None
+
+def get_europa_fallback_news():
+    feed_url = "https://feeds.feedburner.com/euronews/en/business/"
+    items = _fetch_feed_items(feed_url, limit=8)
+    patterns = REGION_KEYWORDS["europa"] + FALLBACK_KEYWORDS_EN
+    for item in items:
+        title_lower = item["title"].lower()
+        if any(re.search(p, title_lower) for p in patterns):
+            item["title"] = translate_es(item["title"])
+            item["description"] = translate_es(item["description"])
+            return item
+    return None
+
+def get_usa_fallback_news():
+    feed_url = "https://feeds.reuters.com/reuters/businessNews"
+    items = _fetch_feed_items(feed_url, limit=8)
+    patterns = REGION_KEYWORDS["usa"] + FALLBACK_KEYWORDS_EN
+    for item in items:
+        title_lower = item["title"].lower()
+        if any(re.search(p, title_lower) for p in patterns):
+            item["title"] = translate_es(item["title"])
+            item["description"] = translate_es(item["description"])
+            return item
+    return None
+
+def generate_conclusiones(macro, news_list):
+    labels = [("peru", "🇵🇪 Perú"), ("usa", "🇺🇸 EE.UU."), ("europa", "🇪🇺 Europa")]
+    lineas = []
+    for key, label in labels:
+        data = macro.get(key, {})
+        tasa = [o["value"] for o in data.get("tasa", [])]
+        infl = [o["value"] for o in data.get("inflacion", [])]
+        pbi = [o["value"] for o in data.get("pbi", [])]
+        partes = []
+        if tasa:
+            partes.append(f"tasa de referencia en {_fmt(tasa[-1])}% ({_trend(tasa)})")
+        if infl:
+            partes.append(f"inflación interanual en {_fmt(infl[-1])}% ({_trend(infl)})")
+        if pbi:
+            partes.append(f"crecimiento del PBI en {_fmt(pbi[-1])}% ({_trend(pbi)})")
+        resumen = ", ".join(partes) + "." if partes else "sin datos disponibles esta semana."
+
+        noticia = find_relevant_news(key, news_list)
+        if not noticia and key == "peru":
+            noticia = get_peru_fallback_news()
+        if not noticia and key == "europa":
+            noticia = get_europa_fallback_news()
+        if not noticia and key == "usa":
+            noticia = get_usa_fallback_news()
+
+        lineas.append({
+            "label": label,
+            "resumen": f"{label}: {resumen}",
+            "noticia_titulo": noticia["title"] if noticia else None,
+            "noticia_desc": noticia["description"] if noticia else None,
+            "noticia_link": noticia["link"] if noticia else None,
+        })
+    return lineas
+
+MESES_ES = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"]
+
+news = get_rss_news()
+calendar = get_calendar()
+macro = get_macro_data()
+conclusiones = generate_conclusiones(macro, news)
+week_str = f"{TODAY.day} de {MESES_ES[TODAY.month - 1]}, {TODAY.year}"
+
+with open("templates/dashboard.html") as f:
+    template = Template(f.read())
+
+html = template.render(week=week_str, news=news, calendar=calendar, macro=macro, conclusiones=conclusiones)
+
+os.makedirs("output", exist_ok=True)
+with open("output/index.html", "w") as f:
+    f.write(html)
+
+print(f"✅ Dashboard generado — {len(news)} noticias, calendario OK")
