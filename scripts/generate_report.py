@@ -257,14 +257,12 @@ REGION_KEYWORDS = {
     "europa": [r"\becb\b", r"\bbce\b", "euro", "europe", "european", "eurozone", "germany", "france", r"\beu\b", "lagarde"],
 }
 
-def find_relevant_news_index(region_key, news_list, used_indices):
+def find_relevant_news(region_key, news_list):
     patterns = REGION_KEYWORDS.get(region_key, [])
-    for i, n in enumerate(news_list):
-        if i in used_indices:
-            continue
+    for n in news_list:
         title_lower = n["title"].lower()
         if any(re.search(p, title_lower) for p in patterns):
-            return i
+            return n
     return None
 
 def get_peru_fallback_news():
@@ -277,25 +275,6 @@ def get_peru_fallback_news():
 def generate_conclusiones(macro, news_list):
     labels = [("peru", "🇵🇪 Perú"), ("usa", "🇺🇸 EE.UU."), ("europa", "🇪🇺 Europa")]
     lineas = []
-    used_indices = set()
-
-    # Primero: buscar coincidencia específica por región
-    asignadas = {}
-    for key, _ in labels:
-        idx = find_relevant_news_index(key, news_list, used_indices)
-        if idx is not None:
-            asignadas[key] = news_list[idx]
-            used_indices.add(idx)
-
-    # Segundo: rellenar huecos con la siguiente noticia disponible sin repetir
-    for key, _ in labels:
-        if key not in asignadas:
-            for i, n in enumerate(news_list):
-                if i not in used_indices:
-                    asignadas[key] = n
-                    used_indices.add(i)
-                    break
-
     for key, label in labels:
         data = macro.get(key, {})
         tasa = [o["value"] for o in data.get("tasa", [])]
@@ -310,7 +289,10 @@ def generate_conclusiones(macro, news_list):
             partes.append(f"crecimiento del PBI en {_fmt(pbi[-1])}% ({_trend(pbi)})")
         resumen = ", ".join(partes) + "." if partes else "sin datos disponibles esta semana."
 
-        noticia = asignadas.get(key)
+        # Solo asigna noticia si hay coincidencia GENUINA con la región.
+        # Perú tiene fuente propia como respaldo (Gestión). EE.UU./Europa: solo si calza,
+        # nunca se le da a una región la noticia "sobrante" de otra.
+        noticia = find_relevant_news(key, news_list)
         if not noticia and key == "peru":
             noticia = get_peru_fallback_news()
 
