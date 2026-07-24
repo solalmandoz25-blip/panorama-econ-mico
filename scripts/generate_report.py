@@ -5,9 +5,19 @@ import requests
 import xml.etree.ElementTree as ET
 from datetime import datetime, timedelta
 from jinja2 import Template
+from deep_translator import GoogleTranslator
 
 TODAY = datetime.today()
 FRED_KEY = os.environ.get("FRED_API_KEY", "")
+
+def translate_es(text):
+    if not text:
+        return text
+    try:
+        return GoogleTranslator(source="auto", target="es").translate(text)
+    except Exception as e:
+        print(f"Error traducción: {e}")
+        return text
 
 def _clean_html(text):
     text = re.sub(r"<[^>]+>", "", text or "")
@@ -63,7 +73,16 @@ def get_rss_news():
         if n["title"] not in seen_titles:
             seen_titles.add(n["title"])
             deduped.append(n)
-    return deduped[:6]
+    deduped = deduped[:6]
+
+    # Traducir títulos y descripciones al español
+    for n in deduped:
+        original_title = n["title"]
+        n["title"] = translate_es(n["title"])
+        n["description"] = translate_es(n["description"])
+        print(f"Traducido: {original_title[:40]}... -> {n['title'][:40]}...")
+
+    return deduped
 
 def get_calendar():
     url = "https://nfs.faireconomy.media/ff_calendar_thisweek.json"
@@ -213,7 +232,6 @@ def find_relevant_news(region_key, news_list):
     return None
 
 def get_peru_fallback_news():
-    """Fuente dedicada de Perú, ya que los feeds internacionales rara vez cubren Perú."""
     feed_url = "https://gestion.pe/arc/outboundfeeds/rss/category/economia/?outputType=xml"
     items = _fetch_feed_items(feed_url, limit=5)
     if items:
@@ -252,11 +270,12 @@ def generate_conclusiones(macro, news_list):
         })
     return lineas
 
+MESES_ES = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"]
+
 news = get_rss_news()
 calendar = get_calendar()
 macro = get_macro_data()
 conclusiones = generate_conclusiones(macro, news)
-MESES_ES = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"]
 week_str = f"{TODAY.day} de {MESES_ES[TODAY.month - 1]}, {TODAY.year}"
 
 with open("templates/dashboard.html") as f:
