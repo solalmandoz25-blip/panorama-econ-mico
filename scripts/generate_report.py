@@ -144,7 +144,8 @@ def get_calendar():
                 break
     except Exception as e:
         print(f"Error calendar: {e}")
-   peru_events = []
+
+    peru_events = []
     series_pe = [
         ("PD04722MM", "Tasa de referencia BCRP", "★★★"),
         ("PN01273PM", "Inflación interanual (IPC)", "★★★"),
