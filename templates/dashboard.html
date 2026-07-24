@@ -33,8 +33,13 @@
   .macro-card { background: white; border-radius: 10px; padding: 1.2rem 1.5rem; box-shadow: 0 1px 6px rgba(0,0,0,0.07); }
   .macro-card h3 { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.1em; color: #0a2342; margin-bottom: 0.8rem; font-weight: bold; }
   .conclusion-box { background: white; border-radius: 10px; padding: 1.5rem 2rem; box-shadow: 0 1px 6px rgba(0,0,0,0.07); }
-  .conclusion-list { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+  .conclusion-list { list-style: none; display: flex; flex-direction: column; gap: 14px; }
   .conclusion-list li { font-size: 0.9rem; line-height: 1.6; padding-left: 1rem; border-left: 3px solid #0a2342; }
+  .conclusion-news { margin-top: 6px; font-size: 0.82rem; color: #444; }
+  .conclusion-news .news-title { font-weight: bold; color: #0a2342; }
+  .conclusion-news .news-title a { color: #0a2342; text-decoration: none; }
+  .conclusion-news .news-title a:hover { text-decoration: underline; }
+  .conclusion-news .news-desc { color: #555; margin-top: 2px; }
   footer { text-align: center; padding: 2rem; font-size: 0.7rem; color: #bbb; border-top: 1px solid #eee; margin-top: 2rem; }
 </style>
 </head>
@@ -94,8 +99,18 @@
   <div class="section-title">Perspectiva de tesorería<span class="badge-auto">✦ Automático</span></div>
   <div class="conclusion-box">
     <ul class="conclusion-list">
-      {% for linea in conclusiones %}
-      <li>{{ linea }}</li>
+      {% for c in conclusiones %}
+      <li>
+        {{ c.resumen }}
+        {% if c.noticia_titulo %}
+        <div class="conclusion-news">
+          <div class="news-title"><a href="{{ c.noticia_link }}" target="_blank">{{ c.noticia_titulo }}</a></div>
+          {% if c.noticia_desc %}
+          <div class="news-desc">{{ c.noticia_desc }}</div>
+          {% endif %}
+        </div>
+        {% endif %}
+      </li>
       {% endfor %}
     </ul>
   </div>
