@@ -143,7 +143,6 @@ def get_macro_data():
     cpi_raw = fred_get("CPIAUCSL", 16)
     gdp = fred_get("A191RL1Q225SBEA", 3)
 
-    # CPI interanual = (CPI_actual / CPI_hace_12_meses - 1) * 100
     infl_us = []
     if len(cpi_raw) >= 13:
         for i in range(12, len(cpi_raw)):
@@ -179,7 +178,21 @@ def _trend(vals):
         return "estable"
     return "al alza" if diff > 0 else "a la baja"
 
-def generate_conclusiones(macro):
+REGION_KEYWORDS = {
+    "peru": ["peru", "perú", "bcrp", "lima", "sol peruano", "sunat"],
+    "usa": ["fed", "powell", "treasury", "washington", "u.s.", "us ", "dollar", "united states", "america"],
+    "europa": ["ecb", "bce", "euro", "europe", "european", "eurozone", "germany", "france", "eu "],
+}
+
+def find_relevant_news(region_key, news_list):
+    keywords = REGION_KEYWORDS.get(region_key, [])
+    for n in news_list:
+        title_lower = n["title"].lower()
+        if any(k in title_lower for k in keywords):
+            return n["title"]
+    return None
+
+def generate_conclusiones(macro, news_list):
     labels = [("peru", "🇵🇪 Perú"), ("usa", "🇺🇸 EE.UU."), ("europa", "🇪🇺 Europa")]
     lineas = []
     for key, label in labels:
@@ -194,14 +207,17 @@ def generate_conclusiones(macro):
             partes.append(f"inflación interanual en {infl[-1]}% ({_trend(infl)})")
         if pbi:
             partes.append(f"crecimiento del PBI en {pbi[-1]}% ({_trend(pbi)})")
-        if partes:
-            lineas.append(f"{label}: " + ", ".join(partes) + ".")
+        linea = f"{label}: " + ", ".join(partes) + "." if partes else f"{label}: sin datos disponibles esta semana."
+        noticia = find_relevant_news(key, news_list)
+        if noticia:
+            linea += f" Noticia relevante: \"{noticia}\"."
+        lineas.append(linea)
     return lineas
 
 news = get_rss_news()
 calendar = get_calendar()
 macro = get_macro_data()
-conclusiones = generate_conclusiones(macro)
+conclusiones = generate_conclusiones(macro, news)
 week_str = TODAY.strftime("%d de %B, %Y")
 
 with open("templates/dashboard.html") as f:
