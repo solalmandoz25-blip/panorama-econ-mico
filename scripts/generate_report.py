@@ -240,6 +240,8 @@ def generate_conclusiones(macro, news_list):
         noticia = find_relevant_news(key, news_list)
         if not noticia and key == "peru":
             noticia = get_peru_fallback_news()
+        if not noticia and key == "usa" and news_list:
+            noticia = news_list[0]
 
         lineas.append({
             "label": label,
