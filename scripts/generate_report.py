@@ -53,7 +53,6 @@ def get_rss_news():
     ]
     all_news = []
 
-    # Solo: política monetaria, tasas, inflación, y factores geopolíticos/guerra
     keywords_high = [
         "fed", "rate cut", "rate hike", "interest rate", "monetary policy", "central bank",
         "inflation", "bcrp", "bce", "ecb", "powell", "lagarde", "treasury yield",
@@ -64,7 +63,6 @@ def get_rss_news():
     keywords_med = [
         "gdp", "economy", "trade", "growth", "economía", "crecimiento", "pbi",
     ]
-    # Excluir explícitamente contenido centrado en mercado bursátil/acciones
     exclude_keywords = [
         "stock", "stocks", "shares", "equity", "equities", "earnings", "nasdaq",
         "s&p", "dow jones", "ipo", "buyback", "dividend", "wall street", "markets wrap",
@@ -118,7 +116,8 @@ def get_calendar():
                 if currency in countries and impact == level:
                     country_label = countries[currency]
                     if len(result[country_label]) < 4:
-                        result[country_label].append(f"{title} {impact_stars[level]}")
+                        title_es = translate_es(title)
+                        result[country_label].append(f"{title_es} {impact_stars[level]}")
             if all(len(result[c]) >= 1 for c in countries.values()):
                 break
     except Exception as e:
