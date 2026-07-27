@@ -121,8 +121,8 @@ def _fmt_event_date(date_str):
 
 def get_calendar():
     url = "https://nfs.faireconomy.media/ff_calendar_thisweek.json"
-    countries = {"USD": "🇺🇸 EE.UU.", "EUR": "🇪🇺 Europa"}
-    result = {"🇺🇸 EE.UU.": [], "🇪🇺 Europa": []}
+    countries = {"USD": "🇺🇸 Estados Unidos", "EUR": "🇪🇺 Europa"}
+    result = {"🇺🇸 Estados Unidos": [], "🇪🇺 Europa": []}
     try:
         r = requests.get(url, timeout=8)
         data = r.json()
@@ -374,7 +374,7 @@ def get_usa_fallback_news():
     return None
 
 def generate_conclusiones(macro, news_list):
-    labels = [("peru", "🇵🇪 Perú"), ("usa", "🇺🇸 EE.UU."), ("europa", "🇪🇺 Europa")]
+    labels = [("peru", "🇵🇪 Perú"), ("usa", "🇺🇸 Estados Unidos"), ("europa", "🇪🇺 Europa")]
     lineas = []
     for key, label in labels:
         data = macro.get(key, {})
@@ -407,6 +407,17 @@ def generate_conclusiones(macro, news_list):
         })
     return lineas
 
+def get_top3_para_clientes(news_list):
+    """Selecciona los 3 puntos mas importantes de la semana para compartir
+    con clientes: prioriza noticias de alta relevancia; si no hay 3,
+    completa con las siguientes disponibles."""
+    altas = [n for n in news_list if n["relevance"] == "Alta relevancia"]
+    top3 = altas[:3]
+    if len(top3) < 3:
+        restantes = [n for n in news_list if n not in top3]
+        top3 += restantes[: 3 - len(top3)]
+    return top3
+
 MESES_ES = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"]
 
 news = get_rss_news()
@@ -414,12 +425,13 @@ calendar = get_calendar()
 macro = get_macro_data()
 macro_trend = build_macro_trend(macro)
 conclusiones = generate_conclusiones(macro, news)
+top3 = get_top3_para_clientes(news)
 week_str = f"{TODAY.day} de {MESES_ES[TODAY.month - 1]}, {TODAY.year}"
 
 with open("templates/dashboard.html") as f:
     template = Template(f.read())
 
-html = template.render(week=week_str, news=news, calendar=calendar, macro=macro, macro_trend=macro_trend, conclusiones=conclusiones)
+html = template.render(week=week_str, news=news, calendar=calendar, macro=macro, macro_trend=macro_trend, conclusiones=conclusiones, top3=top3)
 
 os.makedirs("output", exist_ok=True)
 with open("output/index.html", "w") as f:
