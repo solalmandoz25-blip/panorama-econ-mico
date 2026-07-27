@@ -445,35 +445,6 @@ def get_impacto_empresarial(macro_trend):
         resultado.append({"label": label, "resumen": f"{label}: {resumen}"})
     return resultado
 
-def get_dato_semana(macro_trend):
-    """Selecciona el dato macro con el cambio mas significativo de la
-    semana (mayor variacion absoluta entre 'anterior' y 'actual')."""
-    labels = {"peru": "🇵🇪 Perú", "usa": "🇺🇸 Estados Unidos", "europa": "🇪🇺 Europa"}
-    metric_labels = {"tasa": "Tasa de referencia", "inflacion": "Inflación interanual", "pbi": "Crecimiento del PBI"}
-    candidatos = []
-    for metric, regiones in macro_trend.items():
-        for region_key, d in regiones.items():
-            if not d:
-                continue
-            cambio = round(d["actual"] - d["anterior"], 2)
-            candidatos.append({
-                "region_label": labels.get(region_key, region_key),
-                "metric_label": metric_labels.get(metric, metric),
-                "valor": d["actual"],
-                "anterior": d["anterior"],
-                "cambio": cambio,
-            })
-    if not candidatos:
-        return None
-    destacado = max(candidatos, key=lambda c: abs(c["cambio"]))
-    if destacado["cambio"] == 0:
-        destacado["texto"] = f"{destacado['metric_label']} de {destacado['region_label']} se mantuvo estable en {destacado['valor']}%."
-    else:
-        direccion = "subió" if destacado["cambio"] > 0 else "bajó"
-        signo = "+" if destacado["cambio"] > 0 else ""
-        destacado["texto"] = f"{destacado['metric_label']} de {destacado['region_label']} {direccion} de {destacado['anterior']}% a {destacado['valor']}% ({signo}{destacado['cambio']} p.p.)."
-    return destacado
-
 def get_top3_para_clientes(news_list):
     """Selecciona los 3 puntos mas importantes de la semana para compartir
     con clientes: prioriza noticias de alta relevancia; si no hay 3,
@@ -493,14 +464,13 @@ macro = get_macro_data()
 macro_trend = build_macro_trend(macro)
 conclusiones = generate_conclusiones(macro, news)
 impacto = get_impacto_empresarial(macro_trend)
-dato_semana = get_dato_semana(macro_trend)
 top3 = get_top3_para_clientes(news)
 week_str = f"{TODAY.day} de {MESES_ES[TODAY.month - 1]}, {TODAY.year}"
 
 with open("templates/dashboard.html") as f:
     template = Template(f.read())
 
-html = template.render(week=week_str, news=news, calendar=calendar, macro=macro, macro_trend=macro_trend, conclusiones=conclusiones, top3=top3, impacto=impacto, dato_semana=dato_semana)
+html = template.render(week=week_str, news=news, calendar=calendar, macro=macro, macro_trend=macro_trend, conclusiones=conclusiones, top3=top3, impacto=impacto)
 
 os.makedirs("output", exist_ok=True)
 with open("output/index.html", "w") as f:
