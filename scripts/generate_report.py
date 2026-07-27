@@ -445,6 +445,13 @@ def get_impacto_empresarial(macro_trend):
         resultado.append({"label": label, "resumen": f"{label}: {resumen}"})
     return resultado
 
+def _decap(texto):
+    """Pone en minúscula solo la primera letra, preservando siglas
+    como PBI que ya vienen en mayúscula dentro de la frase."""
+    if not texto:
+        return texto
+    return texto[0].lower() + texto[1:]
+
 def get_frase_final(macro_trend, dato_semana):
     """Genera una frase de cierre de maximo dos lineas que resume el tono
     general de la semana, combinando la tendencia dominante con el dato
@@ -463,7 +470,7 @@ def get_frase_final(macro_trend, dato_semana):
         "estable": "una semana de relativa estabilidad en los principales indicadores",
     }[dominante]
     if dato_semana:
-        return f"En general, {tono}; lo más destacado fue el movimiento en {dato_semana['metric_label'].lower()} de {dato_semana['region_label']}."
+        return f"En general, {tono}; lo más destacado fue el movimiento en {_decap(dato_semana['metric_label'])} de {dato_semana['region_label']}."
     return f"En general, {tono} esta semana."
 
 def get_dato_semana(macro_trend):
