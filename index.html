@@ -60,6 +60,11 @@ footer { text-align: center; padding: 2rem; font-size: 0.7rem; color: #bbb; bord
 
 <div class="news-item">
 <span class="tag tag-high">Alta relevancia</span>
+<div class="title"><a href="https://www.bloomberg.com/news/articles/2026-07-27/citi-traders-are-betting-fed-will-keep-rates-on-hold-this-week" target="_blank">Los operadores de Citi apuestan a que la Fed mantendrá las tasas sin cambios esta semana</a></div>
+</div>
+
+<div class="news-item">
+<span class="tag tag-high">Alta relevancia</span>
 <div class="title"><a href="https://www.bloomberg.com/news/articles/2026-07-27/treasury-yields-follow-oil-lower-with-fed-and-supply-in-focus" target="_blank">Los rendimientos de los bonos del Tesoro siguen a la baja del petróleo con la Fed y la oferta en el foco</a></div>
 </div>
 
@@ -71,11 +76,6 @@ footer { text-align: center; padding: 2rem; font-size: 0.7rem; color: #bbb; bord
 <div class="news-item">
 <span class="tag tag-high">Alta relevancia</span>
 <div class="title"><a href="https://www.bloomberg.com/news/articles/2026-07-26/fed-faces-growing-pressure-to-hike-rates-as-price-risks-rebound" target="_blank">La Reserva Federal enfrenta nuevas presiones para subir las tasas a medida que repuntan los riesgos de precios</a></div>
-</div>
-
-<div class="news-item">
-<span class="tag tag-high">Alta relevancia</span>
-<div class="title"><a href="https://www.bloomberg.com/news/articles/2026-07-27/snb-expects-to-keep-interest-rate-at-zero-until-end-of-2027" target="_blank">El BNS espera mantener la tasa de interés en cero hasta finales de 2027</a></div>
 </div>
 
 <div class="news-item">
@@ -166,9 +166,9 @@ footer { text-align: center; padding: 2rem; font-size: 0.7rem; color: #bbb; bord
 🇵🇪 Perú: tasa de referencia en 4.25% (estable), inflación interanual en 4.01% (estable), crecimiento del PBI en 1.80% (a la baja).
 
 <div class="conclusion-news">
-<div class="news-title"><a href="https://gestion.pe/economia/empresas/fibra-prime-evalua-inversiones-fuera-de-lima-tras-compra-de-parque-logistico-lima-sur-noticia/" target="_blank">Fibra Prime no se detiene: tras compra récord de US$ 145 millones ya evalúa nuevas adquisiciones</a></div>
+<div class="news-title"><a href="https://gestion.pe/economia/empresas/jockey-club-del-peru-alista-nuevo-plan-de-negocios-para-rentabilizar-sus-terrenos-en-lima-noticia/" target="_blank">Jockey Club alista nuevo plan de negocios para rentabilizar sus terrenos en Lima</a></div>
 
-<div class="news-desc">Fibra Prime fortalece su apuesta por el mercado logístico con la adquisición del Parque Logístico Lima Sur (PLS) por US$ 145 millones, operación que eleva su portafolio a US$...</div>
+<div class="news-desc">El Jockey Club del Perú ha iniciado un proceso de transformación operativa y comercial que busca redefinir su futuro financiero. Tras contener una caída sostenida de una década...</div>
 
 </div>
 
@@ -178,9 +178,9 @@ footer { text-align: center; padding: 2rem; font-size: 0.7rem; color: #bbb; bord
 🇺🇸 EE.UU.: tasa de referencia en 3.63% (estable), inflación interanual en 3.73% (a la baja), crecimiento del PBI en 2.10% (a la baja).
 
 <div class="conclusion-news">
-<div class="news-title"><a href="https://www.bloomberg.com/news/articles/2026-07-27/treasury-yields-follow-oil-lower-with-fed-and-supply-in-focus" target="_blank">Los rendimientos de los bonos del Tesoro siguen a la baja del petróleo con la Fed y la oferta en el foco</a></div>
+<div class="news-title"><a href="https://www.bloomberg.com/news/articles/2026-07-27/citi-traders-are-betting-fed-will-keep-rates-on-hold-this-week" target="_blank">Los operadores de Citi apuestan a que la Fed mantendrá las tasas sin cambios esta semana</a></div>
 
-<div class="news-desc">Los bonos del Tesoro de Estados Unidos subieron a medida que los precios del petróleo se suavizaron después de que Estados Unidos detuviera su campaña de ataques de casi dos semanas contra Irán, mientras los operadores contemplaban una probabilidad de aproximadamente una entre tres de...</div>
+<div class="news-desc">Los operadores de Citigroup Inc. están apostando a que la Reserva Federal dejará las tasas sin cambios esta semana, incluso cuando los mercados de swaps asignan una probabilidad de más de una entre tres de...</div>
 
 </div>
 
@@ -208,11 +208,88 @@ footer { text-align: center; padding: 2rem; font-size: 0.7rem; color: #bbb; bord
 const macroTrend = {"inflacion": {"europa": {"actual": 8.7, "anterior": 9.2, "proyectada": 8.2}, "peru": {"actual": 4.01, "anterior": 3.91, "proyectada": 4.11}, "usa": {"actual": 3.73, "anterior": 4.27, "proyectada": 3.19}}, "pbi": {"europa": {"actual": 1.0, "anterior": 1.83, "proyectada": 0.16}, "peru": {"actual": 1.8, "anterior": 3.73, "proyectada": -0.13}, "usa": {"actual": 2.1, "anterior": 0.5, "proyectada": 3.7}}, "tasa": {"europa": {"actual": 2.25, "anterior": 2.25, "proyectada": 2.25}, "peru": {"actual": 4.25, "anterior": 4.25, "proyectada": 4.25}, "usa": {"actual": 3.63, "anterior": 3.63, "proyectada": 3.63}}};
 
 if (window.ChartDataLabels) {
-Chart.register(window.ChartDataLabels);
+  Chart.register(window.ChartDataLabels);
 }
 
 const MONO_FONT = "'IBM Plex Mono', 'Courier New', monospace";
 const LABELS = ['Anterior', 'Actual', 'Proyectada'];
 
 const REGIONS = [
-{ key: 'peru', label: '🇵🇪 Perú', color: '#0a2342' },
+  { key: 'peru', label: '🇵🇪 Perú', color: '#0a2342' },
+  { key: 'usa', label: '🇺🇸 EE.UU.', color: '#2e6fad' },
+  { key: 'europa', label: '🇪🇺 Europa', color: '#a9825c' }
+];
+
+function makeTrendChart(id, dataByRegion) {
+  const ctx = document.getElementById(id);
+  if (!ctx) { return; }
+  try {
+    const datasets = [];
+    for (let i = 0; i < REGIONS.length; i++) {
+      const r = REGIONS[i];
+      const d = dataByRegion ? dataByRegion[r.key] : null;
+      const values = d ? [d.anterior, d.actual, d.proyectada] : [null, null, null];
+      datasets.push({
+        label: r.label,
+        data: values,
+        borderColor: r.color,
+        backgroundColor: r.color,
+        borderWidth: 2,
+        tension: 0.25,
+        pointRadius: 4,
+        pointBackgroundColor: r.color
+      });
+    }
+
+    new Chart(ctx, {
+      type: 'line',
+      data: { labels: LABELS, datasets: datasets },
+      options: {
+        responsive: true,
+        layout: { padding: { top: 24, right: 10 } },
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: { font: { size: 9, family: MONO_FONT }, color: '#555', boxWidth: 10, boxHeight: 10 }
+          },
+          datalabels: {
+            anchor: 'end',
+            align: 'top',
+            offset: 4,
+            clamp: true,
+            color: function(context) { return context.dataset.borderColor; },
+            font: { size: 7, weight: 'bold', family: MONO_FONT },
+            formatter: function(value) {
+              if (value === null || value === undefined) { return ''; }
+              return value.toFixed(1) + '%';
+            }
+          }
+        },
+        scales: {
+          x: {
+            ticks: { font: { size: 9, family: MONO_FONT }, color: '#777' },
+            grid: { display: false },
+            border: { color: '#ccc' }
+          },
+          y: {
+            ticks: { font: { size: 9, family: MONO_FONT }, color: '#aaa' },
+            grid: { color: '#eeeeee', lineWidth: 1 },
+            border: { display: false }
+          }
+        }
+      }
+    });
+  } catch (err) {
+    const msg = document.createElement('div');
+    msg.style.cssText = 'color:#b91c1c;font-size:11px;font-family:monospace;padding:8px;';
+    msg.textContent = 'Error grafico: ' + err.message;
+    ctx.parentNode.appendChild(msg);
+  }
+}
+
+makeTrendChart('chart-inflacion', macroTrend.inflacion);
+makeTrendChart('chart-tasa', macroTrend.tasa);
+makeTrendChart('chart-pbi', macroTrend.pbi);
+</script>
+</body>
+</html>
