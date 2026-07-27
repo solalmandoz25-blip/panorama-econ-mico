@@ -147,6 +147,15 @@ footer { text-align: center; padding: 2rem; font-size: 0.7rem; color: #bbb; bord
 </ul>
 </div>
 
+<div class="section-title">Qué Significa para Mí y mi Empresa<span class="badge-auto">✦ Automático</span></div>
+<div class="conclusion-box">
+<ul class="conclusion-list">
+{% for i in impacto %}
+<li>{{ i.resumen }}</li>
+{% endfor %}
+</ul>
+</div>
+
 </div>
 <footer>Panorama Económico &nbsp;·&nbsp; BCP Miami &nbsp;·&nbsp; Generado automáticamente cada lunes</footer>
 
