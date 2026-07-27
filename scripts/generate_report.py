@@ -279,6 +279,31 @@ def get_macro_data():
 
     return macro
 
+def compute_trend(data_list):
+    """Toma la serie de datos reales y arma anterior/actual/proyectada.
+    'Proyectada' es una extrapolación lineal simple: continúa la misma
+    pendiente entre 'anterior' y 'actual' un paso más hacia adelante."""
+    if not data_list or len(data_list) < 2:
+        return None
+    try:
+        anterior = float(data_list[-2]["value"])
+        actual = float(data_list[-1]["value"])
+    except (ValueError, TypeError, IndexError):
+        return None
+    proyectada = round(actual + (actual - anterior), 2)
+    return {"anterior": round(anterior, 2), "actual": round(actual, 2), "proyectada": proyectada}
+
+def build_macro_trend(macro):
+    keys = ["tasa", "inflacion", "pbi"]
+    trend = {}
+    for k in keys:
+        trend[k] = {
+            "peru": compute_trend(macro.get("peru", {}).get(k, [])),
+            "usa": compute_trend(macro.get("usa", {}).get(k, [])),
+            "europa": compute_trend(macro.get("europa", {}).get(k, [])),
+        }
+    return trend
+
 def _fmt(val):
     try:
         return f"{float(val):.2f}"
@@ -341,57 +366,8 @@ def get_usa_fallback_news():
             item["title"] = translate_es(item["title"])
             item["description"] = translate_es(item["description"])
             return item
-    return None
-
-def generate_conclusiones(macro, news_list):
-    labels = [("peru", "🇵🇪 Perú"), ("usa", "🇺🇸 EE.UU."), ("europa", "🇪🇺 Europa")]
-    lineas = []
-    for key, label in labels:
-        data = macro.get(key, {})
-        tasa = [o["value"] for o in data.get("tasa", [])]
-        infl = [o["value"] for o in data.get("inflacion", [])]
-        pbi = [o["value"] for o in data.get("pbi", [])]
-        partes = []
-        if tasa:
-            partes.append(f"tasa de referencia en {_fmt(tasa[-1])}% ({_trend(tasa)})")
-        if infl:
-            partes.append(f"inflación interanual en {_fmt(infl[-1])}% ({_trend(infl)})")
-        if pbi:
-            partes.append(f"crecimiento del PBI en {_fmt(pbi[-1])}% ({_trend(pbi)})")
-        resumen = ", ".join(partes) + "." if partes else "sin datos disponibles esta semana."
-
-        noticia = find_relevant_news(key, news_list)
-        if not noticia and key == "peru":
-            noticia = get_peru_fallback_news()
-        if not noticia and key == "europa":
-            noticia = get_europa_fallback_news()
-        if not noticia and key == "usa":
-            noticia = get_usa_fallback_news()
-
-        lineas.append({
-            "label": label,
-            "resumen": f"{label}: {resumen}",
-            "noticia_titulo": noticia["title"] if noticia else None,
-            "noticia_desc": noticia["description"] if noticia else None,
-            "noticia_link": noticia["link"] if noticia else None,
-        })
-    return lineas
-
-MESES_ES = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"]
-
-news = get_rss_news()
-calendar = get_calendar()
-macro = get_macro_data()
-conclusiones = generate_conclusiones(macro, news)
-week_str = f"{TODAY.day} de {MESES_ES[TODAY.month - 1]}, {TODAY.year}"
-
-with open("templates/dashboard.html") as f:
-    template = Template(f.read())
-
-html = template.render(week=week_str, news=news, calendar=calendar, macro=macro, conclusiones=conclusiones)
-
-os.makedirs("output", exist_ok=True)
-with open("output/index.html", "w") as f:
-    f.write(html)
-
-print(f"✅ Dashboard generado — {len(news)} noticias, calendario OK")
+    if items:
+        item = items[0]
+        item["title"] = translate_es(item["title"])
+        item["description"] = translate_es(item["description"])
+        return
