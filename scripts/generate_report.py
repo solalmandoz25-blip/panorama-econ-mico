@@ -412,19 +412,19 @@ def get_impacto_empresarial(macro_trend):
     decisiones de negocio: costo de financiamiento, precios, crecimiento."""
     interpretaciones = {
         "tasa": {
-            "al alza": "financiamiento mas costoso; conviene evaluar fijar tasas cuanto antes",
-            "a la baja": "costo de fondeo a la baja; podria ser buen momento para nuevas lineas de credito",
-            "estable": "costo de financiamiento estable, sin cambios inmediatos esperados",
+            "al alza": "financiamiento más costoso; se recomienda evaluar la fijación de tasas en el corto plazo",
+            "a la baja": "costo de fondeo a la baja; representa una oportunidad para nuevas líneas de crédito",
+            "estable": "costo de financiamiento estable, sin cambios significativos previstos",
         },
         "inflacion": {
-            "al alza": "presion sobre costos operativos y margenes; revisar estrategias de precios",
-            "a la baja": "entorno de precios mas predecible, favorece la planificacion a mediano plazo",
-            "estable": "inflacion bajo control, sin mayor impacto esperado en el corto plazo",
+            "al alza": "presión al alza sobre costos operativos y márgenes; se sugiere revisar la estrategia de precios",
+            "a la baja": "entorno de precios más predecible, favorable para la planificación a mediano plazo",
+            "estable": "inflación bajo control, sin impacto significativo previsto en el corto plazo",
         },
         "pbi": {
-            "al alza": "crecimiento economico favorece expansion y mayor demanda",
-            "a la baja": "desaceleracion sugiere cautela en proyecciones de crecimiento",
-            "estable": "actividad economica estable, sin senales de cambio abrupto",
+            "al alza": "el crecimiento económico favorece la expansión y una mayor demanda",
+            "a la baja": "la desaceleración sugiere cautela en las proyecciones de crecimiento",
+            "estable": "actividad económica estable, sin señales de cambio abrupto",
         },
     }
     labels = [("peru", "🇵🇪 Perú"), ("usa", "🇺🇸 Estados Unidos"), ("europa", "🇪🇺 Europa")]
@@ -458,7 +458,7 @@ def get_frase_final(macro_trend, dato_semana):
             conteo[direccion] += 1
     dominante = max(conteo, key=conteo.get)
     tono = {
-        "al alza": "una semana de presiones al alza en varios frentes",
+        "al alza": "una semana marcada por presiones al alza en varios frentes",
         "a la baja": "una semana con señales de alivio en varios frentes",
         "estable": "una semana de relativa estabilidad en los principales indicadores",
     }[dominante]
