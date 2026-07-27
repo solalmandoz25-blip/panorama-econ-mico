@@ -127,11 +127,88 @@ footer { text-align: center; padding: 2rem; font-size: 0.7rem; color: #bbb; bord
 const macroTrend = {{ macro_trend | tojson }};
 
 if (window.ChartDataLabels) {
-Chart.register(window.ChartDataLabels);
+  Chart.register(window.ChartDataLabels);
 }
 
 const MONO_FONT = "'IBM Plex Mono', 'Courier New', monospace";
 const LABELS = ['Anterior', 'Actual', 'Proyectada'];
 
 const REGIONS = [
-{ key: 'peru', label: '🇵🇪 Perú', color: '#0a2342' },
+  { key: 'peru', label: '🇵🇪 Perú', color: '#0a2342' },
+  { key: 'usa', label: '🇺🇸 EE.UU.', color: '#2e6fad' },
+  { key: 'europa', label: '🇪🇺 Europa', color: '#a9825c' }
+];
+
+function makeTrendChart(id, dataByRegion) {
+  const ctx = document.getElementById(id);
+  if (!ctx) { return; }
+  try {
+    const datasets = [];
+    for (let i = 0; i < REGIONS.length; i++) {
+      const r = REGIONS[i];
+      const d = dataByRegion ? dataByRegion[r.key] : null;
+      const values = d ? [d.anterior, d.actual, d.proyectada] : [null, null, null];
+      datasets.push({
+        label: r.label,
+        data: values,
+        borderColor: r.color,
+        backgroundColor: r.color,
+        borderWidth: 2,
+        tension: 0.25,
+        pointRadius: 4,
+        pointBackgroundColor: r.color
+      });
+    }
+
+    new Chart(ctx, {
+      type: 'line',
+      data: { labels: LABELS, datasets: datasets },
+      options: {
+        responsive: true,
+        layout: { padding: { top: 24, right: 10 } },
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: { font: { size: 9, family: MONO_FONT }, color: '#555', boxWidth: 10, boxHeight: 10 }
+          },
+          datalabels: {
+            anchor: 'end',
+            align: 'top',
+            offset: 4,
+            clamp: true,
+            color: function(context) { return context.dataset.borderColor; },
+            font: { size: 7, weight: 'bold', family: MONO_FONT },
+            formatter: function(value) {
+              if (value === null || value === undefined) { return ''; }
+              return value.toFixed(1) + '%';
+            }
+          }
+        },
+        scales: {
+          x: {
+            ticks: { font: { size: 9, family: MONO_FONT }, color: '#777' },
+            grid: { display: false },
+            border: { color: '#ccc' }
+          },
+          y: {
+            ticks: { font: { size: 9, family: MONO_FONT }, color: '#aaa' },
+            grid: { color: '#eeeeee', lineWidth: 1 },
+            border: { display: false }
+          }
+        }
+      }
+    });
+  } catch (err) {
+    const msg = document.createElement('div');
+    msg.style.cssText = 'color:#b91c1c;font-size:11px;font-family:monospace;padding:8px;';
+    msg.textContent = 'Error grafico: ' + err.message;
+    ctx.parentNode.appendChild(msg);
+  }
+}
+
+makeTrendChart('chart-inflacion', macroTrend.inflacion);
+makeTrendChart('chart-tasa', macroTrend.tasa);
+makeTrendChart('chart-pbi', macroTrend.pbi);
+</script>
+</body>
+</html>
