@@ -35,6 +35,7 @@ header span { font-size: 0.8rem; opacity: 0.65; color: white; }
 .macro-card { background: white; border-radius: 6px; padding: 1.1rem 1.3rem 1.3rem; box-shadow: 0 1px 6px rgba(0,0,0,0.07); position: relative; overflow: hidden; }
 .macro-card::before { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: #0a2342; }
 .macro-card h3 { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.12em; color: #0a2342; margin-bottom: 0.9rem; font-weight: bold; font-family: 'IBM Plex Mono', monospace; }
+.macro-note { font-size: 0.65rem; color: #999; font-style: italic; margin-top: 8px; text-align: right; }
 .conclusion-box { background: white; border-radius: 10px; padding: 1.5rem 2rem; box-shadow: 0 1px 6px rgba(0,0,0,0.07); }
 .conclusion-list { list-style: none; display: flex; flex-direction: column; gap: 14px; }
 .conclusion-list li { font-size: 0.9rem; line-height: 1.6; padding-left: 1rem; border-left: 3px solid #0a2342; }
@@ -86,18 +87,19 @@ footer { text-align: center; padding: 2rem; font-size: 0.7rem; color: #bbb; bord
 <div class="section-title">Indicadores Macroeconómicos<span class="badge-auto">✦ Automático</span></div>
 <div class="macro-grid">
 <div class="macro-card">
-<h3>🇵🇪 Perú</h3>
-<canvas id="chart-peru" height="200"></canvas>
+<h3>Inflación %</h3>
+<canvas id="chart-inflacion" height="200"></canvas>
 </div>
 <div class="macro-card">
-<h3>🇺🇸 EE.UU.</h3>
-<canvas id="chart-usa" height="200"></canvas>
+<h3>Tasa de Referencia %</h3>
+<canvas id="chart-tasa" height="200"></canvas>
 </div>
 <div class="macro-card">
-<h3>🇪🇺 Europa</h3>
-<canvas id="chart-europa" height="200"></canvas>
+<h3>Crecimiento del PBI %</h3>
+<canvas id="chart-pbi" height="200"></canvas>
 </div>
 </div>
+<div class="macro-note">*Proyectada: extrapolación lineal simple a partir de la tendencia reciente.</div>
 
 <div class="section-title">Perspectiva de tesorería<span class="badge-auto">✦ Automático</span></div>
 <div class="conclusion-box">
@@ -122,92 +124,14 @@ footer { text-align: center; padding: 2rem; font-size: 0.7rem; color: #bbb; bord
 <footer>Panorama Económico &nbsp;·&nbsp; BCP Miami &nbsp;·&nbsp; Generado automáticamente cada lunes</footer>
 
 <script>
-const macro = {{ macro | tojson }};
+const macroTrend = {{ macro_trend | tojson }};
 
 if (window.ChartDataLabels) {
 Chart.register(window.ChartDataLabels);
 }
 
 const MONO_FONT = "'IBM Plex Mono', 'Courier New', monospace";
+const LABELS = ['Anterior', 'Actual', 'Proyectada'];
 
-function getUniformLabels() {
-const now = new Date();
-const labels = [];
-for (let i = 2; i >= 0; i--) {
-const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-const mm = String(d.getMonth() + 1).padStart(2, '0');
-labels.push(`${d.getFullYear()}-${mm}`);
-}
-return labels;
-}
-const UNIFORM_LABELS = getUniformLabels();
-
-function makeChart(id, data, label) {
-const ctx = document.getElementById(id);
-if (!ctx || !data) return;
-
-const labels = UNIFORM_LABELS;
-
-const getFillForwardVals = (arr) => {
-if (!arr || arr.length === 0) return labels.map(() => null);
-const sorted = [...arr].sort((a, b) => a.date.localeCompare(b.date));
-return labels.map(l => {
-let last = null;
-for (const o of sorted) {
-if (o.date <= l) last = o;
-}
-if (last === null) last = sorted[0];
-return last ? parseFloat(last.value) : null;
-});
-};
-
-new Chart(ctx, {
-type: 'bar',
-data: {
-labels: labels,
-datasets: [
-{ label: 'Inflación %', data: getFillForwardVals(data.inflacion), backgroundColor: '#0a2342', borderRadius: 1, categoryPercentage: 0.78, barPercentage: 0.82 },
-{ label: 'Tasa %', data: getFillForwardVals(data.tasa), backgroundColor: '#2e6fad', borderRadius: 1, categoryPercentage: 0.78, barPercentage: 0.82 },
-{ label: 'PBI %', data: getFillForwardVals(data.pbi), backgroundColor: '#b0c4de', borderRadius: 1, categoryPercentage: 0.78, barPercentage: 0.82 },
-]
-},
-options: {
-responsive: true,
-layout: { padding: { top: 20 } },
-plugins: {
-legend: {
-position: 'bottom',
-labels: { font: { size: 9, family: MONO_FONT }, color: '#555', boxWidth: 10, boxHeight: 10, usePointStyle: false }
-},
-datalabels: {
-anchor: 'end',
-align: 'end',
-offset: 2,
-clamp: true,
-color: '#0a2342',
-font: { size: 7, weight: 'bold', family: MONO_FONT },
-formatter: (value) => value === null || value === undefined ? '' : value.toFixed(1) + '%'
-}
-},
-scales: {
-x: {
-ticks: { font: { size: 9, family: MONO_FONT }, color: '#777' },
-grid: { display: false },
-border: { color: '#ccc' }
-},
-y: {
-ticks: { font: { size: 9, family: MONO_FONT }, color: '#aaa' },
-grid: { color: '#eeeeee', lineWidth: 1 },
-border: { display: false }
-}
-}
-}
-});
-}
-
-makeChart('chart-peru', macro.peru, 'Perú');
-makeChart('chart-usa', macro.usa, 'EE.UU.');
-makeChart('chart-europa', macro.europa, 'Europa');
-</script>
-</body>
-</html>
+const REGIONS = [
+{ key: 'peru', label: '🇵🇪 Perú', color: '#0a2342' },
