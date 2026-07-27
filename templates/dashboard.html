@@ -36,6 +36,14 @@ header span { font-size: 0.8rem; opacity: 0.65; color: white; }
 .macro-card::before { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: #0a2342; }
 .macro-card h3 { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.12em; color: #0a2342; margin-bottom: 0.9rem; font-weight: bold; font-family: 'IBM Plex Mono', monospace; }
 .macro-note { font-size: 0.65rem; color: #999; font-style: italic; margin-top: 8px; text-align: right; }
+.top3-list { display: flex; flex-direction: column; gap: 10px; }
+.top3-item { background: white; border-radius: 8px; padding: 1rem 1.2rem; box-shadow: 0 1px 6px rgba(0,0,0,0.07); display: flex; gap: 14px; align-items: flex-start; }
+.top3-num { font-family: 'IBM Plex Mono', monospace; font-size: 1.5rem; font-weight: bold; color: #0a2342; min-width: 30px; line-height: 1; }
+.top3-content { flex: 1; }
+.top3-title { font-size: 0.95rem; font-weight: bold; line-height: 1.35; }
+.top3-title a { color: #0a2342; text-decoration: none; }
+.top3-title a:hover { text-decoration: underline; }
+.top3-desc { font-size: 0.82rem; color: #555; margin-top: 4px; line-height: 1.5; }
 .conclusion-box { background: white; border-radius: 10px; padding: 1.5rem 2rem; box-shadow: 0 1px 6px rgba(0,0,0,0.07); }
 .conclusion-list { list-style: none; display: flex; flex-direction: column; gap: 14px; }
 .conclusion-list li { font-size: 0.9rem; line-height: 1.6; padding-left: 1rem; border-left: 3px solid #0a2342; }
@@ -53,6 +61,25 @@ footer { text-align: center; padding: 2rem; font-size: 0.7rem; color: #bbb; bord
 <span>BCP Miami &nbsp;·&nbsp; Semana del {{ week }}</span>
 </header>
 <div class="container">
+
+<div class="section-title">Top 3 para Clientes Esta Semana<span class="badge-auto">✦ Automático</span></div>
+<div class="top3-list">
+{% if top3 %}
+{% for t in top3 %}
+<div class="top3-item">
+<div class="top3-num">{{ loop.index }}</div>
+<div class="top3-content">
+<div class="top3-title"><a href="{{ t.link }}" target="_blank">{{ t.title }}</a></div>
+{% if t.description %}
+<div class="top3-desc">{{ t.description }}</div>
+{% endif %}
+</div>
+</div>
+{% endfor %}
+{% else %}
+<div class="top3-item"><div class="top3-content" style="color:#bbb;font-style:italic">Sin destacados esta semana.</div></div>
+{% endif %}
+</div>
 
 <div class="section-title">Noticias económicas relevantes<span class="badge-auto">✦ Automático</span></div>
 <div class="news-list">
@@ -135,7 +162,7 @@ const LABELS = ['Anterior', 'Actual', 'Proyectada'];
 
 const REGIONS = [
   { key: 'peru', label: '🇵🇪 Perú', color: '#0a2342' },
-  { key: 'usa', label: '🇺🇸 EE.UU.', color: '#2e6fad' },
+  { key: 'usa', label: '🇺🇸 Estados Unidos', color: '#2e6fad' },
   { key: 'europa', label: '🇪🇺 Europa', color: '#a9825c' }
 ];
 
