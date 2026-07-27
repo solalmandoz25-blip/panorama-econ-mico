@@ -159,7 +159,7 @@ def get_calendar():
                 last = periods[-1]
                 val = round(float(last["values"][0]), 2)
                 fecha = last["name"]
-                peru_events.append(f"Publicado — {nombre}: {val}% ({fecha}) {estrellas}")
+                peru_events.append(f"{fecha} — {nombre}: {val}% {estrellas}")
         except Exception as e:
             print(f"Error BCRP {series_id}: {e}")
 
