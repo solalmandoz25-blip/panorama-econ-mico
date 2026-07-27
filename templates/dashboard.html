@@ -66,25 +66,6 @@ footer { text-align: center; padding: 2rem; font-size: 0.7rem; color: #bbb; bord
 </header>
 <div class="container">
 
-<div class="section-title">Clave de la Semana<span class="badge-auto">✦ Automático</span></div>
-<div class="top3-list">
-{% if top3 %}
-{% for t in top3 %}
-<div class="top3-item">
-<div class="top3-num">{{ loop.index }}</div>
-<div class="top3-content">
-<div class="top3-title"><a href="{{ t.link }}" target="_blank">{{ t.title }}</a></div>
-{% if t.description %}
-<div class="top3-desc">{{ t.description }}</div>
-{% endif %}
-</div>
-</div>
-{% endfor %}
-{% else %}
-<div class="top3-item"><div class="top3-content" style="color:#bbb;font-style:italic">Sin destacados esta semana.</div></div>
-{% endif %}
-</div>
-
 <div class="section-title">Dato de la Semana<span class="badge-auto">✦ Automático</span></div>
 <div class="dato-box">
 {% if dato_semana %}
@@ -157,15 +138,6 @@ footer { text-align: center; padding: 2rem; font-size: 0.7rem; color: #bbb; bord
 </div>
 {% endif %}
 </li>
-{% endfor %}
-</ul>
-</div>
-
-<div class="section-title">Implicación para su Empresa<span class="badge-auto">✦ Automático</span></div>
-<div class="conclusion-box">
-<ul class="conclusion-list">
-{% for i in impacto %}
-<li>{{ i.resumen }}</li>
 {% endfor %}
 </ul>
 </div>
