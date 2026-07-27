@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Panorama Económico — BCP Miami</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-datalabels/2.2.0/chartjs-plugin-datalabels.min.js"></script>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: Georgia, serif; background: #f4f3f0; color: #1a1a1a; }
+header { background: #0a2342; color: white; padding: 1.4rem 2.5rem; display: flex; justify-content: space-between; align-items: center; }
+header h1 { font-size: 1.1rem; letter-spacing: 0.12em; font-weight: bold; color: white; }
+header span { font-size: 0.8rem; opacity: 0.65; color: white; }
+.container { max-width: 1100px; margin: 0 auto; padding: 1.8rem 1.5rem; }
+.section-title { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.14em; color: #0a2342; border-bottom: 1px solid #0a2342; padding-bottom: 4px; margin: 2rem 0 1rem; font-weight: bold; display: flex; justify-content: space-between; align-items: center; }
+.badge-auto { font-size: 0.65rem; background: #f0fdf4; color: #166534; border: 1px solid #86efac; border-radius: 20px; padding: 2px 10px; font-weight: normal; letter-spacing: 0; display: none; }
+.badge-manual { font-size: 0.65rem; background: #eff6ff; color: #1e40af; border: 1px solid #93c5fd; border-radius: 20px; padding: 2px 10px; font-weight: normal; letter-spacing: 0; }
+.news-list { display: flex; flex-direction: column; gap: 6px; }
+.news-item { background: white; border: 0.5px solid #e5e5e5; border-left: 3px solid #0a2342; border-radius: 0 8px 8px 0; padding: 0.55rem 0.9rem; display: flex; align-items: center; gap: 10px; }
+.news-item .title { font-size: 0.85rem; color: #1a1a1a; font-weight: bold; line-height: 1.3; flex: 1; }
+.news-item .title a { color: #0a2342; text-decoration: none; }
+.news-item .title a:hover { text-decoration: underline; }
+.tag { display: inline-flex; align-items: center; justify-content: center; font-size: 0.62rem; padding: 2px 8px; border-radius: 20px; white-space: nowrap; min-width: 108px; flex-shrink: 0; }
+.tag-high { background: #fef2f2; color: #991b1b; border: 1px solid #fca5a5; }
+.tag-med { background: #fffbeb; color: #92400e; border: 1px solid #fcd34d; }
+.cal-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.cal-country { background: white; border: 0.5px solid #e5e5e5; border-radius: 8px; padding: 0.8rem 1rem; }
+.cal-country-name { font-size: 0.72rem; font-weight: bold; color: #0a2342; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; padding-bottom: 6px; border-bottom: 1px solid #f0f0f0; }
+.cal-event { font-size: 0.78rem; color: #444; padding: 5px 0; border-bottom: 0.5px solid #f5f5f5; }
+.cal-event:last-child { border-bottom: none; }
+.cal-empty { font-size: 0.78rem; color: #bbb; font-style: italic; }
+.macro-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.macro-card { background: white; border-radius: 6px; padding: 1.1rem 1.3rem 1.3rem; box-shadow: 0 1px 6px rgba(0,0,0,0.07); position: relative; overflow: hidden; }
+.macro-card::before { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: #0a2342; }
+.macro-card h3 { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.12em; color: #0a2342; margin-bottom: 0.9rem; font-weight: bold; font-family: 'IBM Plex Mono', monospace; }
+.macro-note { font-size: 0.65rem; color: #999; font-style: italic; margin-top: 8px; text-align: right; }
+.conclusion-box { background: white; border-radius: 10px; padding: 1.5rem 2rem; box-shadow: 0 1px 6px rgba(0,0,0,0.07); }
+.conclusion-list { list-style: none; display: flex; flex-direction: column; gap: 14px; }
+.conclusion-list li { font-size: 0.9rem; line-height: 1.6; padding-left: 1rem; border-left: 3px solid #0a2342; }
+.conclusion-news { margin-top: 6px; font-size: 0.82rem; color: #444; }
+.conclusion-news .news-title { font-weight: bold; color: #0a2342; }
+.conclusion-news .news-title a { color: #0a2342; text-decoration: none; }
+.conclusion-news .news-title a:hover { text-decoration: underline; }
+.conclusion-news .news-desc { color: #555; margin-top: 2px; }
+footer { text-align: center; padding: 2rem; font-size: 0.7rem; color: #bbb; border-top: 1px solid #eee; margin-top: 2rem; }
+</style>
+</head>
+<body>
+<header>
+<h1>PANORAMA ECONÓMICO</h1>
+<span>BCP Miami &nbsp;·&nbsp; Semana del 27 de julio, 2026</span>
+</header>
+<div class="container">
+
+<div class="section-title">Noticias económicas relevantes<span class="badge-auto">✦ Automático</span></div>
+<div class="news-list">
+
+
+<div class="news-item">
+<span class="tag tag-high">Alta relevancia</span>
+<div class="title"><a href="https://www.bloomberg.com/news/articles/2026-07-27/treasury-yields-follow-oil-lower-with-fed-and-supply-in-focus" target="_blank">Los rendimientos de los bonos del Tesoro siguen a la baja del petróleo con la Fed y la oferta en el foco</a></div>
+</div>
+
+<div class="news-item">
+<span class="tag tag-high">Alta relevancia</span>
+<div class="title"><a href="https://www.bloomberg.com/news/articles/2026-07-27/china-says-us-pledged-to-cap-replacement-tariffs-at-20" target="_blank">China dice que Estados Unidos se comprometió a limitar los aranceles de reemplazo al 20%</a></div>
+</div>
+
+<div class="news-item">
+<span class="tag tag-high">Alta relevancia</span>
+<div class="title"><a href="https://www.bloomberg.com/news/articles/2026-07-26/fed-faces-growing-pressure-to-hike-rates-as-price-risks-rebound" target="_blank">La Reserva Federal enfrenta nuevas presiones para subir las tasas a medida que repuntan los riesgos de precios</a></div>
+</div>
+
+<div class="news-item">
+<span class="tag tag-high">Alta relevancia</span>
+<div class="title"><a href="https://www.bloomberg.com/news/articles/2026-07-27/snb-expects-to-keep-interest-rate-at-zero-until-end-of-2027" target="_blank">El BNS espera mantener la tasa de interés en cero hasta finales de 2027</a></div>
+</div>
+
+<div class="news-item">
+<span class="tag tag-med">Media relevancia</span>
+<div class="title"><a href="https://www.bloomberg.com/news/articles/2026-07-27/chile-taps-international-bond-markets-after-debt-limit-increase" target="_blank">Chile recurre a los mercados internacionales de bonos tras aumento del límite de deuda</a></div>
+</div>
+
+<div class="news-item">
+<span class="tag tag-med">Media relevancia</span>
+<div class="title"><a href="https://www.bloomberg.com/news/articles/2026-07-27/kazakh-oil-port-cpc-set-to-load-tankers-again-after-drone-pause" target="_blank">La terminal petrolera del CPC reanuda las exportaciones de crudo kazajo después de los ataques</a></div>
+</div>
+
+
+</div>
+
+<div class="section-title">Calendario económico — eventos ★★★<span class="badge-auto">✦ Automático</span></div>
+<div class="cal-grid">
+
+<div class="cal-country">
+<div class="cal-country-name">🇺🇸 EE.UU.</div>
+
+
+<div class="cal-event">Mié 29 jul, 14:00 — Tasa de fondos federales ★★★</div>
+
+<div class="cal-event">Mié 29 jul, 14:00 — Declaración del FOMC ★★★</div>
+
+<div class="cal-event">Mié 29 jul, 14:30 — Conferencia de prensa del FOMC ★★★</div>
+
+<div class="cal-event">Jue 30 jul, 08:30 — Avance del PIB t/t ★★★</div>
+
+
+</div>
+
+<div class="cal-country">
+<div class="cal-country-name">🇪🇺 Europa</div>
+
+
+<div class="cal-event">Jue 30 jul, 02:29 — IPC preliminar alemán m/m ★★</div>
+
+<div class="cal-event">Jue 30 jul, 04:00 — PIB preliminar alemán t/t ★★</div>
+
+<div class="cal-event">Vie 31 jul, 05:00 — Core CPI Flash Estimate y/y ★★</div>
+
+<div class="cal-event">Vie 31 jul, 05:00 — CPI Flash Estimate y/y ★★</div>
+
+
+</div>
+
+<div class="cal-country">
+<div class="cal-country-name">🇵🇪 Perú</div>
+
+
+<div class="cal-event">Jul.2026 — Tasa de referencia BCRP: 4.25% ★★★</div>
+
+<div class="cal-event">Jun.2026 — Inflación interanual (IPC): 4.01% ★★★</div>
+
+<div class="cal-event">May.2026 — Crecimiento del PBI: 1.8% ★★</div>
+
+<div class="cal-event">Próximo — Lun 3 ago — Publicación IPC (inflación) INEI ★★★</div>
+
+
+</div>
+
+</div>
+
+<div class="section-title">Indicadores Macroeconómicos<span class="badge-auto">✦ Automático</span></div>
+<div class="macro-grid">
+<div class="macro-card">
+<h3>Inflación %</h3>
+<canvas id="chart-inflacion" height="200"></canvas>
+</div>
+<div class="macro-card">
+<h3>Tasa de Referencia %</h3>
+<canvas id="chart-tasa" height="200"></canvas>
+</div>
+<div class="macro-card">
+<h3>Crecimiento del PBI %</h3>
+<canvas id="chart-pbi" height="200"></canvas>
+</div>
+</div>
+<div class="macro-note">*Proyectada: extrapolación lineal simple a partir de la tendencia reciente.</div>
+
+<div class="section-title">Perspectiva de tesorería<span class="badge-auto">✦ Automático</span></div>
+<div class="conclusion-box">
+<ul class="conclusion-list">
+
+<li>
+🇵🇪 Perú: tasa de referencia en 4.25% (estable), inflación interanual en 4.01% (estable), crecimiento del PBI en 1.80% (a la baja).
+
+<div class="conclusion-news">
+<div class="news-title"><a href="https://gestion.pe/economia/empresas/fibra-prime-evalua-inversiones-fuera-de-lima-tras-compra-de-parque-logistico-lima-sur-noticia/" target="_blank">Fibra Prime no se detiene: tras compra récord de US$ 145 millones ya evalúa nuevas adquisiciones</a></div>
+
+<div class="news-desc">Fibra Prime fortalece su apuesta por el mercado logístico con la adquisición del Parque Logístico Lima Sur (PLS) por US$ 145 millones, operación que eleva su portafolio a US$...</div>
+
+</div>
+
+</li>
+
+<li>
+🇺🇸 EE.UU.: tasa de referencia en 3.63% (estable), inflación interanual en 3.73% (a la baja), crecimiento del PBI en 2.10% (a la baja).
+
+<div class="conclusion-news">
+<div class="news-title"><a href="https://www.bloomberg.com/news/articles/2026-07-27/treasury-yields-follow-oil-lower-with-fed-and-supply-in-focus" target="_blank">Los rendimientos de los bonos del Tesoro siguen a la baja del petróleo con la Fed y la oferta en el foco</a></div>
+
+<div class="news-desc">Los bonos del Tesoro de Estados Unidos subieron a medida que los precios del petróleo se suavizaron después de que Estados Unidos detuviera su campaña de ataques de casi dos semanas contra Irán, mientras los operadores contemplaban una probabilidad de aproximadamente una entre tres de...</div>
+
+</div>
+
+</li>
+
+<li>
+🇪🇺 Europa: tasa de referencia en 2.25% (al alza), inflación interanual en 8.70% (a la baja), crecimiento del PBI en 1.00% (a la baja).
+
+<div class="conclusion-news">
+<div class="news-title"><a href="http://www.euronews.com/my-europe/2026/07/24/eu-seeks-dialogue-with-us-as-tensions-rise-after-google-fine" target="_blank">Estados Unidos lanza investigación comercial a la UE por multas a grandes tecnológicas</a></div>
+
+<div class="news-desc">El presidente Donald Trump anunció una investigación comercial sobre la UE, acusando al bloque de atacar injustamente a los gigantes tecnológicos estadounidenses, un día después de que Google fuera multada con 890 millones de euros por medidas antimonopolio.</div>
+
+</div>
+
+</li>
+
+</ul>
+</div>
+
+</div>
+<footer>Panorama Económico &nbsp;·&nbsp; BCP Miami &nbsp;·&nbsp; Generado automáticamente cada lunes</footer>
+
+<script>
+const macroTrend = {"inflacion": {"europa": {"actual": 8.7, "anterior": 9.2, "proyectada": 8.2}, "peru": {"actual": 4.01, "anterior": 3.91, "proyectada": 4.11}, "usa": {"actual": 3.73, "anterior": 4.27, "proyectada": 3.19}}, "pbi": {"europa": {"actual": 1.0, "anterior": 1.83, "proyectada": 0.16}, "peru": {"actual": 1.8, "anterior": 3.73, "proyectada": -0.13}, "usa": {"actual": 2.1, "anterior": 0.5, "proyectada": 3.7}}, "tasa": {"europa": {"actual": 2.25, "anterior": 2.25, "proyectada": 2.25}, "peru": {"actual": 4.25, "anterior": 4.25, "proyectada": 4.25}, "usa": {"actual": 3.63, "anterior": 3.63, "proyectada": 3.63}}};
+
+if (window.ChartDataLabels) {
+Chart.register(window.ChartDataLabels);
+}
+
+const MONO_FONT = "'IBM Plex Mono', 'Courier New', monospace";
+const LABELS = ['Anterior', 'Actual', 'Proyectada'];
+
+const REGIONS = [
+{ key: 'peru', label: '🇵🇪 Perú', color: '#0a2342' },
