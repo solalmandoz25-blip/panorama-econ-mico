@@ -365,4 +365,145 @@ def get_usa_fallback_news():
         if any(re.search(p, title_lower) for p in patterns):
             item["title"] = translate_es(item["title"])
             item["description"] = translate_es(item["description"])
-            return
+            return item
+    if items:
+        item = items[0]
+        item["title"] = translate_es(item["title"])
+        item["description"] = translate_es(item["description"])
+        return item
+    return None
+
+def generate_conclusiones(macro, news_list):
+    labels = [("peru", "🇵🇪 Perú"), ("usa", "🇺🇸 Estados Unidos"), ("europa", "🇪🇺 Europa")]
+    lineas = []
+    for key, label in labels:
+        data = macro.get(key, {})
+        tasa = [o["value"] for o in data.get("tasa", [])]
+        infl = [o["value"] for o in data.get("inflacion", [])]
+        pbi = [o["value"] for o in data.get("pbi", [])]
+        partes = []
+        if tasa:
+            partes.append(f"tasa de referencia en {_fmt(tasa[-1])}% ({_trend(tasa)})")
+        if infl:
+            partes.append(f"inflación interanual en {_fmt(infl[-1])}% ({_trend(infl)})")
+        if pbi:
+            partes.append(f"crecimiento del PBI en {_fmt(pbi[-1])}% ({_trend(pbi)})")
+        resumen = ", ".join(partes) + "." if partes else "sin datos disponibles esta semana."
+
+        noticia = find_relevant_news(key, news_list)
+        if not noticia and key == "peru":
+            noticia = get_peru_fallback_news()
+        if not noticia and key == "europa":
+            noticia = get_europa_fallback_news()
+        if not noticia and key == "usa":
+            noticia = get_usa_fallback_news()
+
+        lineas.append({
+            "label": label,
+            "resumen": f"{label}: {resumen}",
+            "noticia_titulo": noticia["title"] if noticia else None,
+            "noticia_desc": noticia["description"] if noticia else None,
+            "noticia_link": noticia["link"] if noticia else None,
+        })
+    return lineas
+
+def get_impacto_empresarial(macro_trend):
+    """Traduce las tendencias macro en implicancias practicas para
+    decisiones de negocio: costo de financiamiento, precios, crecimiento."""
+    interpretaciones = {
+        "tasa": {
+            "al alza": "financiamiento mas costoso; conviene evaluar fijar tasas cuanto antes",
+            "a la baja": "costo de fondeo a la baja; podria ser buen momento para nuevas lineas de credito",
+            "estable": "costo de financiamiento estable, sin cambios inmediatos esperados",
+        },
+        "inflacion": {
+            "al alza": "presion sobre costos operativos y margenes; revisar estrategias de precios",
+            "a la baja": "entorno de precios mas predecible, favorece la planificacion a mediano plazo",
+            "estable": "inflacion bajo control, sin mayor impacto esperado en el corto plazo",
+        },
+        "pbi": {
+            "al alza": "crecimiento economico favorece expansion y mayor demanda",
+            "a la baja": "desaceleracion sugiere cautela en proyecciones de crecimiento",
+            "estable": "actividad economica estable, sin senales de cambio abrupto",
+        },
+    }
+    labels = [("peru", "🇵🇪 Perú"), ("usa", "🇺🇸 Estados Unidos"), ("europa", "🇪🇺 Europa")]
+    resultado = []
+    for key, label in labels:
+        partes = []
+        for metric in ["tasa", "inflacion", "pbi"]:
+            d = macro_trend.get(metric, {}).get(key)
+            if not d:
+                continue
+            direccion = _trend([d["anterior"], d["actual"]])
+            partes.append(interpretaciones[metric][direccion])
+        if partes:
+            resumen = "; ".join(partes) + "."
+            resumen = resumen[0].upper() + resumen[1:]
+        else:
+            resumen = "sin datos suficientes para un análisis esta semana."
+        resultado.append({"label": label, "resumen": f"{label}: {resumen}"})
+    return resultado
+
+def get_dato_semana(macro_trend):
+    """Selecciona el dato macro con el cambio mas significativo de la
+    semana (mayor variacion absoluta entre 'anterior' y 'actual')."""
+    labels = {"peru": "🇵🇪 Perú", "usa": "🇺🇸 Estados Unidos", "europa": "🇪🇺 Europa"}
+    metric_labels = {"tasa": "Tasa de referencia", "inflacion": "Inflación interanual", "pbi": "Crecimiento del PBI"}
+    candidatos = []
+    for metric, regiones in macro_trend.items():
+        for region_key, d in regiones.items():
+            if not d:
+                continue
+            cambio = round(d["actual"] - d["anterior"], 2)
+            candidatos.append({
+                "region_label": labels.get(region_key, region_key),
+                "metric_label": metric_labels.get(metric, metric),
+                "valor": d["actual"],
+                "anterior": d["anterior"],
+                "cambio": cambio,
+            })
+    if not candidatos:
+        return None
+    destacado = max(candidatos, key=lambda c: abs(c["cambio"]))
+    if destacado["cambio"] == 0:
+        destacado["texto"] = f"{destacado['metric_label']} de {destacado['region_label']} se mantuvo estable en {destacado['valor']}%."
+    else:
+        direccion = "subió" if destacado["cambio"] > 0 else "bajó"
+        signo = "+" if destacado["cambio"] > 0 else ""
+        destacado["texto"] = f"{destacado['metric_label']} de {destacado['region_label']} {direccion} de {destacado['anterior']}% a {destacado['valor']}% ({signo}{destacado['cambio']} p.p.)."
+    return destacado
+
+def get_top3_para_clientes(news_list):
+    """Selecciona los 3 puntos mas importantes de la semana para compartir
+    con clientes: prioriza noticias de alta relevancia; si no hay 3,
+    completa con las siguientes disponibles."""
+    altas = [n for n in news_list if n["relevance"] == "Alta relevancia"]
+    top3 = altas[:3]
+    if len(top3) < 3:
+        restantes = [n for n in news_list if n not in top3]
+        top3 += restantes[: 3 - len(top3)]
+    return top3
+
+MESES_ES = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"]
+
+news = get_rss_news()
+calendar = get_calendar()
+macro = get_macro_data()
+macro_trend = build_macro_trend(macro)
+conclusiones = generate_conclusiones(macro, news)
+impacto = get_impacto_empresarial(macro_trend)
+dato_semana = get_dato_semana(macro_trend)
+top3 = get_top3_para_clientes(news)
+week_str = f"{TODAY.day} de {MESES_ES[TODAY.month - 1]}, {TODAY.year}"
+
+with open("templates/dashboard.html") as f:
+    template = Template(f.read())
+
+html = template.render(week=week_str, news=news, calendar=calendar, macro=macro, macro_trend=macro_trend, conclusiones=conclusiones, top3=top3, impacto=impacto, dato_semana=dato_semana)
+
+os.makedirs("output", exist_ok=True)
+with open("output/index.html", "w") as f:
+    f.write(html)
+
+print(f"✅ Dashboard generado — {len(news)} noticias, calendario OK")
