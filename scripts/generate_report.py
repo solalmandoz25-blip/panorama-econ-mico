@@ -520,16 +520,14 @@ calendar = get_calendar()
 macro = get_macro_data()
 macro_trend = build_macro_trend(macro)
 conclusiones = generate_conclusiones(macro, news)
-impacto = get_impacto_empresarial(macro_trend)
 dato_semana = get_dato_semana(macro_trend)
 frase_final = get_frase_final(macro_trend, dato_semana)
-top3 = get_top3_para_clientes(news)
 week_str = f"{TODAY.day} de {MESES_ES[TODAY.month - 1]}, {TODAY.year}"
 
 with open("templates/dashboard.html") as f:
     template = Template(f.read())
 
-html = template.render(week=week_str, news=news, calendar=calendar, macro=macro, macro_trend=macro_trend, conclusiones=conclusiones, top3=top3, impacto=impacto, dato_semana=dato_semana, frase_final=frase_final)
+html = template.render(week=week_str, news=news, calendar=calendar, macro=macro, macro_trend=macro_trend, conclusiones=conclusiones, dato_semana=dato_semana, frase_final=frase_final)
 
 os.makedirs("output", exist_ok=True)
 with open("output/index.html", "w") as f:
