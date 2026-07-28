@@ -46,6 +46,8 @@ def _fetch_feed_items(url, limit=8):
         print(f"Error feed {url}: {e}")
     return items_out
 
+TICKER_PATTERN = re.compile(r"\([A-Z]{1,5}(\.[A-Z]{1,3})?\)")
+
 def get_rss_news():
     feeds = [
         ("Bloomberg", "https://feeds.bloomberg.com/markets/news.rss"),
@@ -56,29 +58,34 @@ def get_rss_news():
     ]
     all_news = []
 
+    # Solo 3 temas: politica monetaria/tasas, inflacion, y guerra/geopolitica relevante.
     keywords_high = [
-        "fed", "rate cut", "rate hike", "interest rate", "monetary policy", "central bank",
-        "inflation", "bcrp", "bce", "ecb", "powell", "lagarde", "treasury yield",
-        "recession", "tasa de interés", "inflación", "política monetaria",
-        "war", "conflict", "sanctions", "geopolit", "military", "invasion",
-        "drone", "ukraine", "russia", "middle east", "ceasefire", "tariff", "trade war",
+        "fed", "rate cut", "rate hike", "interest rate", "policy rate", "monetary policy",
+        "central bank", "bcrp", "bce", "ecb", "powell", "lagarde",
+        "quantitative easing", "quantitative tightening", "fomc",
+        "tasa de interés", "tasa de referencia", "política monetaria",
+        "inflation", "inflación", "consumer prices", "cpi",
+        "war", "conflict", "sanctions", "invasion", "military strike", "drone strike",
+        "ceasefire", "ukraine", "russia", "middle east", "geopolit",
     ]
     keywords_med = [
-        "gdp", "economy", "economic", "trade", "growth", "economía", "crecimiento", "pbi",
-        "jobs report", "unemployment", "employment", "consumer prices", "cpi", "ppi",
-        "budget", "deficit", "debt ceiling", "stimulus", "exports", "imports",
-        "supply chain", "manufacturing", "housing market", "oil prices", "energy prices",
-        "currency", "exchange rate", "bond market", "sovereign debt", "credit rating",
+        "treasury yield", "bond yield", "rate decision", "ecb decision", "bcrp decision",
+        "tariff", "trade war", "ppi", "producer prices",
     ]
     exclude_keywords = [
         "stock", "stocks", "shares", "equity", "equities", "earnings", "nasdaq",
         "s&p", "dow jones", "ipo", "buyback", "dividend", "wall street", "markets wrap",
+        "profit", "quarterly", "revenue", "guidance", "unit", "ceo", "cfo",
+        "acquisition", "merger", "lowers its", "raises its", "lifts outlook",
     ]
 
     for source, url in feeds:
         for item in _fetch_feed_items(url, limit=15):
-            title_lower = item["title"].lower()
+            title = item["title"]
+            title_lower = title.lower()
             if any(k in title_lower for k in exclude_keywords):
+                continue
+            if TICKER_PATTERN.search(title):
                 continue
             if any(k in title_lower for k in keywords_high):
                 relevance = "Alta relevancia"
