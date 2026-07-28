@@ -157,9 +157,9 @@ def get_calendar():
             periods = r2.json().get("periods", [])
             if periods:
                 last = periods[-1]
-                val = round(float(last["values"][0]), 2)
+                val = float(last["values"][0])
                 fecha = last["name"]
-                peru_events.append(f"{fecha} — {nombre}: {val}% {estrellas}")
+                peru_events.append(f"{fecha} — {nombre}: {val:.2f}% {estrellas}")
         except Exception as e:
             print(f"Error BCRP {series_id}: {e}")
 
@@ -494,12 +494,15 @@ def get_dato_semana(macro_trend):
     if not candidatos:
         return None
     destacado = max(candidatos, key=lambda c: abs(c["cambio"]))
+    valor_fmt = f"{destacado['valor']:.2f}"
+    anterior_fmt = f"{destacado['anterior']:.2f}"
+    destacado["valor"] = valor_fmt
     if destacado["cambio"] == 0:
-        destacado["texto"] = f"{destacado['metric_label']} de {destacado['region_label']} se mantuvo estable en {destacado['valor']}%."
+        destacado["texto"] = f"{destacado['metric_label']} de {destacado['region_label']} se mantuvo estable en {valor_fmt}%."
     else:
         direccion = "subió" if destacado["cambio"] > 0 else "bajó"
         signo = "+" if destacado["cambio"] > 0 else ""
-        destacado["texto"] = f"{destacado['metric_label']} de {destacado['region_label']} {direccion} de {destacado['anterior']}% a {destacado['valor']}% ({signo}{destacado['cambio']} p.p.)."
+        destacado["texto"] = f"{destacado['metric_label']} de {destacado['region_label']} {direccion} de {anterior_fmt}% a {valor_fmt}% ({signo}{destacado['cambio']:.2f} p.p.)."
     return destacado
 
 def get_top3_para_clientes(news_list):
