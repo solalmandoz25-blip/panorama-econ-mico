@@ -279,6 +279,35 @@ def get_macro_data():
 
     return macro
 
+def imf_weo_series(indicator, country_code):
+    """Consulta la API pública del FMI (World Economic Outlook / DataMapper)
+    que trae series historicas y proyecciones oficiales por pais."""
+    url = f"https://www.imf.org/external/datamapper/api/v1/{indicator}/{country_code}"
+    try:
+        r = requests.get(url, timeout=10)
+        data = r.json()
+        return data.get("values", {}).get(indicator, {}).get(country_code, {})
+    except Exception as e:
+        print(f"Error IMF WEO {indicator} {country_code}: {e}")
+        return {}
+
+def get_imf_trend(indicator, country_code):
+    """Arma anterior/actual/proyectada usando datos REALES del FMI (WEO):
+    año anterior, año actual y año siguiente publicados oficialmente."""
+    series = imf_weo_series(indicator, country_code)
+    if not series:
+        return None
+    anterior_year = str(TODAY.year - 1)
+    actual_year = str(TODAY.year)
+    proyectada_year = str(TODAY.year + 1)
+    anterior = series.get(anterior_year)
+    actual = series.get(actual_year)
+    proyectada = series.get(proyectada_year)
+    if anterior is None or actual is None or proyectada is None:
+        print(f"IMF WEO {indicator} {country_code}: faltan años {anterior_year}/{actual_year}/{proyectada_year} en {list(series.keys())[-6:]}")
+        return None
+    return {"anterior": round(float(anterior), 2), "actual": round(float(actual), 2), "proyectada": round(float(proyectada), 2)}
+
 def compute_trend(data_list):
     """Toma la serie de datos reales y arma anterior/actual/proyectada.
     'Proyectada' es una extrapolación lineal simple: continúa la misma
@@ -294,14 +323,24 @@ def compute_trend(data_list):
     return {"anterior": round(anterior, 2), "actual": round(actual, 2), "proyectada": proyectada}
 
 def build_macro_trend(macro):
-    keys = ["tasa", "inflacion", "pbi"]
-    trend = {}
-    for k in keys:
-        trend[k] = {
-            "peru": compute_trend(macro.get("peru", {}).get(k, [])),
-            "usa": compute_trend(macro.get("usa", {}).get(k, [])),
-            "europa": compute_trend(macro.get("europa", {}).get(k, [])),
-        }
+    """Tasa: no existe una proyeccion oficial gratuita y consistente para
+    los 3 (solo la Fed publica dot-plot), asi que se mantiene la
+    extrapolacion de tendencia sobre datos reales historicos.
+    Inflacion y PBI: se reemplaza por proyecciones OFICIALES del FMI
+    (World Economic Outlook), que ya publican año anterior/actual/siguiente."""
+    trend = {
+        "tasa": {
+            "peru": compute_trend(macro.get("peru", {}).get("tasa", [])),
+            "usa": compute_trend(macro.get("usa", {}).get("tasa", [])),
+            "europa": compute_trend(macro.get("europa", {}).get("tasa", [])),
+        },
+        "inflacion": {},
+        "pbi": {},
+    }
+    imf_countries = {"peru": "PER", "usa": "USA", "europa": "EURO"}
+    for region_key, imf_code in imf_countries.items():
+        trend["inflacion"][region_key] = get_imf_trend("PCPIPCH", imf_code)
+        trend["pbi"][region_key] = get_imf_trend("NGDP_RPCH", imf_code)
     return trend
 
 def _fmt(val):
