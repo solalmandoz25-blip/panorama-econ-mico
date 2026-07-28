@@ -223,7 +223,7 @@ function makeTrendChart(id, dataByRegion) {
             font: { size: 7, weight: 'bold', family: MONO_FONT },
             formatter: function(value) {
               if (value === null || value === undefined) { return ''; }
-              return value.toFixed(1) + '%';
+              return value.toFixed(2) + '%';
             }
           }
         },
