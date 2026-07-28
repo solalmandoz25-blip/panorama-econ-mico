@@ -197,8 +197,27 @@ function makeTrendChart(id, dataByRegion) {
           },
           datalabels: {
             anchor: 'end',
-            align: function(context) { return context.datasetIndex === 1 ? 'bottom' : 'top'; },
-            offset: function(context) { return context.datasetIndex === 1 ? 6 : 5; },
+            align: function(context) {
+              const idx = context.dataIndex;
+              const values = context.chart.data.datasets.map(function(ds) { return ds.data[idx]; });
+              const thisValue = context.dataset.data[idx];
+              if (thisValue === null || thisValue === undefined) { return 'top'; }
+              const sorted = values.filter(function(v) { return v !== null && v !== undefined; }).slice().sort(function(a, b) { return a - b; });
+              const rank = sorted.indexOf(thisValue);
+              if (rank === sorted.length - 1) { return 'top'; }
+              if (rank === 0) { return 'bottom'; }
+              return 'right';
+            },
+            offset: function(context) {
+              const idx = context.dataIndex;
+              const values = context.chart.data.datasets.map(function(ds) { return ds.data[idx]; });
+              const thisValue = context.dataset.data[idx];
+              if (thisValue === null || thisValue === undefined) { return 5; }
+              const sorted = values.filter(function(v) { return v !== null && v !== undefined; }).slice().sort(function(a, b) { return a - b; });
+              const rank = sorted.indexOf(thisValue);
+              if (rank === sorted.length - 1 || rank === 0) { return 5; }
+              return 8;
+            },
             clamp: true,
             color: function(context) { return context.dataset.borderColor; },
             font: { size: 7, weight: 'bold', family: MONO_FONT },
