@@ -281,15 +281,18 @@ def get_macro_data():
 
 def imf_weo_series(indicator, country_code):
     """Consulta la API pública del FMI (World Economic Outlook / DataMapper)
-    que trae series historicas y proyecciones oficiales por pais."""
+    que trae series historicas y proyecciones oficiales por pais.
+    Reintenta porque el servidor del FMI a veces responde lento."""
     url = f"https://www.imf.org/external/datamapper/api/v1/{indicator}/{country_code}"
-    try:
-        r = requests.get(url, timeout=10)
-        data = r.json()
-        return data.get("values", {}).get(indicator, {}).get(country_code, {})
-    except Exception as e:
-        print(f"Error IMF WEO {indicator} {country_code}: {e}")
-        return {}
+    for intento in range(3):
+        try:
+            r = requests.get(url, timeout=25)
+            data = r.json()
+            return data.get("values", {}).get(indicator, {}).get(country_code, {})
+        except Exception as e:
+            print(f"Error IMF WEO {indicator} {country_code} (intento {intento+1}): {e}")
+        time.sleep(2)
+    return {}
 
 def get_imf_trend(indicator, country_code):
     """Arma anterior/actual/proyectada usando datos REALES del FMI (WEO):
