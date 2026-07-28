@@ -197,8 +197,8 @@ function makeTrendChart(id, dataByRegion) {
           },
           datalabels: {
             anchor: 'end',
-            align: 'top',
-            offset: 4,
+            align: function(context) { return context.datasetIndex === 1 ? 'bottom' : 'top'; },
+            offset: function(context) { return context.datasetIndex === 1 ? 6 : 5; },
             clamp: true,
             color: function(context) { return context.dataset.borderColor; },
             font: { size: 7, weight: 'bold', family: MONO_FONT },
@@ -218,7 +218,7 @@ function makeTrendChart(id, dataByRegion) {
             ticks: { font: { size: 9, family: MONO_FONT }, color: '#aaa' },
             grid: { display: false },
             border: { display: false }
-        }
+          }
         }
       }
     });
