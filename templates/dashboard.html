@@ -155,7 +155,7 @@ if (window.ChartDataLabels) {
 }
 
 const MONO_FONT = "'IBM Plex Mono', 'Courier New', monospace";
-const LABELS = ['Anterior', 'Actual', 'Proyectada'];
+const PERIODO_LABELS = {{ periodo_labels | tojson }};
 
 const REGIONS = [
   { key: 'peru', label: 'Perú 🇵🇪', color: '#0a2342' },
@@ -163,7 +163,7 @@ const REGIONS = [
   { key: 'europa', label: 'Europa 🇪🇺', color: '#a9825c' }
 ];
 
-function makeTrendChart(id, dataByRegion) {
+function makeTrendChart(id, dataByRegion, labels) {
   const ctx = document.getElementById(id);
   if (!ctx) { return; }
   try {
@@ -186,7 +186,7 @@ function makeTrendChart(id, dataByRegion) {
 
     new Chart(ctx, {
       type: 'line',
-      data: { labels: LABELS, datasets: datasets },
+      data: { labels: labels, datasets: datasets },
       options: {
         responsive: true,
         layout: { padding: { top: 24, right: 10 } },
@@ -249,9 +249,9 @@ function makeTrendChart(id, dataByRegion) {
   }
 }
 
-makeTrendChart('chart-inflacion', macroTrend.inflacion);
-makeTrendChart('chart-tasa', macroTrend.tasa);
-makeTrendChart('chart-pbi', macroTrend.pbi);
+makeTrendChart('chart-inflacion', macroTrend.inflacion, PERIODO_LABELS.inflacion);
+makeTrendChart('chart-tasa', macroTrend.tasa, PERIODO_LABELS.tasa);
+makeTrendChart('chart-pbi', macroTrend.pbi, PERIODO_LABELS.pbi);
 </script>
 </body>
 </html>
