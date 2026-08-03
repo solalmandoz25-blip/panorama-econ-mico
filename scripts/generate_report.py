@@ -565,6 +565,32 @@ def get_top3_para_clientes(news_list):
         top3 += restantes[: 3 - len(top3)]
     return top3
 
+def get_periodo_labels():
+    """Arma las etiquetas Anterior/Actual/Proyectada con el periodo real:
+    mes para tasa (datos mensuales), año para inflacion/PBI (datos del FMI,
+    que son anuales)."""
+    def add_months(date, delta):
+        total = date.month - 1 + delta
+        y = date.year + total // 12
+        m = total % 12 + 1
+        return date.replace(year=y, month=m, day=1)
+
+    anterior_dt = add_months(TODAY, -1)
+    actual_dt = TODAY
+    proyectada_dt = add_months(TODAY, 1)
+
+    tasa_labels = [
+        f"Anterior ({MESES_ABR_ES[anterior_dt.month - 1]}. {anterior_dt.year})",
+        f"Actual ({MESES_ABR_ES[actual_dt.month - 1]}. {actual_dt.year})",
+        f"Proyectada ({MESES_ABR_ES[proyectada_dt.month - 1]}. {proyectada_dt.year})",
+    ]
+    infl_pbi_labels = [
+        f"Anterior ({TODAY.year - 1})",
+        f"Actual ({TODAY.year})",
+        f"Proyectada ({TODAY.year + 1})",
+    ]
+    return {"tasa": tasa_labels, "inflacion": infl_pbi_labels, "pbi": infl_pbi_labels}
+
 MESES_ES = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"]
 
 news = get_rss_news()
@@ -574,12 +600,13 @@ macro_trend = build_macro_trend(macro)
 conclusiones = generate_conclusiones(macro, news)
 dato_semana = get_dato_semana(macro_trend)
 frase_final = get_frase_final(macro_trend, dato_semana)
+periodo_labels = get_periodo_labels()
 week_str = f"{TODAY.day} de {MESES_ES[TODAY.month - 1]}, {TODAY.year}"
 
 with open("templates/dashboard.html") as f:
     template = Template(f.read())
 
-html = template.render(week=week_str, news=news, calendar=calendar, macro=macro, macro_trend=macro_trend, conclusiones=conclusiones, dato_semana=dato_semana, frase_final=frase_final)
+html = template.render(week=week_str, news=news, calendar=calendar, macro=macro, macro_trend=macro_trend, conclusiones=conclusiones, dato_semana=dato_semana, frase_final=frase_final, periodo_labels=periodo_labels)
 
 os.makedirs("output", exist_ok=True)
 with open("output/index.html", "w") as f:
