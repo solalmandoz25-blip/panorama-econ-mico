@@ -17,7 +17,15 @@ def translate_es(text):
     if not text:
         return text
     try:
-        return GoogleTranslator(source="auto", target="es").translate(text)
+        result = GoogleTranslator(source="auto", target="es").translate(text)
+        if not result:
+            return text
+        bad_markers = ["server error", "that's an error", "please try again later", "error 500", "error 502", "error 503"]
+        result_lower = result.lower()
+        if any(marker in result_lower for marker in bad_markers):
+            print(f"Traduccion sospechosa descartada, usando original: {text[:60]}")
+            return text
+        return result
     except Exception as e:
         print(f"Error traducción: {e}")
         return text
@@ -142,8 +150,8 @@ def get_calendar():
             print(f"Error calendar {url}: {e}")
 
     try:
-        impact_stars = {"High": "★★★", "Medium": "★★", "Low": "★"}
-        for level in ["High", "Medium", "Low"]:
+        impact_stars = {"High": "★★★", "Medium": "★★"}
+        for level in ["High", "Medium"]:
             for event in all_events:
                 currency = event.get("country", "")
                 impact = event.get("impact", "")
@@ -156,8 +164,6 @@ def get_calendar():
                         fecha = _fmt_event_date(date_str)
                         prefijo = f"{fecha} — " if fecha else ""
                         result[country_label].append(f"{prefijo}{title_es} {impact_stars[level]}")
-            if all(len(result[c]) >= 1 for c in countries.values()):
-                break
     except Exception as e:
         print(f"Error calendar: {e}")
 
