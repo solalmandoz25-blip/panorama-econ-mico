@@ -549,6 +549,34 @@ def get_dato_semana(macro_trend, macro):
     destacado["valor"] = valor_fmt
     return destacado
 
+def get_conclusion_dolar(macro_trend):
+    """Genera una breve conclusion sobre la fortaleza esperada del dolar
+    frente al euro, basada en el diferencial de tasas de interes
+    proyectado entre la Fed y el BCE (datos reales ya calculados en
+    macro_trend). A mayor tasa relativa de EE.UU., mayor atractivo de
+    capital hacia el dolar."""
+    tasa = macro_trend.get("tasa", {})
+    usa = tasa.get("usa")
+    europa = tasa.get("europa")
+    if not usa or not europa:
+        return None
+
+    cambio_usa = round(usa["proyectada"] - usa["actual"], 2)
+    cambio_europa = round(europa["proyectada"] - europa["actual"], 2)
+    diferencial = round(cambio_usa - cambio_europa, 2)
+
+    if diferencial > 0.05:
+        direccion = "fortalecerse"
+        razon = f"la Fed proyecta mantener tasas relativamente más altas frente al BCE (diferencial de {diferencial:+.2f} p.p.), lo que favorece el atractivo del dólar frente al euro"
+    elif diferencial < -0.05:
+        direccion = "debilitarse"
+        razon = f"el diferencial de tasas se mueve a favor del euro frente al dólar ({diferencial:+.2f} p.p.), lo que le resta atractivo relativo al dólar"
+    else:
+        direccion = "mantenerse relativamente estable"
+        razon = "el diferencial de tasas entre la Fed y el BCE no muestra cambios significativos en el corto plazo"
+
+    return f"Con base en las proyecciones de tasas, se espera que el dólar tienda a {direccion} frente al euro en el corto plazo, ya que {razon}."
+
 def get_periodo_labels():
     """Arma las etiquetas Anterior/Actual/Proyectada con el periodo real:
     mes para tasa (datos mensuales), año para inflacion/PBI (datos del FMI,
@@ -582,13 +610,14 @@ calendar = get_calendar()
 macro = get_macro_data()
 macro_trend = build_macro_trend(macro)
 dato_semana = get_dato_semana(macro_trend, macro)
+conclusion_dolar = get_conclusion_dolar(macro_trend)
 periodo_labels = get_periodo_labels()
 month_str = f"{MESES_ES[TODAY.month - 1].capitalize()} {TODAY.year}"
 
 with open("templates/dashboard.html") as f:
     template = Template(f.read())
 
-html = template.render(month=month_str, news=news, calendar=calendar, macro=macro, macro_trend=macro_trend, dato_semana=dato_semana, periodo_labels=periodo_labels)
+html = template.render(month=month_str, news=news, calendar=calendar, macro=macro, macro_trend=macro_trend, dato_semana=dato_semana, conclusion_dolar=conclusion_dolar, periodo_labels=periodo_labels)
 
 os.makedirs("output", exist_ok=True)
 with open("output/index.html", "w") as f:
