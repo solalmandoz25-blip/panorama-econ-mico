@@ -114,6 +114,18 @@ def get_rss_news():
             deduped.append(n)
     deduped = deduped[:10]
 
+    def _region_priority(title_en):
+        t = title_en.lower()
+        if any(re.search(p, t) for p in REGION_KEYWORDS["usa"]):
+            return 0
+        if any(re.search(p, t) for p in REGION_KEYWORDS["peru"]):
+            return 1
+        if any(re.search(p, t) for p in REGION_KEYWORDS["europa"]):
+            return 2
+        return 3
+
+    deduped.sort(key=lambda n: _region_priority(n["title"]))
+
     for n in deduped:
         n["title_en"] = n["title"]
         original_title = n["title"]
