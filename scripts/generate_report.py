@@ -464,6 +464,68 @@ def get_usa_fallback_news():
         return item
     return None
 
+def _fecha_legible(date_str):
+    """Convierte una fecha cruda (YYYY-MM de FRED, o ya formateada como
+    'Jun.2026' del BCRP) a un formato legible consistente."""
+    if not date_str:
+        return ""
+    m = re.match(r"^(\d{4})-(\d{2})$", date_str)
+    if m:
+        anio, mes = m.group(1), int(m.group(2))
+        return f"{MESES_ABR_ES[mes - 1].capitalize()}. {anio}"
+    return date_str
+
+def get_dato_semana(macro_trend, macro):
+    """Selecciona el dato macro con el cambio mas significativo del
+    mes (mayor variacion absoluta entre 'anterior' y 'actual') y arma
+    un titular llamativo tipo prensa, con fecha, headline y descripcion."""
+    labels = {"peru": "🇵🇪 Perú", "usa": "🇺🇸 Estados Unidos", "europa": "🇪🇺 Europa"}
+    metric_labels = {"tasa": "Tasa de referencia", "inflacion": "Inflación interanual", "pbi": "Crecimiento del PBI"}
+    candidatos = []
+    for metric, regiones in macro_trend.items():
+        for region_key, d in regiones.items():
+            if not d:
+                continue
+            cambio = round(d["actual"] - d["anterior"], 2)
+            candidatos.append({
+                "metric_key": metric,
+                "region_key": region_key,
+                "region_label": labels.get(region_key, region_key),
+                "metric_label": metric_labels.get(metric, metric),
+                "valor": d["actual"],
+                "anterior": d["anterior"],
+                "cambio": cambio,
+            })
+    if not candidatos:
+        return None
+    destacado = max(candidatos, key=lambda c: abs(c["cambio"]))
+
+    raw_list = macro.get(destacado["region_key"], {}).get(destacado["metric_key"], [])
+    if raw_list:
+        fecha = _fecha_legible(raw_list[-1]["date"])
+    elif destacado["metric_key"] == "tasa":
+        fecha = f"{MESES_ES[TODAY.month - 1].capitalize()} {TODAY.year}"
+    else:
+        fecha = str(TODAY.year)
+
+    valor_fmt = f"{destacado['valor']:.2f}"
+    anterior_fmt = f"{destacado['anterior']:.2f}"
+
+    if destacado["cambio"] == 0:
+        headline = f"{destacado['metric_label']} de {destacado['region_label']} se mantiene estable en {valor_fmt}%"
+        descripcion = f"Sin cambios respecto al periodo anterior ({anterior_fmt}%)."
+    else:
+        direccion = "sube" if destacado["cambio"] > 0 else "baja"
+        signo = "+" if destacado["cambio"] > 0 else ""
+        headline = f"{destacado['metric_label']} de {destacado['region_label']} {direccion} a {valor_fmt}%"
+        descripcion = f"Desde {anterior_fmt}% en el periodo anterior ({signo}{destacado['cambio']:.2f} p.p.)."
+
+    destacado["fecha"] = fecha
+    destacado["headline"] = headline
+    destacado["descripcion"] = descripcion
+    destacado["valor"] = valor_fmt
+    return destacado
+
 def get_periodo_labels():
     """Arma las etiquetas Anterior/Actual/Proyectada con el periodo real:
     mes para tasa (datos mensuales), año para inflacion/PBI (datos del FMI,
@@ -490,60 +552,13 @@ def get_periodo_labels():
     ]
     return {"tasa": tasa_labels, "inflacion": infl_pbi_labels, "pbi": infl_pbi_labels}
 
-def get_dato_semana(macro_trend):
-    """Selecciona el dato macro con el cambio mas significativo del
-    mes (mayor variacion absoluta entre 'anterior' y 'actual') y arma
-    un titular llamativo tipo prensa, con fecha, headline y descripcion."""
-    labels = {"peru": "🇵🇪 Perú", "usa": "🇺🇸 Estados Unidos", "europa": "🇪🇺 Europa"}
-    metric_labels = {"tasa": "Tasa de referencia", "inflacion": "Inflación interanual", "pbi": "Crecimiento del PBI"}
-    candidatos = []
-    for metric, regiones in macro_trend.items():
-        for region_key, d in regiones.items():
-            if not d:
-                continue
-            cambio = round(d["actual"] - d["anterior"], 2)
-            candidatos.append({
-                "metric_key": metric,
-                "region_label": labels.get(region_key, region_key),
-                "metric_label": metric_labels.get(metric, metric),
-                "valor": d["actual"],
-                "anterior": d["anterior"],
-                "cambio": cambio,
-            })
-    if not candidatos:
-        return None
-    destacado = max(candidatos, key=lambda c: abs(c["cambio"]))
-
-    if destacado["metric_key"] == "tasa":
-        fecha = f"{MESES_ES[TODAY.month - 1].capitalize()} {TODAY.year}"
-    else:
-        fecha = str(TODAY.year)
-
-    valor_fmt = f"{destacado['valor']:.2f}"
-    anterior_fmt = f"{destacado['anterior']:.2f}"
-
-    if destacado["cambio"] == 0:
-        headline = f"{destacado['metric_label']} de {destacado['region_label']} se mantiene estable en {valor_fmt}%"
-        descripcion = f"Sin cambios respecto al periodo anterior ({anterior_fmt}%)."
-    else:
-        direccion = "sube" if destacado["cambio"] > 0 else "baja"
-        signo = "+" if destacado["cambio"] > 0 else ""
-        headline = f"{destacado['metric_label']} de {destacado['region_label']} {direccion} a {valor_fmt}%"
-        descripcion = f"Desde {anterior_fmt}% en el periodo anterior ({signo}{destacado['cambio']:.2f} p.p.)."
-
-    destacado["fecha"] = fecha
-    destacado["headline"] = headline
-    destacado["descripcion"] = descripcion
-    destacado["valor"] = valor_fmt
-    return destacado
-
 MESES_ES = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"]
 
 news = get_rss_news()
 calendar = get_calendar()
 macro = get_macro_data()
 macro_trend = build_macro_trend(macro)
-dato_semana = get_dato_semana(macro_trend)
+dato_semana = get_dato_semana(macro_trend, macro)
 periodo_labels = get_periodo_labels()
 month_str = f"{MESES_ES[TODAY.month - 1].capitalize()} {TODAY.year}"
 
