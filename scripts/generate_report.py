@@ -149,35 +149,26 @@ def get_calendar():
         except Exception as e:
             print(f"Error calendar {url}: {e}")
 
-    try:
-        impact_stars = {"High": "★★★", "Medium": "★★", "Low": "★"}
-        for level in ["High", "Medium"]:
-            for event in all_events:
-                currency = event.get("country", "")
-                impact = event.get("impact", "")
-                title = event.get("title", "")
-                date_str = event.get("date", "")
-                if currency in countries and impact == level:
-                    country_label = countries[currency]
-                    if len(result[country_label]) < 8:
-                        title_es = translate_es(title)
-                        fecha = _fmt_event_date(date_str)
-                        prefijo = f"{fecha} — " if fecha else ""
-                        result[country_label].append(f"{prefijo}{title_es} {impact_stars[level]}")
+    def _parse_dt(event):
+        try:
+            return datetime.fromisoformat(event.get("date", ""))
+        except Exception:
+            return datetime.max
 
-        # Si alguna region se quedo sin nada de alta/media, rellenar con baja
-        # importancia para no dejarla vacia.
-        for currency, country_label in countries.items():
-            if len(result[country_label]) == 0:
-                for event in all_events:
-                    if event.get("country", "") == currency and event.get("impact", "") == "Low":
-                        if len(result[country_label]) < 8:
-                            title_es = translate_es(event.get("title", ""))
-                            fecha = _fmt_event_date(event.get("date", ""))
-                            prefijo = f"{fecha} — " if fecha else ""
-                            result[country_label].append(f"{prefijo}{title_es} ★")
-    except Exception as e:
-        print(f"Error calendar: {e}")
+    impact_stars = {"High": "★★★", "Medium": "★★", "Low": "★"}
+    for currency, country_label in countries.items():
+        matched = [e for e in all_events if e.get("country", "") == currency and e.get("impact", "") in ("High", "Medium")]
+        if not matched:
+            matched = [e for e in all_events if e.get("country", "") == currency and e.get("impact", "") == "Low"]
+        matched.sort(key=_parse_dt)
+        eventos = []
+        for e in matched[:8]:
+            title_es = translate_es(e.get("title", ""))
+            fecha = _fmt_event_date(e.get("date", ""))
+            prefijo = f"{fecha} — " if fecha else ""
+            impact = e.get("impact", "")
+            eventos.append(f"{prefijo}{title_es} {impact_stars.get(impact, '')}")
+        result[country_label] = eventos
 
     peru_events = []
     series_pe = [
