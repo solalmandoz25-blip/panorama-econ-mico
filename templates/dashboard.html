@@ -62,20 +62,6 @@ footer { text-align: center; padding: 2rem; font-size: 0.7rem; color: #bbb; bord
 {% endif %}
 </div>
 
-<div class="section-title">Noticias Relevantes<span class="badge-auto">✦ Automático</span></div>
-<div class="news-list">
-{% if news %}
-{% for n in news %}
-<div class="news-item">
-<span class="tag {% if n.relevance == 'Alta relevancia' %}tag-high{% else %}tag-med{% endif %}">{{ n.relevance }}</span>
-<div class="title"><a href="{{ n.link }}" target="_blank">{{ n.title }}</a></div>
-</div>
-{% endfor %}
-{% else %}
-<div class="news-item"><div class="title" style="color:#bbb;font-style:italic">No se encontraron noticias relevantes este mes.</div></div>
-{% endif %}
-</div>
-
 <div class="section-title">Calendario Económico del Mes<span class="badge-auto">✦ Automático</span></div>
 <div class="cal-grid">
 {% for country, events in calendar.items() %}
@@ -90,6 +76,20 @@ footer { text-align: center; padding: 2rem; font-size: 0.7rem; color: #bbb; bord
 {% endif %}
 </div>
 {% endfor %}
+</div>
+
+<div class="section-title">Noticias Relevantes<span class="badge-auto">✦ Automático</span></div>
+<div class="news-list">
+{% if news %}
+{% for n in news %}
+<div class="news-item">
+<span class="tag {% if n.relevance == 'Alta relevancia' %}tag-high{% else %}tag-med{% endif %}">{{ n.relevance }}</span>
+<div class="title"><a href="{{ n.link }}" target="_blank">{{ n.title }}</a></div>
+</div>
+{% endfor %}
+{% else %}
+<div class="news-item"><div class="title" style="color:#bbb;font-style:italic">No se encontraron noticias relevantes este mes.</div></div>
+{% endif %}
 </div>
 
 <div class="section-title">Indicadores Clave<span class="badge-auto">✦ Automático</span></div>
