@@ -230,7 +230,12 @@ def get_calendar():
         peru_events.append(f"Próximo — {dia} {fecha_dt.day} {mes} — {nombre} {estrellas}")
 
     result["🇵🇪 Perú"] = peru_events
-    return result
+    ordenado = {
+        "🇺🇸 Estados Unidos": result["🇺🇸 Estados Unidos"],
+        "🇵🇪 Perú": result["🇵🇪 Perú"],
+        "🇪🇺 Europa": result["🇪🇺 Europa"],
+    }
+    return ordenado
 
 def fred_get(series_id, limit=13):
     url = "https://api.stlouisfed.org/fred/series/observations"
