@@ -155,14 +155,26 @@ def get_calendar():
         except Exception:
             return datetime.max
 
+    CALENDAR_KEYWORDS = [
+        "inflation", "cpi", "consumer price", "pce", "core pce",
+        "unemployment", "jobless", "payroll", "employment change", "jobs report", "non-farm", "nonfarm",
+        "gdp",
+        "rate decision", "interest rate", "policy rate", "fed funds", "refinancing rate", "deposit rate",
+        "monetary policy",
+    ]
+
+    def _es_relevante(title):
+        t = title.lower()
+        return any(k in t for k in CALENDAR_KEYWORDS)
+
     impact_stars = {"High": "★★★", "Medium": "★★", "Low": "★"}
     for currency, country_label in countries.items():
-        matched = [e for e in all_events if e.get("country", "") == currency and e.get("impact", "") in ("High", "Medium")]
+        matched = [e for e in all_events if e.get("country", "") == currency and _es_relevante(e.get("title", "")) and e.get("impact", "") in ("High", "Medium")]
         if not matched:
-            matched = [e for e in all_events if e.get("country", "") == currency and e.get("impact", "") == "Low"]
+            matched = [e for e in all_events if e.get("country", "") == currency and _es_relevante(e.get("title", "")) and e.get("impact", "") == "Low"]
         matched.sort(key=_parse_dt)
         eventos = []
-        for e in matched[:8]:
+        for e in matched[:5]:
             title_es = translate_es(e.get("title", ""))
             fecha = _fmt_event_date(e.get("date", ""))
             prefijo = f"{fecha} — " if fecha else ""
@@ -220,7 +232,7 @@ def get_calendar():
         mes = MESES_ABR_ES[fecha_dt.month - 1]
         peru_events.append(f"Próximo — {dia} {fecha_dt.day} {mes} {fecha_dt.year} — {nombre} {estrellas}")
 
-    result["🇵🇪 Perú"] = peru_events
+    result["🇵🇪 Perú"] = peru_events[:5]
     ordenado = {
         "🇺🇸 Estados Unidos": result["🇺🇸 Estados Unidos"],
         "🇵🇪 Perú": result["🇵🇪 Perú"],
