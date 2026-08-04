@@ -569,9 +569,9 @@ def get_periodo_labels():
         ["Proyectada", f"({MESES_ABR_ES[proyectada_dt.month - 1]}. {proyectada_dt.year})"],
     ]
     infl_pbi_labels = [
-        ["Anterior", f"({TODAY.year - 1})"],
-        ["Actual", f"({TODAY.year})"],
-        ["Proyectada", f"({TODAY.year + 1})"],
+        ["Anterior", f"({MESES_ABR_ES[TODAY.month - 1]}. {TODAY.year - 1})"],
+        ["Actual", f"({MESES_ABR_ES[TODAY.month - 1]}. {TODAY.year})"],
+        ["Proyectada", f"({MESES_ABR_ES[TODAY.month - 1]}. {TODAY.year + 1})"],
     ]
     return {"tasa": tasa_labels, "inflacion": infl_pbi_labels, "pbi": infl_pbi_labels}
 
