@@ -514,7 +514,8 @@ def get_frase_final(macro_trend, dato_semana):
 
 def get_dato_semana(macro_trend):
     """Selecciona el dato macro con el cambio mas significativo del
-    mes (mayor variacion absoluta entre 'anterior' y 'actual')."""
+    mes (mayor variacion absoluta entre 'anterior' y 'actual') y arma
+    un titular llamativo tipo prensa, con fecha, headline y descripcion."""
     labels = {"peru": "🇵🇪 Perú", "usa": "🇺🇸 Estados Unidos", "europa": "🇪🇺 Europa"}
     metric_labels = {"tasa": "Tasa de referencia", "inflacion": "Inflación interanual", "pbi": "Crecimiento del PBI"}
     candidatos = []
@@ -524,6 +525,7 @@ def get_dato_semana(macro_trend):
                 continue
             cambio = round(d["actual"] - d["anterior"], 2)
             candidatos.append({
+                "metric_key": metric,
                 "region_label": labels.get(region_key, region_key),
                 "metric_label": metric_labels.get(metric, metric),
                 "valor": d["actual"],
@@ -533,15 +535,28 @@ def get_dato_semana(macro_trend):
     if not candidatos:
         return None
     destacado = max(candidatos, key=lambda c: abs(c["cambio"]))
+
+    if destacado["metric_key"] == "tasa":
+        fecha = f"{MESES_ES[TODAY.month - 1].capitalize()} {TODAY.year}"
+    else:
+        fecha = str(TODAY.year)
+
     valor_fmt = f"{destacado['valor']:.2f}"
     anterior_fmt = f"{destacado['anterior']:.2f}"
-    destacado["valor"] = valor_fmt
+
     if destacado["cambio"] == 0:
-        destacado["texto"] = f"{destacado['metric_label']} de {destacado['region_label']} se mantuvo estable en {valor_fmt}%."
+        headline = f"{destacado['metric_label']} de {destacado['region_label']} se mantiene estable en {valor_fmt}%"
+        descripcion = f"Sin cambios respecto al periodo anterior ({anterior_fmt}%)."
     else:
-        direccion = "subió" if destacado["cambio"] > 0 else "bajó"
+        direccion = "sube" if destacado["cambio"] > 0 else "baja"
         signo = "+" if destacado["cambio"] > 0 else ""
-        destacado["texto"] = f"{destacado['metric_label']} de {destacado['region_label']} {direccion} de {anterior_fmt}% a {valor_fmt}% ({signo}{destacado['cambio']:.2f} p.p.)."
+        headline = f"{destacado['metric_label']} de {destacado['region_label']} {direccion} a {valor_fmt}%"
+        descripcion = f"Desde {anterior_fmt}% en el periodo anterior ({signo}{destacado['cambio']:.2f} p.p.)."
+
+    destacado["fecha"] = fecha
+    destacado["headline"] = headline
+    destacado["descripcion"] = descripcion
+    destacado["valor"] = valor_fmt
     return destacado
 
 def get_periodo_labels():
