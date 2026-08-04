@@ -104,15 +104,14 @@ def get_rss_news():
             all_news.append({"source": source, "title": item["title"], "link": item["link"], "relevance": relevance, "description": item["description"]})
 
     high = [n for n in all_news if n["relevance"] == "Alta relevancia"][:5]
-    med = [n for n in all_news if n["relevance"] == "Media relevancia"][:5]
-    result = high + med
+    result = high
     seen_titles = set()
     deduped = []
     for n in result:
         if n["title"] not in seen_titles:
             seen_titles.add(n["title"])
             deduped.append(n)
-    deduped = deduped[:10]
+    deduped = deduped[:5]
 
     def _region_priority(title_en):
         t = title_en.lower()
