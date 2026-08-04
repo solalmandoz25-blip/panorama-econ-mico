@@ -80,7 +80,7 @@ def get_rss_news():
     ]
 
     for source, url in feeds:
-        for item in _fetch_feed_items(url, limit=15):
+        for item in _fetch_feed_items(url, limit=40):
             title = item["title"]
             title_lower = title.lower()
             if any(k in title_lower for k in exclude_keywords):
@@ -95,8 +95,8 @@ def get_rss_news():
                 continue
             all_news.append({"source": source, "title": item["title"], "link": item["link"], "relevance": relevance, "description": item["description"]})
 
-    high = [n for n in all_news if n["relevance"] == "Alta relevancia"][:4]
-    med = [n for n in all_news if n["relevance"] == "Media relevancia"][:3]
+    high = [n for n in all_news if n["relevance"] == "Alta relevancia"][:7]
+    med = [n for n in all_news if n["relevance"] == "Media relevancia"][:5]
     result = high + med
     seen_titles = set()
     deduped = []
@@ -104,7 +104,7 @@ def get_rss_news():
         if n["title"] not in seen_titles:
             seen_titles.add(n["title"])
             deduped.append(n)
-    deduped = deduped[:6]
+    deduped = deduped[:10]
 
     for n in deduped:
         n["title_en"] = n["title"]
@@ -127,22 +127,31 @@ def _fmt_event_date(date_str):
         return ""
 
 def get_calendar():
-    url = "https://nfs.faireconomy.media/ff_calendar_thisweek.json"
+    urls = [
+        "https://nfs.faireconomy.media/ff_calendar_thisweek.json",
+        "https://nfs.faireconomy.media/ff_calendar_nextweek.json",
+    ]
     countries = {"USD": "🇺🇸 Estados Unidos", "EUR": "🇪🇺 Europa"}
     result = {"🇺🇸 Estados Unidos": [], "🇪🇺 Europa": []}
+    all_events = []
+    for url in urls:
+        try:
+            r = requests.get(url, timeout=8)
+            all_events.extend(r.json())
+        except Exception as e:
+            print(f"Error calendar {url}: {e}")
+
     try:
-        r = requests.get(url, timeout=8)
-        data = r.json()
         impact_stars = {"High": "★★★", "Medium": "★★", "Low": "★"}
         for level in ["High", "Medium", "Low"]:
-            for event in data:
+            for event in all_events:
                 currency = event.get("country", "")
                 impact = event.get("impact", "")
                 title = event.get("title", "")
                 date_str = event.get("date", "")
                 if currency in countries and impact == level:
                     country_label = countries[currency]
-                    if len(result[country_label]) < 4:
+                    if len(result[country_label]) < 8:
                         title_es = translate_es(title)
                         fecha = _fmt_event_date(date_str)
                         prefijo = f"{fecha} — " if fecha else ""
@@ -197,8 +206,7 @@ def get_calendar():
         (pbi_release, "Publicación PBI mensual INEI", "★★"),
     ]
     proximos_futuros = sorted([p for p in proximos if p[0] >= hoy])
-    if proximos_futuros:
-        fecha_dt, nombre, estrellas = proximos_futuros[0]
+    for fecha_dt, nombre, estrellas in proximos_futuros:
         dia = DIAS_ES[fecha_dt.weekday()]
         mes = MESES_ABR_ES[fecha_dt.month - 1]
         peru_events.append(f"Próximo — {dia} {fecha_dt.day} {mes} — {nombre} {estrellas}")
@@ -223,6 +231,16 @@ def fred_get(series_id, limit=13):
     except Exception as e:
         print(f"Error FRED {series_id}: {e}")
         return []
+
+def fred_latest(series_id, limit=4):
+    """Devuelve el valor mas reciente de una serie de FRED."""
+    obs = fred_get(series_id, limit)
+    if not obs:
+        return None
+    try:
+        return float(obs[-1]["value"])
+    except (ValueError, TypeError, KeyError, IndexError):
+        return None
 
 def fred_monthly(series_id, months=3, raw_limit=100):
     obs = fred_get(series_id, raw_limit)
@@ -335,7 +353,9 @@ def compute_trend(data_list):
 def build_macro_trend(macro):
     """Tasa: no existe una proyeccion oficial gratuita y consistente para
     los 3 (solo la Fed publica dot-plot), asi que se mantiene la
-    extrapolacion de tendencia sobre datos reales historicos.
+    extrapolacion de tendencia sobre datos reales historicos para Peru
+    y Europa. Para EE.UU. se usa la proyeccion REAL de la Fed (FEDTARMD,
+    mediana del dot-plot del FOMC).
     Inflacion y PBI: se reemplaza por proyecciones OFICIALES del FMI
     (World Economic Outlook), que ya publican año anterior/actual/siguiente."""
     trend = {
@@ -347,6 +367,14 @@ def build_macro_trend(macro):
         "inflacion": {},
         "pbi": {},
     }
+
+    fed_dot_plot = fred_latest("FEDTARMD")
+    if trend["tasa"]["usa"] and fed_dot_plot is not None:
+        trend["tasa"]["usa"]["proyectada"] = round(fed_dot_plot, 2)
+        print(f"Tasa OK — USA proyectada real (Fed dot-plot): {fed_dot_plot}")
+    else:
+        print(f"Tasa USA: no se pudo obtener dot-plot real de la Fed, se mantiene extrapolacion (fed_dot_plot={fed_dot_plot})")
+
     imf_countries = {"peru": "PER", "usa": "USA", "europa": "EURO"}
     for region_key, imf_code in imf_countries.items():
         trend["inflacion"][region_key] = get_imf_trend("PCPIPCH", imf_code)
@@ -437,7 +465,7 @@ def generate_conclusiones(macro, news_list):
             partes.append(f"inflación interanual en {_fmt(infl[-1])}% ({_trend(infl)})")
         if pbi:
             partes.append(f"crecimiento del PBI en {_fmt(pbi[-1])}% ({_trend(pbi)})")
-        resumen = ", ".join(partes) + "." if partes else "sin datos disponibles esta semana."
+        resumen = ", ".join(partes) + "." if partes else "sin datos disponibles este mes."
 
         noticia = find_relevant_news(key, news_list)
         if not noticia and key == "peru":
@@ -456,44 +484,6 @@ def generate_conclusiones(macro, news_list):
         })
     return lineas
 
-def get_impacto_empresarial(macro_trend):
-    """Traduce las tendencias macro en implicancias practicas para
-    decisiones de negocio: costo de financiamiento, precios, crecimiento."""
-    interpretaciones = {
-        "tasa": {
-            "al alza": "financiamiento más costoso; se recomienda evaluar la fijación de tasas en el corto plazo",
-            "a la baja": "costo de fondeo a la baja; representa una oportunidad para nuevas líneas de crédito",
-            "estable": "costo de financiamiento estable, sin cambios significativos previstos",
-        },
-        "inflacion": {
-            "al alza": "presión al alza sobre costos operativos y márgenes; se sugiere revisar la estrategia de precios",
-            "a la baja": "entorno de precios más predecible, favorable para la planificación a mediano plazo",
-            "estable": "inflación bajo control, sin impacto significativo previsto en el corto plazo",
-        },
-        "pbi": {
-            "al alza": "el crecimiento económico favorece la expansión y una mayor demanda",
-            "a la baja": "la desaceleración sugiere cautela en las proyecciones de crecimiento",
-            "estable": "actividad económica estable, sin señales de cambio abrupto",
-        },
-    }
-    labels = [("peru", "🇵🇪 Perú"), ("usa", "🇺🇸 Estados Unidos"), ("europa", "🇪🇺 Europa")]
-    resultado = []
-    for key, label in labels:
-        partes = []
-        for metric in ["tasa", "inflacion", "pbi"]:
-            d = macro_trend.get(metric, {}).get(key)
-            if not d:
-                continue
-            direccion = _trend([d["anterior"], d["actual"]])
-            partes.append(interpretaciones[metric][direccion])
-        if partes:
-            resumen = "; ".join(partes) + "."
-            resumen = resumen[0].upper() + resumen[1:]
-        else:
-            resumen = "sin datos suficientes para un análisis esta semana."
-        resultado.append({"label": label, "resumen": f"{label}: {resumen}"})
-    return resultado
-
 def _decap(texto):
     """Pone en minúscula solo la primera letra, preservando siglas
     como PBI que ya vienen en mayúscula dentro de la frase."""
@@ -503,7 +493,7 @@ def _decap(texto):
 
 def get_frase_final(macro_trend, dato_semana):
     """Genera una frase de cierre de maximo dos lineas que resume el tono
-    general de la semana, combinando la tendencia dominante con el dato
+    general del mes, combinando la tendencia dominante con el dato
     mas destacado."""
     conteo = {"al alza": 0, "a la baja": 0, "estable": 0}
     for metric, regiones in macro_trend.items():
@@ -514,17 +504,17 @@ def get_frase_final(macro_trend, dato_semana):
             conteo[direccion] += 1
     dominante = max(conteo, key=conteo.get)
     tono = {
-        "al alza": "una semana marcada por presiones al alza en varios frentes",
-        "a la baja": "una semana con señales de alivio en varios frentes",
-        "estable": "una semana de relativa estabilidad en los principales indicadores",
+        "al alza": "un mes marcado por presiones al alza en varios frentes",
+        "a la baja": "un mes con señales de alivio en varios frentes",
+        "estable": "un mes de relativa estabilidad en los principales indicadores",
     }[dominante]
     if dato_semana:
         return f"En general, {tono}; lo más destacado fue el movimiento en {_decap(dato_semana['metric_label'])} de {dato_semana['region_label']}."
-    return f"En general, {tono} esta semana."
+    return f"En general, {tono}."
 
 def get_dato_semana(macro_trend):
-    """Selecciona el dato macro con el cambio mas significativo de la
-    semana (mayor variacion absoluta entre 'anterior' y 'actual')."""
+    """Selecciona el dato macro con el cambio mas significativo del
+    mes (mayor variacion absoluta entre 'anterior' y 'actual')."""
     labels = {"peru": "🇵🇪 Perú", "usa": "🇺🇸 Estados Unidos", "europa": "🇪🇺 Europa"}
     metric_labels = {"tasa": "Tasa de referencia", "inflacion": "Inflación interanual", "pbi": "Crecimiento del PBI"}
     candidatos = []
@@ -554,17 +544,6 @@ def get_dato_semana(macro_trend):
         destacado["texto"] = f"{destacado['metric_label']} de {destacado['region_label']} {direccion} de {anterior_fmt}% a {valor_fmt}% ({signo}{destacado['cambio']:.2f} p.p.)."
     return destacado
 
-def get_top3_para_clientes(news_list):
-    """Selecciona los 3 puntos mas importantes de la semana para compartir
-    con clientes: prioriza noticias de alta relevancia; si no hay 3,
-    completa con las siguientes disponibles."""
-    altas = [n for n in news_list if n["relevance"] == "Alta relevancia"]
-    top3 = altas[:3]
-    if len(top3) < 3:
-        restantes = [n for n in news_list if n not in top3]
-        top3 += restantes[: 3 - len(top3)]
-    return top3
-
 def get_periodo_labels():
     """Arma las etiquetas Anterior/Actual/Proyectada con el periodo real:
     mes para tasa (datos mensuales), año para inflacion/PBI (datos del FMI,
@@ -580,14 +559,14 @@ def get_periodo_labels():
     proyectada_dt = add_months(TODAY, 1)
 
     tasa_labels = [
-        f"Anterior ({MESES_ABR_ES[anterior_dt.month - 1]}. {anterior_dt.year})",
-        f"Actual ({MESES_ABR_ES[actual_dt.month - 1]}. {actual_dt.year})",
-        f"Proyectada ({MESES_ABR_ES[proyectada_dt.month - 1]}. {proyectada_dt.year})",
+        ["Anterior", f"({MESES_ABR_ES[anterior_dt.month - 1]}. {anterior_dt.year})"],
+        ["Actual", f"({MESES_ABR_ES[actual_dt.month - 1]}. {actual_dt.year})"],
+        ["Proyectada", f"({MESES_ABR_ES[proyectada_dt.month - 1]}. {proyectada_dt.year})"],
     ]
     infl_pbi_labels = [
-        f"Anterior ({TODAY.year - 1})",
-        f"Actual ({TODAY.year})",
-        f"Proyectada ({TODAY.year + 1})",
+        ["Anterior", f"({TODAY.year - 1})"],
+        ["Actual", f"({TODAY.year})"],
+        ["Proyectada", f"({TODAY.year + 1})"],
     ]
     return {"tasa": tasa_labels, "inflacion": infl_pbi_labels, "pbi": infl_pbi_labels}
 
@@ -601,12 +580,12 @@ conclusiones = generate_conclusiones(macro, news)
 dato_semana = get_dato_semana(macro_trend)
 frase_final = get_frase_final(macro_trend, dato_semana)
 periodo_labels = get_periodo_labels()
-week_str = f"{TODAY.day} de {MESES_ES[TODAY.month - 1]}, {TODAY.year}"
+month_str = f"{MESES_ES[TODAY.month - 1].capitalize()} {TODAY.year}"
 
 with open("templates/dashboard.html") as f:
     template = Template(f.read())
 
-html = template.render(week=week_str, news=news, calendar=calendar, macro=macro, macro_trend=macro_trend, conclusiones=conclusiones, dato_semana=dato_semana, frase_final=frase_final, periodo_labels=periodo_labels)
+html = template.render(month=month_str, news=news, calendar=calendar, macro=macro, macro_trend=macro_trend, conclusiones=conclusiones, dato_semana=dato_semana, frase_final=frase_final, periodo_labels=periodo_labels)
 
 os.makedirs("output", exist_ok=True)
 with open("output/index.html", "w") as f:
