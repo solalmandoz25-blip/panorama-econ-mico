@@ -218,7 +218,7 @@ def get_calendar():
     for fecha_dt, nombre, estrellas in proximos_futuros:
         dia = DIAS_ES[fecha_dt.weekday()]
         mes = MESES_ABR_ES[fecha_dt.month - 1]
-        peru_events.append(f"Próximo — {dia} {fecha_dt.day} {mes} — {nombre} {estrellas}")
+        peru_events.append(f"Próximo — {dia} {fecha_dt.day} {mes} {fecha_dt.year} — {nombre} {estrellas}")
 
     result["🇵🇪 Perú"] = peru_events
     ordenado = {
