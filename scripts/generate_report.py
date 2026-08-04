@@ -150,7 +150,7 @@ def get_calendar():
             print(f"Error calendar {url}: {e}")
 
     try:
-        impact_stars = {"High": "★★★", "Medium": "★★"}
+        impact_stars = {"High": "★★★", "Medium": "★★", "Low": "★"}
         for level in ["High", "Medium"]:
             for event in all_events:
                 currency = event.get("country", "")
@@ -164,6 +164,18 @@ def get_calendar():
                         fecha = _fmt_event_date(date_str)
                         prefijo = f"{fecha} — " if fecha else ""
                         result[country_label].append(f"{prefijo}{title_es} {impact_stars[level]}")
+
+        # Si alguna region se quedo sin nada de alta/media, rellenar con baja
+        # importancia para no dejarla vacia.
+        for currency, country_label in countries.items():
+            if len(result[country_label]) == 0:
+                for event in all_events:
+                    if event.get("country", "") == currency and event.get("impact", "") == "Low":
+                        if len(result[country_label]) < 8:
+                            title_es = translate_es(event.get("title", ""))
+                            fecha = _fmt_event_date(event.get("date", ""))
+                            prefijo = f"{fecha} — " if fecha else ""
+                            result[country_label].append(f"{prefijo}{title_es} ★")
     except Exception as e:
         print(f"Error calendar: {e}")
 
