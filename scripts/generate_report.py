@@ -450,67 +450,31 @@ def get_usa_fallback_news():
         return item
     return None
 
-def generate_conclusiones(macro, news_list):
-    labels = [("peru", "🇵🇪 Perú"), ("usa", "🇺🇸 Estados Unidos"), ("europa", "🇪🇺 Europa")]
-    lineas = []
-    for key, label in labels:
-        data = macro.get(key, {})
-        tasa = [o["value"] for o in data.get("tasa", [])]
-        infl = [o["value"] for o in data.get("inflacion", [])]
-        pbi = [o["value"] for o in data.get("pbi", [])]
-        partes = []
-        if tasa:
-            partes.append(f"tasa de referencia en {_fmt(tasa[-1])}% ({_trend(tasa)})")
-        if infl:
-            partes.append(f"inflación interanual en {_fmt(infl[-1])}% ({_trend(infl)})")
-        if pbi:
-            partes.append(f"crecimiento del PBI en {_fmt(pbi[-1])}% ({_trend(pbi)})")
-        resumen = ", ".join(partes) + "." if partes else "sin datos disponibles este mes."
+def get_periodo_labels():
+    """Arma las etiquetas Anterior/Actual/Proyectada con el periodo real:
+    mes para tasa (datos mensuales), año para inflacion/PBI (datos del FMI,
+    que son anuales)."""
+    def add_months(date, delta):
+        total = date.month - 1 + delta
+        y = date.year + total // 12
+        m = total % 12 + 1
+        return date.replace(year=y, month=m, day=1)
 
-        noticia = find_relevant_news(key, news_list)
-        if not noticia and key == "peru":
-            noticia = get_peru_fallback_news()
-        if not noticia and key == "europa":
-            noticia = get_europa_fallback_news()
-        if not noticia and key == "usa":
-            noticia = get_usa_fallback_news()
+    anterior_dt = add_months(TODAY, -1)
+    actual_dt = TODAY
+    proyectada_dt = add_months(TODAY, 1)
 
-        lineas.append({
-            "label": label,
-            "resumen": f"{label}: {resumen}",
-            "noticia_titulo": noticia["title"] if noticia else None,
-            "noticia_desc": noticia["description"] if noticia else None,
-            "noticia_link": noticia["link"] if noticia else None,
-        })
-    return lineas
-
-def _decap(texto):
-    """Pone en minúscula solo la primera letra, preservando siglas
-    como PBI que ya vienen en mayúscula dentro de la frase."""
-    if not texto:
-        return texto
-    return texto[0].lower() + texto[1:]
-
-def get_frase_final(macro_trend, dato_semana):
-    """Genera una frase de cierre de maximo dos lineas que resume el tono
-    general del mes, combinando la tendencia dominante con el dato
-    mas destacado."""
-    conteo = {"al alza": 0, "a la baja": 0, "estable": 0}
-    for metric, regiones in macro_trend.items():
-        for region_key, d in regiones.items():
-            if not d:
-                continue
-            direccion = _trend([d["anterior"], d["actual"]])
-            conteo[direccion] += 1
-    dominante = max(conteo, key=conteo.get)
-    tono = {
-        "al alza": "un mes marcado por presiones al alza en varios frentes",
-        "a la baja": "un mes con señales de alivio en varios frentes",
-        "estable": "un mes de relativa estabilidad en los principales indicadores",
-    }[dominante]
-    if dato_semana:
-        return f"En general, {tono}; lo más destacado fue el movimiento en {_decap(dato_semana['metric_label'])} de {dato_semana['region_label']}."
-    return f"En general, {tono}."
+    tasa_labels = [
+        ["Anterior", f"({MESES_ABR_ES[anterior_dt.month - 1]}. {anterior_dt.year})"],
+        ["Actual", f"({MESES_ABR_ES[actual_dt.month - 1]}. {actual_dt.year})"],
+        ["Proyectada", f"({MESES_ABR_ES[proyectada_dt.month - 1]}. {proyectada_dt.year})"],
+    ]
+    infl_pbi_labels = [
+        ["Anterior", f"({TODAY.year - 1})"],
+        ["Actual", f"({TODAY.year})"],
+        ["Proyectada", f"({TODAY.year + 1})"],
+    ]
+    return {"tasa": tasa_labels, "inflacion": infl_pbi_labels, "pbi": infl_pbi_labels}
 
 def get_dato_semana(macro_trend):
     """Selecciona el dato macro con el cambio mas significativo del
@@ -559,48 +523,20 @@ def get_dato_semana(macro_trend):
     destacado["valor"] = valor_fmt
     return destacado
 
-def get_periodo_labels():
-    """Arma las etiquetas Anterior/Actual/Proyectada con el periodo real:
-    mes para tasa (datos mensuales), año para inflacion/PBI (datos del FMI,
-    que son anuales)."""
-    def add_months(date, delta):
-        total = date.month - 1 + delta
-        y = date.year + total // 12
-        m = total % 12 + 1
-        return date.replace(year=y, month=m, day=1)
-
-    anterior_dt = add_months(TODAY, -1)
-    actual_dt = TODAY
-    proyectada_dt = add_months(TODAY, 1)
-
-    tasa_labels = [
-        ["Anterior", f"({MESES_ABR_ES[anterior_dt.month - 1]}. {anterior_dt.year})"],
-        ["Actual", f"({MESES_ABR_ES[actual_dt.month - 1]}. {actual_dt.year})"],
-        ["Proyectada", f"({MESES_ABR_ES[proyectada_dt.month - 1]}. {proyectada_dt.year})"],
-    ]
-    infl_pbi_labels = [
-        ["Anterior", f"({TODAY.year - 1})"],
-        ["Actual", f"({TODAY.year})"],
-        ["Proyectada", f"({TODAY.year + 1})"],
-    ]
-    return {"tasa": tasa_labels, "inflacion": infl_pbi_labels, "pbi": infl_pbi_labels}
-
 MESES_ES = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"]
 
 news = get_rss_news()
 calendar = get_calendar()
 macro = get_macro_data()
 macro_trend = build_macro_trend(macro)
-conclusiones = generate_conclusiones(macro, news)
 dato_semana = get_dato_semana(macro_trend)
-frase_final = get_frase_final(macro_trend, dato_semana)
 periodo_labels = get_periodo_labels()
 month_str = f"{MESES_ES[TODAY.month - 1].capitalize()} {TODAY.year}"
 
 with open("templates/dashboard.html") as f:
     template = Template(f.read())
 
-html = template.render(month=month_str, news=news, calendar=calendar, macro=macro, macro_trend=macro_trend, conclusiones=conclusiones, dato_semana=dato_semana, frase_final=frase_final, periodo_labels=periodo_labels)
+html = template.render(month=month_str, news=news, calendar=calendar, macro=macro, macro_trend=macro_trend, dato_semana=dato_semana, periodo_labels=periodo_labels)
 
 os.makedirs("output", exist_ok=True)
 with open("output/index.html", "w") as f:
