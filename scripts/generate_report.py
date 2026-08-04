@@ -103,7 +103,7 @@ def get_rss_news():
                 continue
             all_news.append({"source": source, "title": item["title"], "link": item["link"], "relevance": relevance, "description": item["description"]})
 
-    high = [n for n in all_news if n["relevance"] == "Alta relevancia"][:7]
+    high = [n for n in all_news if n["relevance"] == "Alta relevancia"][:5]
     med = [n for n in all_news if n["relevance"] == "Media relevancia"][:5]
     result = high + med
     seen_titles = set()
