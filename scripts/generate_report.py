@@ -204,9 +204,9 @@ def get_calendar():
 
     impact_stars = {"High": "★★★", "Medium": "★★", "Low": "★"}
     for currency, country_label in countries.items():
-        matched = [e for e in all_events if e.get("country", "") == currency and _es_relevante(e.get("title", "")) and e.get("impact", "") in ("High", "Medium")]
+        matched = [e for e in all_events if e.get("country", "") == currency and _es_relevante(e.get("title", "")) and e.get("impact", "") in ("High", "Medium") and _parse_dt(e) >= TODAY]
         if not matched:
-            matched = [e for e in all_events if e.get("country", "") == currency and _es_relevante(e.get("title", "")) and e.get("impact", "") == "Low"]
+            matched = [e for e in all_events if e.get("country", "") == currency and _es_relevante(e.get("title", "")) and e.get("impact", "") == "Low" and _parse_dt(e) >= TODAY]
         matched.sort(key=_parse_dt)
         eventos = []
         grupos_por_fecha = set()
