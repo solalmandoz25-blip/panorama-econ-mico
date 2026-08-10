@@ -503,13 +503,18 @@ def _fecha_legible(date_str):
 
 def get_dato_semana(macro_trend, macro):
     """Selecciona el dato macro con el cambio mas significativo del
-    mes (mayor variacion absoluta entre 'anterior' y 'actual') y arma
-    un titular llamativo tipo prensa, con fecha, headline y descripcion."""
+    mes, comparando datos REALES mensuales (BCRP/FRED) para tasa,
+    inflacion y PBI en las 3 regiones -- no las proyecciones anuales
+    del FMI, que solo se actualizan 2 veces al año y dejarian este
+    dato 'congelado' la mayor parte del tiempo. Arma un titular
+    llamativo tipo prensa, con fecha, headline y descripcion."""
     labels = {"peru": "🇵🇪 Perú", "usa": "🇺🇸 Estados Unidos", "europa": "🇪🇺 Europa"}
     metric_labels = {"tasa": "Tasa de referencia", "inflacion": "Inflación interanual", "pbi": "Crecimiento del PBI"}
     candidatos = []
-    for metric, regiones in macro_trend.items():
-        for region_key, d in regiones.items():
+    for region_key in ["peru", "usa", "europa"]:
+        for metric in ["tasa", "inflacion", "pbi"]:
+            raw_list = macro.get(region_key, {}).get(metric, [])
+            d = compute_trend(raw_list)
             if not d:
                 continue
             cambio = round(d["actual"] - d["anterior"], 2)
@@ -529,10 +534,8 @@ def get_dato_semana(macro_trend, macro):
     raw_list = macro.get(destacado["region_key"], {}).get(destacado["metric_key"], [])
     if raw_list:
         fecha = _fecha_legible(raw_list[-1]["date"])
-    elif destacado["metric_key"] == "tasa":
-        fecha = f"{MESES_ES[TODAY.month - 1].capitalize()} {TODAY.year}"
     else:
-        fecha = str(TODAY.year)
+        fecha = f"{MESES_ES[TODAY.month - 1].capitalize()} {TODAY.year}"
 
     valor_fmt = f"{destacado['valor']:.2f}"
     anterior_fmt = f"{destacado['anterior']:.2f}"
