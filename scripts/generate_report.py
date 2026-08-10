@@ -501,13 +501,33 @@ def _fecha_legible(date_str):
         return f"{MESES_ABR_ES[mes - 1].capitalize()}. {anio}"
     return date_str
 
+def _fecha_orden(date_str):
+    """Convierte una fecha cruda (BCRP tipo 'Jul.2026' o FRED tipo
+    '2026-07') en una tupla (año, mes) comparable, para poder elegir
+    el dato mas reciente disponible."""
+    if not date_str:
+        return (0, 0)
+    m = re.match(r"^(\d{4})-(\d{2})$", date_str)
+    if m:
+        return (int(m.group(1)), int(m.group(2)))
+    m2 = re.match(r"^([A-Za-zÀ-ÿ]{3})\.?(\d{4})$", date_str)
+    if m2:
+        mes_str = m2.group(1).lower()
+        anio = int(m2.group(2))
+        try:
+            mes_idx = MESES_ABR_ES.index(mes_str) + 1
+        except ValueError:
+            mes_idx = 0
+        return (anio, mes_idx)
+    return (0, 0)
+
 def get_dato_semana(macro_trend, macro):
-    """Selecciona el dato macro con el cambio mas significativo del
-    mes, comparando datos REALES mensuales (BCRP/FRED) para tasa,
-    inflacion y PBI en las 3 regiones -- no las proyecciones anuales
-    del FMI, que solo se actualizan 2 veces al año y dejarian este
-    dato 'congelado' la mayor parte del tiempo. Arma un titular
-    llamativo tipo prensa, con fecha, headline y descripcion."""
+    """Selecciona el dato macro MAS RECIENTE disponible del mes actual
+    (comparando datos REALES mensuales de BCRP/FRED en las 3 regiones),
+    no las proyecciones anuales del FMI (que solo cambian 2 veces al
+    año). Si hay empate de fecha entre varias metricas, se usa el
+    mayor cambio como desempate. Arma un titular tipo prensa, con
+    fecha, headline y descripcion."""
     labels = {"peru": "🇵🇪 Perú", "usa": "🇺🇸 Estados Unidos", "europa": "🇪🇺 Europa"}
     metric_labels = {"tasa": "Tasa de referencia", "inflacion": "Inflación interanual", "pbi": "Crecimiento del PBI"}
     candidatos = []
@@ -518,6 +538,7 @@ def get_dato_semana(macro_trend, macro):
             if not d:
                 continue
             cambio = round(d["actual"] - d["anterior"], 2)
+            fecha_orden = _fecha_orden(raw_list[-1]["date"]) if raw_list else (0, 0)
             candidatos.append({
                 "metric_key": metric,
                 "region_key": region_key,
@@ -526,10 +547,11 @@ def get_dato_semana(macro_trend, macro):
                 "valor": d["actual"],
                 "anterior": d["anterior"],
                 "cambio": cambio,
+                "fecha_orden": fecha_orden,
             })
     if not candidatos:
         return None
-    destacado = max(candidatos, key=lambda c: abs(c["cambio"]))
+    destacado = max(candidatos, key=lambda c: (c["fecha_orden"], abs(c["cambio"])))
 
     raw_list = macro.get(destacado["region_key"], {}).get(destacado["metric_key"], [])
     if raw_list:
