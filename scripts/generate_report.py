@@ -171,7 +171,10 @@ def get_calendar():
 
     def _parse_dt(event):
         try:
-            return datetime.fromisoformat(event.get("date", ""))
+            dt = datetime.fromisoformat(event.get("date", ""))
+            if dt.tzinfo is not None:
+                dt = dt.replace(tzinfo=None)
+            return dt
         except Exception:
             return datetime.max
 
