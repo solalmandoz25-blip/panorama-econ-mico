@@ -417,4 +417,212 @@ def build_macro_trend(macro):
     imf_countries = {"peru": "PER", "usa": "USA", "europa": "EURO"}
     for region_key, imf_code in imf_countries.items():
         trend["inflacion"][region_key] = get_imf_trend("PCPIPCH", imf_code)
-        trend["pbi"][region_key] = get_imf_trend("NGDP_RPCH"
+        trend["pbi"][region_key] = get_imf_trend("NGDP_RPCH", imf_code)
+    return trend
+
+def _fmt(val):
+    try:
+        return f"{float(val):.2f}"
+    except (TypeError, ValueError):
+        return str(val)
+
+def _trend(vals):
+    nums = [float(v) for v in vals if v is not None]
+    if len(nums) < 2:
+        return "estable"
+    diff = nums[-1] - nums[0]
+    if abs(diff) < 0.05:
+        return "estable"
+    return "al alza" if diff > 0 else "a la baja"
+
+REGION_KEYWORDS = {
+    "peru": [r"\bperu\b", r"\bperú\b", r"\bbcrp\b", r"\blima\b", "sol peruano", "sunat", "andean", "latam", "latin america"],
+    "usa": [r"\bfed\b", "powell", "treasury", "washington", r"\bus\b", r"\bu\.s\.", "dollar", "united states", r"\bamerica", "yield", "rate cut", "rate hike", "recession", "jobs report", "unemployment"],
+    "europa": [r"\becb\b", r"\bbce\b", "euro", "europe", "european", "eurozone", "germany", "france", r"\beu\b", "lagarde"],
+}
+
+FALLBACK_KEYWORDS_EN = [
+    r"\brate\b", "inflation", "monetary", "central bank", "recession", "war", "conflict", "tariff",
+]
+
+def find_relevant_news(region_key, news_list):
+    patterns = REGION_KEYWORDS.get(region_key, [])
+    for n in news_list:
+        title_lower = n.get("title_en", n["title"]).lower()
+        if any(re.search(p, title_lower) for p in patterns):
+            return n
+    return None
+
+def get_peru_fallback_news():
+    feed_url = "https://gestion.pe/arc/outboundfeeds/rss/category/economia/?outputType=xml"
+    items = _fetch_feed_items(feed_url, limit=5)
+    if items:
+        return items[0]
+    return None
+
+def get_europa_fallback_news():
+    feed_url = "https://feeds.feedburner.com/euronews/en/business/"
+    items = _fetch_feed_items(feed_url, limit=8)
+    patterns = REGION_KEYWORDS["europa"] + FALLBACK_KEYWORDS_EN
+    for item in items:
+        title_lower = item["title"].lower()
+        if any(re.search(p, title_lower) for p in patterns):
+            item["title"] = translate_es(item["title"])
+            item["description"] = translate_es(item["description"])
+            return item
+    return None
+
+def get_usa_fallback_news():
+    feed_url = "https://feeds.reuters.com/reuters/businessNews"
+    items = _fetch_feed_items(feed_url, limit=8)
+    patterns = REGION_KEYWORDS["usa"] + FALLBACK_KEYWORDS_EN
+    for item in items:
+        title_lower = item["title"].lower()
+        if any(re.search(p, title_lower) for p in patterns):
+            item["title"] = translate_es(item["title"])
+            item["description"] = translate_es(item["description"])
+            return item
+    if items:
+        item = items[0]
+        item["title"] = translate_es(item["title"])
+        item["description"] = translate_es(item["description"])
+        return item
+    return None
+
+def _fecha_legible(date_str):
+    """Convierte una fecha cruda (YYYY-MM de FRED, o ya formateada como
+    'Jun.2026' del BCRP) a un formato legible consistente."""
+    if not date_str:
+        return ""
+    m = re.match(r"^(\d{4})-(\d{2})$", date_str)
+    if m:
+        anio, mes = m.group(1), int(m.group(2))
+        return f"{MESES_ABR_ES[mes - 1].capitalize()}. {anio}"
+    return date_str
+
+def get_dato_semana(macro_trend, macro):
+    """Selecciona el dato macro con el cambio mas significativo del
+    mes (mayor variacion absoluta entre 'anterior' y 'actual') y arma
+    un titular llamativo tipo prensa, con fecha, headline y descripcion."""
+    labels = {"peru": "🇵🇪 Perú", "usa": "🇺🇸 Estados Unidos", "europa": "🇪🇺 Europa"}
+    metric_labels = {"tasa": "Tasa de referencia", "inflacion": "Inflación interanual", "pbi": "Crecimiento del PBI"}
+    candidatos = []
+    for metric, regiones in macro_trend.items():
+        for region_key, d in regiones.items():
+            if not d:
+                continue
+            cambio = round(d["actual"] - d["anterior"], 2)
+            candidatos.append({
+                "metric_key": metric,
+                "region_key": region_key,
+                "region_label": labels.get(region_key, region_key),
+                "metric_label": metric_labels.get(metric, metric),
+                "valor": d["actual"],
+                "anterior": d["anterior"],
+                "cambio": cambio,
+            })
+    if not candidatos:
+        return None
+    destacado = max(candidatos, key=lambda c: abs(c["cambio"]))
+
+    raw_list = macro.get(destacado["region_key"], {}).get(destacado["metric_key"], [])
+    if raw_list:
+        fecha = _fecha_legible(raw_list[-1]["date"])
+    elif destacado["metric_key"] == "tasa":
+        fecha = f"{MESES_ES[TODAY.month - 1].capitalize()} {TODAY.year}"
+    else:
+        fecha = str(TODAY.year)
+
+    valor_fmt = f"{destacado['valor']:.2f}"
+    anterior_fmt = f"{destacado['anterior']:.2f}"
+
+    if destacado["cambio"] == 0:
+        headline = f"{destacado['metric_label']} de {destacado['region_label']} se mantiene estable en {valor_fmt}%"
+        descripcion = f"Sin cambios respecto al periodo anterior ({anterior_fmt}%)."
+    else:
+        direccion = "sube" if destacado["cambio"] > 0 else "baja"
+        signo = "+" if destacado["cambio"] > 0 else ""
+        headline = f"{destacado['metric_label']} de {destacado['region_label']} {direccion} a {valor_fmt}%"
+        descripcion = f"Desde {anterior_fmt}% en el periodo anterior ({signo}{destacado['cambio']:.2f} p.p.)."
+
+    destacado["fecha"] = fecha
+    destacado["headline"] = headline
+    destacado["descripcion"] = descripcion
+    destacado["valor"] = valor_fmt
+    return destacado
+
+def get_conclusion_dolar(macro_trend):
+    """Genera una breve conclusion sobre la fortaleza esperada del dolar
+    frente al euro, basada en el diferencial de tasas de interes
+    proyectado entre la Fed y el BCE (datos reales ya calculados en
+    macro_trend). A mayor tasa relativa de EE.UU., mayor atractivo de
+    capital hacia el dolar."""
+    tasa = macro_trend.get("tasa", {})
+    usa = tasa.get("usa")
+    europa = tasa.get("europa")
+    if not usa or not europa:
+        return None
+
+    cambio_usa = round(usa["proyectada"] - usa["actual"], 2)
+    cambio_europa = round(europa["proyectada"] - europa["actual"], 2)
+    diferencial = round(cambio_usa - cambio_europa, 2)
+
+    if diferencial > 0.05:
+        direccion = "fortalecerse"
+        razon = f"la Fed proyecta mantener tasas relativamente más altas frente al BCE (diferencial de {diferencial:+.2f} p.p.), lo que favorece el atractivo del dólar frente al euro"
+    elif diferencial < -0.05:
+        direccion = "debilitarse"
+        razon = f"el diferencial de tasas se mueve a favor del euro frente al dólar ({diferencial:+.2f} p.p.), lo que le resta atractivo relativo al dólar"
+    else:
+        direccion = "mantenerse relativamente estable"
+        razon = "el diferencial de tasas entre la Fed y el BCE no muestra cambios significativos en el corto plazo"
+
+    return f"Con base en las proyecciones de tasas, se espera que el dólar tienda a {direccion} frente al euro en el corto plazo, ya que {razon}."
+
+def get_periodo_labels():
+    """Arma las etiquetas Anterior/Actual/Proyectada con el periodo real:
+    mes para tasa (datos mensuales), año para inflacion/PBI (datos del FMI,
+    que son anuales)."""
+    def add_months(date, delta):
+        total = date.month - 1 + delta
+        y = date.year + total // 12
+        m = total % 12 + 1
+        return date.replace(year=y, month=m, day=1)
+
+    anterior_dt = add_months(TODAY, -1)
+    actual_dt = TODAY
+    proyectada_dt = add_months(TODAY, 1)
+
+    tasa_labels = [
+        ["Anterior", f"({MESES_ABR_ES[anterior_dt.month - 1]}. {anterior_dt.year})"],
+        ["Actual", f"({MESES_ABR_ES[actual_dt.month - 1]}. {actual_dt.year})"],
+        ["Proyectada", f"({MESES_ABR_ES[proyectada_dt.month - 1]}. {proyectada_dt.year})"],
+    ]
+    infl_pbi_labels = [
+        ["Anterior", f"({MESES_ABR_ES[TODAY.month - 1]}. {TODAY.year - 1})"],
+        ["Actual", f"({MESES_ABR_ES[TODAY.month - 1]}. {TODAY.year})"],
+        ["Proyectada", f"({MESES_ABR_ES[TODAY.month - 1]}. {TODAY.year + 1})"],
+    ]
+    return {"tasa": tasa_labels, "inflacion": infl_pbi_labels, "pbi": infl_pbi_labels}
+
+MESES_ES = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"]
+
+news = get_rss_news()
+calendar = get_calendar()
+macro = get_macro_data()
+macro_trend = build_macro_trend(macro)
+dato_semana = get_dato_semana(macro_trend, macro)
+conclusion_dolar = get_conclusion_dolar(macro_trend)
+periodo_labels = get_periodo_labels()
+month_str = f"{MESES_ES[TODAY.month - 1].capitalize()} {TODAY.year}"
+
+with open("templates/dashboard.html") as f:
+    template = Template(f.read())
+
+html = template.render(month=month_str, news=news, calendar=calendar, macro=macro, macro_trend=macro_trend, dato_semana=dato_semana, conclusion_dolar=conclusion_dolar, periodo_labels=periodo_labels)
+
+os.makedirs("output", exist_ok=True)
+with open("output/index.html", "w") as f:
+    f.write(html)
+
+print(f"✅ Dashboard generado — {len(news)} noticias, calendario OK")
