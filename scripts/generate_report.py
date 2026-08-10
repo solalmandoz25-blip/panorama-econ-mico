@@ -160,6 +160,15 @@ def get_calendar():
         except Exception as e:
             print(f"Error calendar {url}: {e}")
 
+    seen_eventos = set()
+    all_events_dedup = []
+    for e in all_events:
+        clave = (e.get("title", "").strip().lower(), e.get("date", ""), e.get("country", ""))
+        if clave not in seen_eventos:
+            seen_eventos.add(clave)
+            all_events_dedup.append(e)
+    all_events = all_events_dedup
+
     def _parse_dt(event):
         try:
             return datetime.fromisoformat(event.get("date", ""))
@@ -178,6 +187,21 @@ def get_calendar():
         t = title.lower()
         return any(k in t for k in CALENDAR_KEYWORDS)
 
+    TEMA_GRUPOS = {
+        "inflation": "inflacion", "cpi": "inflacion", "consumer price": "inflacion", "pce": "inflacion", "core pce": "inflacion",
+        "unemployment": "empleo", "jobless": "empleo", "payroll": "empleo", "employment change": "empleo", "jobs report": "empleo", "non-farm": "empleo", "nonfarm": "empleo",
+        "gdp": "pbi",
+        "rate decision": "tasa", "interest rate": "tasa", "policy rate": "tasa", "fed funds": "tasa", "refinancing rate": "tasa", "deposit rate": "tasa",
+        "monetary policy": "tasa",
+    }
+
+    def _grupo_tema(title):
+        t = title.lower()
+        for kw, grupo in TEMA_GRUPOS.items():
+            if kw in t:
+                return grupo
+        return None
+
     impact_stars = {"High": "★★★", "Medium": "★★", "Low": "★"}
     for currency, country_label in countries.items():
         matched = [e for e in all_events if e.get("country", "") == currency and _es_relevante(e.get("title", "")) and e.get("impact", "") in ("High", "Medium")]
@@ -185,8 +209,19 @@ def get_calendar():
             matched = [e for e in all_events if e.get("country", "") == currency and _es_relevante(e.get("title", "")) and e.get("impact", "") == "Low"]
         matched.sort(key=_parse_dt)
         eventos = []
-        for e in matched[:5]:
-            title_es = translate_es(e.get("title", ""))
+        grupos_por_fecha = set()
+        for e in matched:
+            if len(eventos) >= 5:
+                break
+            titulo = e.get("title", "")
+            fecha_dt = _parse_dt(e)
+            grupo = _grupo_tema(titulo)
+            clave_grupo = (grupo, fecha_dt.date() if fecha_dt != datetime.max else None)
+            if grupo and clave_grupo in grupos_por_fecha:
+                continue
+            if grupo:
+                grupos_por_fecha.add(clave_grupo)
+            title_es = translate_es(titulo)
             fecha = _fmt_event_date(e.get("date", ""))
             prefijo = f"{fecha} — " if fecha else ""
             impact = e.get("impact", "")
