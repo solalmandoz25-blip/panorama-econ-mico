@@ -652,13 +652,11 @@ def _fecha_orden(date_str):
     return (0, 0)
 
 def get_dato_semana(macro_trend, macro):
-    """Selecciona el dato macro mas relevante del mes: primero filtra a
-    datos con fecha real de los ultimos 2 meses (para que siga siendo
-    noticia fresca), y dentro de esa ventana elige el que tuvo el
-    MAYOR CAMBIO real (no solo el de fecha mas nueva, para que un
-    'sin cambios' no le gane a un movimiento real como el NFP). Usa
-    datos REALES mensuales de BCRP/FRED, no las proyecciones anuales
-    del FMI. Arma un titular tipo prensa, con fecha, headline y
+    """Selecciona el dato macro con la fecha MAS RECIENTE disponible
+    entre tasa, inflacion, PBI y desempleo en las 3 regiones (datos
+    REALES mensuales de BCRP/FRED, no las proyecciones anuales del
+    FMI). Si hay empate de fecha, se usa el mayor cambio como
+    desempate. Arma un titular tipo prensa, con fecha, headline y
     descripcion."""
     labels = {"peru": "🇵🇪 Perú", "usa": "🇺🇸 Estados Unidos", "europa": "🇪🇺 Europa"}
     metric_labels = {"tasa": "Tasa de referencia", "inflacion": "Inflación interanual", "pbi": "Crecimiento del PBI", "empleo": "Tasa de desempleo"}
@@ -683,15 +681,7 @@ def get_dato_semana(macro_trend, macro):
             })
     if not candidatos:
         return None
-
-    def _meses_atras(fecha_orden, n):
-        total = TODAY.year * 12 + (TODAY.month - 1) - n
-        return (total // 12, total % 12 + 1)
-
-    ventana_min = _meses_atras(None, 2)
-    recientes = [c for c in candidatos if c["fecha_orden"] >= ventana_min and c["fecha_orden"] != (0, 0)]
-    pool = recientes if recientes else candidatos
-    destacado = max(pool, key=lambda c: abs(c["cambio"]))
+    destacado = max(candidatos, key=lambda c: (c["fecha_orden"], abs(c["cambio"])))
 
     raw_list = macro.get(destacado["region_key"], {}).get(destacado["metric_key"], [])
     if raw_list:
