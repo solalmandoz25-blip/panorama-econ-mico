@@ -1,8 +1,8 @@
-name: Weekly Panorama Economico
+name: Monthly Panorama Economico
 
 on:
   schedule:
-    - cron: '0 12 * * 1'  # Cada lunes a las 12pm UTC
+    - cron: '0 12 1 * *'  # El primer día de cada mes a las 12pm UTC
   workflow_dispatch:  # También permite correrlo manualmente
 
 jobs:
