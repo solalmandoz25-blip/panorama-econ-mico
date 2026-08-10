@@ -362,6 +362,7 @@ def get_macro_data():
     unrate_us = fred_get("UNRATE", 3)
     macro["usa"]["empleo"] = [{"date": o["date"][:7], "value": o["value"]} for o in unrate_us]
     macro["peru"]["empleo"] = []
+    print(f"DEBUG US empleo cruda: {macro['usa']['empleo']}")
 
     macro["europa"] = {
         "tasa": fred_monthly("ECBDFR", 3),
