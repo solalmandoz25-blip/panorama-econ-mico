@@ -332,6 +332,7 @@ def get_macro_data():
     }
 
     print(f"Macro OK — PE tasa:{len(macro['peru']['tasa'])} infl:{len(macro['peru']['inflacion'])} pbi:{len(macro['peru']['pbi'])}")
+    print(f"DEBUG PE inflacion cruda: {macro['peru']['inflacion']}")
     print(f"Macro OK — US tasa:{len(macro['usa']['tasa'])} infl:{len(macro['usa']['inflacion'])} pbi:{len(macro['usa']['pbi'])}")
 
     macro["europa"] = {
