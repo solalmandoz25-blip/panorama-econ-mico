@@ -359,12 +359,18 @@ def get_macro_data():
     print(f"DEBUG PE inflacion cruda: {macro['peru']['inflacion']}")
     print(f"Macro OK — US tasa:{len(macro['usa']['tasa'])} infl:{len(macro['usa']['inflacion'])} pbi:{len(macro['usa']['pbi'])}")
 
+    unrate_us = fred_get("UNRATE", 3)
+    macro["usa"]["empleo"] = [{"date": o["date"][:7], "value": o["value"]} for o in unrate_us]
+    macro["peru"]["empleo"] = []
+
     macro["europa"] = {
         "tasa": fred_monthly("ECBDFR", 3),
         "inflacion": fred_monthly("CPHPTT01EZM659N", 3),
         "pbi": fred_monthly("NAEXKP01EZQ659S", 3),
+        "empleo": fred_monthly("LRHUTTTTEZM156S", 3),
     }
     print(f"Macro OK — EUROPA tasa:{len(macro['europa']['tasa'])} infl:{len(macro['europa']['inflacion'])} pbi:{len(macro['europa']['pbi'])}")
+    print(f"Macro OK — US empleo (tasa desempleo):{len(macro['usa']['empleo'])} — EUROPA empleo:{len(macro['europa']['empleo'])}")
 
     return macro
 
@@ -653,10 +659,10 @@ def get_dato_semana(macro_trend, macro):
     mayor cambio como desempate. Arma un titular tipo prensa, con
     fecha, headline y descripcion."""
     labels = {"peru": "🇵🇪 Perú", "usa": "🇺🇸 Estados Unidos", "europa": "🇪🇺 Europa"}
-    metric_labels = {"tasa": "Tasa de referencia", "inflacion": "Inflación interanual", "pbi": "Crecimiento del PBI"}
+    metric_labels = {"tasa": "Tasa de referencia", "inflacion": "Inflación interanual", "pbi": "Crecimiento del PBI", "empleo": "Tasa de desempleo"}
     candidatos = []
     for region_key in ["peru", "usa", "europa"]:
-        for metric in ["tasa", "inflacion", "pbi"]:
+        for metric in ["tasa", "inflacion", "pbi", "empleo"]:
             raw_list = macro.get(region_key, {}).get(metric, [])
             d = compute_trend(raw_list)
             if not d:
