@@ -232,22 +232,6 @@ def get_calendar():
         result[country_label] = eventos
 
     peru_events = []
-    series_pe = [
-        ("PD04722MM", "Tasa de referencia BCRP", "★★★"),
-        ("PN01273PM", "Inflación interanual (IPC)", "★★★"),
-        ("PN01728AM", "Crecimiento del PBI", "★★"),
-    ]
-    for series_id, nombre, estrellas in series_pe:
-        try:
-            r2 = requests.get(f"https://estadisticas.bcrp.gob.pe/estadisticas/series/api/{series_id}/json", timeout=8)
-            periods = r2.json().get("periods", [])
-            if periods:
-                last = periods[-1]
-                val = float(last["values"][0])
-                fecha = last["name"]
-                peru_events.append(f"{fecha} — {nombre}: {val:.2f}% {estrellas}")
-        except Exception as e:
-            print(f"Error BCRP {series_id}: {e}")
 
     def next_weekday(base_date, weekday, n=1):
         d = base_date.replace(day=1)
@@ -268,6 +252,8 @@ def get_calendar():
         decision_tasa = next_weekday(mes_siguiente, 3, 1)
 
     ipc_release = mes_siguiente + timedelta(days=2)
+    if ipc_release.date() == decision_tasa.date():
+        ipc_release = ipc_release + timedelta(days=2)
     pbi_release = mes_siguiente.replace(day=15)
 
     proximos = [
@@ -527,6 +513,106 @@ def get_usa_fallback_news():
         item["description"] = translate_es(item["description"])
         return item
     return None
+
+def generate_conclusiones(macro, news_list):
+    labels = [("peru", "🇵🇪 Perú"), ("usa", "🇺🇸 Estados Unidos"), ("europa", "🇪🇺 Europa")]
+    lineas = []
+    for key, label in labels:
+        data = macro.get(key, {})
+        tasa = [o["value"] for o in data.get("tasa", [])]
+        infl = [o["value"] for o in data.get("inflacion", [])]
+        pbi = [o["value"] for o in data.get("pbi", [])]
+        partes = []
+        if tasa:
+            partes.append(f"tasa de referencia en {_fmt(tasa[-1])}% ({_trend(tasa)})")
+        if infl:
+            partes.append(f"inflación interanual en {_fmt(infl[-1])}% ({_trend(infl)})")
+        if pbi:
+            partes.append(f"crecimiento del PBI en {_fmt(pbi[-1])}% ({_trend(pbi)})")
+        resumen = ", ".join(partes) + "." if partes else "sin datos disponibles este mes."
+
+        noticia = find_relevant_news(key, news_list)
+        if not noticia and key == "peru":
+            noticia = get_peru_fallback_news()
+        if not noticia and key == "europa":
+            noticia = get_europa_fallback_news()
+        if not noticia and key == "usa":
+            noticia = get_usa_fallback_news()
+
+        lineas.append({
+            "label": label,
+            "resumen": f"{label}: {resumen}",
+            "noticia_titulo": noticia["title"] if noticia else None,
+            "noticia_desc": noticia["description"] if noticia else None,
+            "noticia_link": noticia["link"] if noticia else None,
+        })
+    return lineas
+
+def get_impacto_empresarial(macro_trend):
+    """Traduce las tendencias macro en implicancias practicas para
+    decisiones de negocio: costo de financiamiento, precios, crecimiento."""
+    interpretaciones = {
+        "tasa": {
+            "al alza": "financiamiento más costoso; se recomienda evaluar la fijación de tasas en el corto plazo",
+            "a la baja": "costo de fondeo a la baja; representa una oportunidad para nuevas líneas de crédito",
+            "estable": "costo de financiamiento estable, sin cambios significativos previstos",
+        },
+        "inflacion": {
+            "al alza": "presión al alza sobre costos operativos y márgenes; se sugiere revisar la estrategia de precios",
+            "a la baja": "entorno de precios más predecible, favorable para la planificación a mediano plazo",
+            "estable": "inflación bajo control, sin impacto significativo previsto en el corto plazo",
+        },
+        "pbi": {
+            "al alza": "el crecimiento económico favorece la expansión y una mayor demanda",
+            "a la baja": "la desaceleración sugiere cautela en las proyecciones de crecimiento",
+            "estable": "actividad económica estable, sin señales de cambio abrupto",
+        },
+    }
+    labels = [("peru", "🇵🇪 Perú"), ("usa", "🇺🇸 Estados Unidos"), ("europa", "🇪🇺 Europa")]
+    resultado = []
+    for key, label in labels:
+        partes = []
+        for metric in ["tasa", "inflacion", "pbi"]:
+            d = macro_trend.get(metric, {}).get(key)
+            if not d:
+                continue
+            direccion = _trend([d["anterior"], d["actual"]])
+            partes.append(interpretaciones[metric][direccion])
+        if partes:
+            resumen = "; ".join(partes) + "."
+            resumen = resumen[0].upper() + resumen[1:]
+        else:
+            resumen = "sin datos suficientes para un análisis esta semana."
+        resultado.append({"label": label, "resumen": f"{label}: {resumen}"})
+    return resultado
+
+def _decap(texto):
+    """Pone en minúscula solo la primera letra, preservando siglas
+    como PBI que ya vienen en mayúscula dentro de la frase."""
+    if not texto:
+        return texto
+    return texto[0].lower() + texto[1:]
+
+def get_frase_final(macro_trend, dato_semana):
+    """Genera una frase de cierre de maximo dos lineas que resume el tono
+    general de la semana, combinando la tendencia dominante con el dato
+    mas destacado."""
+    conteo = {"al alza": 0, "a la baja": 0, "estable": 0}
+    for metric, regiones in macro_trend.items():
+        for region_key, d in regiones.items():
+            if not d:
+                continue
+            direccion = _trend([d["anterior"], d["actual"]])
+            conteo[direccion] += 1
+    dominante = max(conteo, key=conteo.get)
+    tono = {
+        "al alza": "una semana marcada por presiones al alza en varios frentes",
+        "a la baja": "una semana con señales de alivio en varios frentes",
+        "estable": "una semana de relativa estabilidad en los principales indicadores",
+    }[dominante]
+    if dato_semana:
+        return f"En general, {tono}; lo más destacado fue el movimiento en {_decap(dato_semana['metric_label'])} de {dato_semana['region_label']}."
+    return f"En general, {tono} este mes."
 
 def _fecha_legible(date_str):
     """Convierte una fecha cruda (YYYY-MM de FRED, o ya formateada como
