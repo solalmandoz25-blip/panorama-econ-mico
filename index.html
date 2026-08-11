@@ -340,7 +340,7 @@ header span {
 .macro-note {
     font-size: 0.65rem;
 
-    color: #999;
+    color: #777;
 
     font-style: italic;
 
@@ -708,7 +708,7 @@ BCP Miami &nbsp;·&nbsp; Mes de Agosto 2026
      ====================================================== -->
 
 <div class="section-title">
-Dato del Mes
+Foco del Mes
 <span class="badge-auto">✦ Automático</span>
 </div>
 
@@ -880,10 +880,10 @@ Noticias Relevantes
 <div class="title">
 
 <a
-href="https://www.bloomberg.com/news/articles/2026-08-10/gold-touches-4-400-as-traders-turn-focus-to-us-inflation-data"
+href="https://www.bloomberg.com/news/articles/2026-08-11/trend-chasing-funds-big-short-on-bonds-raises-stakes-for-cpi"
 target="_blank"
 >
-El oro cotiza cerca de máximos de dos meses a medida que la atención se centra en la inflación
+La gran posición corta en bonos de los fondos que siguen tendencias aumenta las apuestas para el IPC
 </a>
 
 </div>
@@ -897,10 +897,10 @@ El oro cotiza cerca de máximos de dos meses a medida que la atención se centra
 <div class="title">
 
 <a
-href="https://www.bloomberg.com/news/articles/2026-08-11/russia-s-crude-oil-exports-tumble-to-their-lowest-since-may"
+href="https://www.bloomberg.com/news/articles/2026-08-10/gold-touches-4-400-as-traders-turn-focus-to-us-inflation-data"
 target="_blank"
 >
-Las exportaciones de petróleo crudo de Rusia caen a su nivel más bajo desde mayo
+El oro cotiza cerca de máximos de dos meses a medida que la atención se centra en la inflación
 </a>
 
 </div>
@@ -1193,11 +1193,15 @@ function makeTrendChart(
 
                 backgroundColor: r.color,
 
-                borderWidth: 2,
+                borderWidth: 2.5,
 
                 tension: 0.25,
 
-                pointRadius: 4,
+                pointRadius: 4.5,
+
+                pointHoverRadius: 5,
+
+                pointBorderWidth: 1,
 
                 pointBackgroundColor:
                     r.color
@@ -1255,21 +1259,27 @@ function makeTrendChart(
 
                                     font: {
 
-                                        size: 9,
+                                        size: 10,
 
                                         family:
-                                            MONO_FONT
+                                            MONO_FONT,
+
+                                        weight:
+                                            '600'
 
                                     },
 
                                     color:
-                                        '#555',
+                                        '#444',
 
                                     boxWidth:
-                                        10,
+                                        11,
 
                                     boxHeight:
-                                        10
+                                        11,
+
+                                    padding:
+                                        12
 
                                 }
 
@@ -1459,7 +1469,7 @@ function makeTrendChart(
 
                                 font: {
 
-                                    size: 7,
+                                    size: 9,
 
                                     weight:
                                         'bold',
@@ -1504,15 +1514,18 @@ function makeTrendChart(
 
                                     font: {
 
-                                        size: 9,
+                                        size: 10,
 
                                         family:
-                                            MONO_FONT
+                                            MONO_FONT,
+
+                                        weight:
+                                            '500'
 
                                     },
 
                                     color:
-                                        '#777',
+                                        '#555',
 
                                     maxRotation:
                                         0,
@@ -1521,7 +1534,10 @@ function makeTrendChart(
                                         0,
 
                                     autoSkip:
-                                        false
+                                        false,
+
+                                    padding:
+                                        5
 
                                 },
 
@@ -1553,12 +1569,18 @@ function makeTrendChart(
                                         size: 9,
 
                                         family:
-                                            MONO_FONT
+                                            MONO_FONT,
+
+                                        weight:
+                                            '500'
 
                                     },
 
                                     color:
-                                        '#aaa'
+                                        '#777',
+
+                                    padding:
+                                        4
 
                                 },
 
