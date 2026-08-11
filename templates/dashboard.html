@@ -36,6 +36,7 @@ header span { font-size: 0.8rem; opacity: 0.65; color: white; }
 .macro-card::before { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: #0a2342; }
 .macro-card h3 { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.12em; color: #0a2342; margin-bottom: 0.9rem; font-weight: bold; font-family: 'IBM Plex Mono', monospace; }
 .macro-note { font-size: 0.65rem; color: #999; font-style: italic; margin-top: 8px; text-align: right; }
+.macro-card canvas { height: 200px !important; width: 100% !important; }
 .dato-box { background: white; border-radius: 10px; padding: 1.6rem 2rem; box-shadow: 0 1px 6px rgba(0,0,0,0.07); text-align: center; }
 .dato-fecha { font-family: 'IBM Plex Mono', monospace; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.12em; color: #a9825c; font-weight: bold; margin-bottom: 8px; }
 .dato-headline { font-size: 1.5rem; font-weight: bold; color: #0a2342; line-height: 1.35; margin-bottom: 8px; }
@@ -164,6 +165,8 @@ const REGIONS = [
   { key: 'europa', label: 'Europa 🇪🇺', color: '#a9825c' }
 ];
 
+const chartInstances = [];
+
 function makeTrendChart(id, dataByRegion, labels) {
   const ctx = document.getElementById(id);
   if (!ctx) { return; }
@@ -185,11 +188,12 @@ function makeTrendChart(id, dataByRegion, labels) {
       });
     }
 
-    new Chart(ctx, {
+    const chart = new Chart(ctx, {
       type: 'line',
       data: { labels: labels, datasets: datasets },
       options: {
         responsive: true,
+        maintainAspectRatio: false,
         layout: { padding: { top: 24, right: 10 } },
         plugins: {
           legend: {
@@ -242,6 +246,7 @@ function makeTrendChart(id, dataByRegion, labels) {
         }
       }
     });
+    chartInstances.push(chart);
   } catch (err) {
     const msg = document.createElement('div');
     msg.style.cssText = 'color:#b91c1c;font-size:11px;font-family:monospace;padding:8px;';
@@ -253,6 +258,13 @@ function makeTrendChart(id, dataByRegion, labels) {
 makeTrendChart('chart-inflacion', macroTrend.inflacion, PERIODO_LABELS.inflacion);
 makeTrendChart('chart-tasa', macroTrend.tasa, PERIODO_LABELS.tasa);
 makeTrendChart('chart-pbi', macroTrend.pbi, PERIODO_LABELS.pbi);
+
+window.addEventListener('beforeprint', function() {
+  chartInstances.forEach(function(c) { c.resize(); c.update(); });
+});
+window.addEventListener('afterprint', function() {
+  chartInstances.forEach(function(c) { c.resize(); c.update(); });
+});
 </script>
 </body>
 </html>
