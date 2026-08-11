@@ -340,7 +340,7 @@ header span {
 .macro-note {
     font-size: 0.65rem;
 
-    color: #999;
+    color: #777;
 
     font-style: italic;
 
@@ -1064,11 +1064,15 @@ function makeTrendChart(
 
                 backgroundColor: r.color,
 
-                borderWidth: 2,
+                borderWidth: 2.5,
 
                 tension: 0.25,
 
-                pointRadius: 4,
+                pointRadius: 4.5,
+
+                pointHoverRadius: 5,
+
+                pointBorderWidth: 1,
 
                 pointBackgroundColor:
                     r.color
@@ -1126,21 +1130,27 @@ function makeTrendChart(
 
                                     font: {
 
-                                        size: 9,
+                                        size: 10,
 
                                         family:
-                                            MONO_FONT
+                                            MONO_FONT,
+
+                                        weight:
+                                            '600'
 
                                     },
 
                                     color:
-                                        '#555',
+                                        '#444',
 
                                     boxWidth:
-                                        10,
+                                        11,
 
                                     boxHeight:
-                                        10
+                                        11,
+
+                                    padding:
+                                        12
 
                                 }
 
@@ -1330,7 +1340,7 @@ function makeTrendChart(
 
                                 font: {
 
-                                    size: 7,
+                                    size: 9,
 
                                     weight:
                                         'bold',
@@ -1375,15 +1385,18 @@ function makeTrendChart(
 
                                     font: {
 
-                                        size: 9,
+                                        size: 10,
 
                                         family:
-                                            MONO_FONT
+                                            MONO_FONT,
+
+                                        weight:
+                                            '500'
 
                                     },
 
                                     color:
-                                        '#777',
+                                        '#555',
 
                                     maxRotation:
                                         0,
@@ -1392,7 +1405,10 @@ function makeTrendChart(
                                         0,
 
                                     autoSkip:
-                                        false
+                                        false,
+
+                                    padding:
+                                        5
 
                                 },
 
@@ -1424,12 +1440,18 @@ function makeTrendChart(
                                         size: 9,
 
                                         family:
-                                            MONO_FONT
+                                            MONO_FONT,
+
+                                        weight:
+                                            '500'
 
                                     },
 
                                     color:
-                                        '#aaa'
+                                        '#777',
+
+                                    padding:
+                                        4
 
                                 },
 
