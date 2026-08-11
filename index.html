@@ -356,6 +356,34 @@ header span {
     width: 100% !important;
 }
 
+.shared-legend {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 18px;
+    flex-wrap: nowrap;
+    margin-top: 8px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.64rem;
+    font-weight: 600;
+    color: #555;
+}
+
+.shared-legend-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+}
+
+.shared-legend-swatch {
+    width: 10px;
+    height: 10px;
+    border-radius: 1px;
+    display: inline-block;
+    flex: 0 0 auto;
+}
+
 
 /* =========================================================
    DATO DEL MES
@@ -1024,6 +1052,20 @@ height="200"
 
 </div>
 
+<div class="shared-legend">
+    <span class="shared-legend-item">
+        <span class="shared-legend-swatch" style="background:#0a2342;"></span>
+        Perú
+    </span>
+    <span class="shared-legend-item">
+        <span class="shared-legend-swatch" style="background:#2e6fad;"></span>
+        Estados Unidos
+    </span>
+    <span class="shared-legend-item">
+        <span class="shared-legend-swatch" style="background:#a9825c;"></span>
+        Europa
+    </span>
+</div>
 
 <div class="macro-note">
 Tasa EE.UU.: proyección oficial de la Fed (dot-plot)
@@ -1254,37 +1296,7 @@ function makeTrendChart(
 
 
                             legend: {
-
-                                position: 'bottom',
-
-                                labels: {
-
-                                    font: {
-
-                                        size: 9,
-
-                                        family:
-                                            MONO_FONT,
-
-                                        weight:
-                                            '600'
-
-                                    },
-
-                                    color:
-                                        '#555',
-
-                                    boxWidth:
-                                        9,
-
-                                    boxHeight:
-                                        9,
-
-                                    padding:
-                                        7
-
-                                }
-
+                                display: false
                             },
 
 
@@ -1471,7 +1483,7 @@ function makeTrendChart(
 
                                 font: {
 
-                                    size: 9,
+                                    size: 8,
 
                                     weight:
                                         'bold',
