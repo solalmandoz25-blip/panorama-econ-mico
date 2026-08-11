@@ -3,267 +3,1588 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>Panorama Económico — BCP Miami</title>
+
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-datalabels/2.2.0/chartjs-plugin-datalabels.min.js"></script>
+
 <style>
-* { box-sizing: border-box; margin: 0; padding: 0; -webkit-print-color-adjust: exact; print-color-adjust: exact; color-adjust: exact; }
-body { font-family: Georgia, serif; background: #f4f3f0; color: #1a1a1a; }
-header { background: #0a2342; color: white; padding: 1.4rem 2.5rem; display: flex; justify-content: space-between; align-items: center; }
-header h1 { font-size: 1.1rem; letter-spacing: 0.12em; font-weight: bold; color: white; }
-header span { font-size: 0.8rem; opacity: 0.9; color: white; }
-.container { max-width: 1100px; margin: 0 auto; padding: 1.8rem 1.5rem; }
-.section-title { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.14em; color: #0a2342; border-bottom: 1px solid #0a2342; padding-bottom: 4px; margin: 2rem 0 1rem; font-weight: bold; display: flex; justify-content: space-between; align-items: center; }
-.badge-auto { font-size: 0.65rem; background: #f0fdf4; color: #166534; border: 1px solid #86efac; border-radius: 20px; padding: 2px 10px; font-weight: normal; letter-spacing: 0; display: none; }
-.badge-manual { font-size: 0.65rem; background: #eff6ff; color: #1e40af; border: 1px solid #93c5fd; border-radius: 20px; padding: 2px 10px; font-weight: normal; letter-spacing: 0; }
-.news-list { display: flex; flex-direction: column; gap: 3px; }
-.news-item { background: white; border: 0.5px solid #e5e5e5; border-left: 3px solid #0a2342; border-radius: 0 8px 8px 0; padding: 0.4rem 0.9rem; display: flex; align-items: center; gap: 10px; }
-.news-item .title { font-size: 0.85rem; color: #1a1a1a; line-height: 1.3; flex: 1; }
-.news-item .title a { color: #0a2342; text-decoration: none; }
-.news-item .title a:hover { text-decoration: underline; }
-.tag { display: inline-flex; align-items: center; justify-content: center; font-size: 0.62rem; padding: 2px 8px; border-radius: 20px; white-space: nowrap; min-width: 108px; flex-shrink: 0; }
-.tag-high { background: #fef2f2; color: #991b1b; border: 1px solid #fca5a5; }
-.tag-med { background: #fffbeb; color: #92400e; border: 1px solid #fcd34d; }
-.cal-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
-.cal-country { background: white; border: 0.5px solid #e5e5e5; border-radius: 8px; padding: 0.8rem 1rem; }
-.cal-country-name { font-size: 0.72rem; font-weight: bold; color: #0a2342; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; padding-bottom: 6px; border-bottom: 1px solid #f0f0f0; }
-.cal-event { font-size: 0.78rem; color: #444; padding: 5px 0; border-bottom: 0.5px solid #f5f5f5; }
-.cal-event:last-child { border-bottom: none; }
-.cal-empty { font-size: 0.78rem; color: #bbb; font-style: italic; }
-.macro-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
-.macro-card { background: white; border-radius: 6px; padding: 1.1rem 1.3rem 1.3rem; box-shadow: 0 1px 6px rgba(0,0,0,0.07); position: relative; overflow: hidden; }
-.macro-card::before { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: #0a2342; }
-.macro-card h3 { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.12em; color: #0a2342; margin-bottom: 0.9rem; font-weight: bold; font-family: 'IBM Plex Mono', monospace; }
-.macro-note { font-size: 0.65rem; color: #999; font-style: italic; margin-top: 8px; text-align: right; }
-.macro-card canvas { height: 200px !important; width: 100% !important; }
-.dato-box { background: white; border-radius: 10px; padding: 1.6rem 2rem; box-shadow: 0 1px 6px rgba(0,0,0,0.07); text-align: center; }
-.dato-fecha { font-family: 'IBM Plex Mono', monospace; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.12em; color: #a9825c; font-weight: bold; margin-bottom: 8px; }
-.dato-headline { font-size: 1.5rem; font-weight: bold; color: #0a2342; line-height: 1.35; margin-bottom: 8px; }
-.dato-descripcion { font-size: 0.9rem; color: #666; }
-.dolar-box { background: white; border-radius: 10px; padding: 1.2rem 1.6rem; box-shadow: 0 1px 6px rgba(0,0,0,0.07); margin-top: 1rem; font-size: 0.9rem; color: #333; line-height: 1.6; border-left: 4px solid #a9825c; }
-.disclaimer { font-size: 0.68rem; color: #555; line-height: 1.6; text-align: justify; max-width: 900px; margin: 2rem auto 0; padding: 1.2rem 1.5rem; border-top: 1px solid #e5e5e5; }
-footer { text-align: center; padding: 2rem; font-size: 0.7rem; color: #bbb; border-top: 1px solid #eee; margin-top: 2rem; }
+
+/* =========================================================
+   GENERAL
+   ========================================================= */
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    color-adjust: exact;
+}
+
+html {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Georgia, serif;
+    background: #f4f3f0;
+    color: #1a1a1a;
+    margin: 0;
+    padding: 0;
+}
+
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+
+header {
+    background: #0a2342;
+    color: white;
+
+    padding: 1.4rem 2.5rem;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+header h1 {
+    font-size: 1.1rem;
+    letter-spacing: 0.12em;
+    font-weight: bold;
+    color: white;
+}
+
+header span {
+    font-size: 0.8rem;
+    opacity: 0.9;
+    color: white;
+}
+
+
+/* =========================================================
+   MAIN CONTAINER
+   ========================================================= */
+
+.container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 1.8rem 1.5rem;
+}
+
+
+/* =========================================================
+   SECTION TITLES
+   ========================================================= */
+
+.section-title {
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+
+    color: #0a2342;
+
+    border-bottom: 1px solid #0a2342;
+
+    padding-bottom: 4px;
+    margin: 2rem 0 1rem;
+
+    font-weight: bold;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+
+/* =========================================================
+   BADGES
+   ========================================================= */
+
+.badge-auto {
+    font-size: 0.65rem;
+
+    background: #f0fdf4;
+    color: #166534;
+
+    border: 1px solid #86efac;
+    border-radius: 20px;
+
+    padding: 2px 10px;
+
+    font-weight: normal;
+    letter-spacing: 0;
+
+    display: none;
+}
+
+.badge-manual {
+    font-size: 0.65rem;
+
+    background: #eff6ff;
+    color: #1e40af;
+
+    border: 1px solid #93c5fd;
+    border-radius: 20px;
+
+    padding: 2px 10px;
+
+    font-weight: normal;
+    letter-spacing: 0;
+}
+
+
+/* =========================================================
+   NEWS
+   ========================================================= */
+
+.news-list {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.news-item {
+    background: white;
+
+    border: 0.5px solid #e5e5e5;
+    border-left: 3px solid #0a2342;
+
+    border-radius: 0 8px 8px 0;
+
+    padding: 0.4rem 0.9rem;
+
+    display: flex;
+    align-items: center;
+
+    gap: 10px;
+}
+
+.news-item .title {
+    font-size: 0.85rem;
+    color: #1a1a1a;
+
+    line-height: 1.3;
+
+    flex: 1;
+}
+
+.news-item .title a {
+    color: #0a2342;
+    text-decoration: none;
+}
+
+.news-item .title a:hover {
+    text-decoration: underline;
+}
+
+.tag {
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    font-size: 0.62rem;
+
+    padding: 2px 8px;
+
+    border-radius: 20px;
+
+    white-space: nowrap;
+
+    min-width: 108px;
+
+    flex-shrink: 0;
+}
+
+.tag-high {
+    background: #fef2f2;
+    color: #991b1b;
+
+    border: 1px solid #fca5a5;
+}
+
+.tag-med {
+    background: #fffbeb;
+    color: #92400e;
+
+    border: 1px solid #fcd34d;
+}
+
+
+/* =========================================================
+   CALENDAR
+   ========================================================= */
+
+.cal-grid {
+    display: grid;
+
+    grid-template-columns: repeat(3, 1fr);
+
+    gap: 12px;
+}
+
+.cal-country {
+    background: white;
+
+    border: 0.5px solid #e5e5e5;
+
+    border-radius: 8px;
+
+    padding: 0.8rem 1rem;
+}
+
+.cal-country-name {
+    font-size: 0.72rem;
+    font-weight: bold;
+
+    color: #0a2342;
+
+    text-transform: uppercase;
+
+    letter-spacing: 0.08em;
+
+    margin-bottom: 8px;
+    padding-bottom: 6px;
+
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.cal-event {
+    font-size: 0.78rem;
+
+    color: #444;
+
+    padding: 5px 0;
+
+    border-bottom: 0.5px solid #f5f5f5;
+}
+
+.cal-event:last-child {
+    border-bottom: none;
+}
+
+.cal-empty {
+    font-size: 0.78rem;
+
+    color: #bbb;
+
+    font-style: italic;
+}
+
+
+/* =========================================================
+   MACRO GRID
+   ========================================================= */
+
+.macro-grid {
+    display: grid;
+
+    grid-template-columns: repeat(3, 1fr);
+
+    gap: 16px;
+}
+
+.macro-card {
+    background: white;
+
+    border-radius: 6px;
+
+    padding: 1.1rem 1.3rem 1.3rem;
+
+    box-shadow: 0 1px 6px rgba(0,0,0,0.07);
+
+    position: relative;
+
+    overflow: hidden;
+}
+
+.macro-card::before {
+    content: "";
+
+    position: absolute;
+
+    top: 0;
+    left: 0;
+    right: 0;
+
+    height: 3px;
+
+    background: #0a2342;
+}
+
+.macro-card h3 {
+    font-size: 0.7rem;
+
+    text-transform: uppercase;
+
+    letter-spacing: 0.12em;
+
+    color: #0a2342;
+
+    margin-bottom: 0.9rem;
+
+    font-weight: bold;
+
+    font-family: 'IBM Plex Mono', monospace;
+}
+
+.macro-note {
+    font-size: 0.65rem;
+
+    color: #999;
+
+    font-style: italic;
+
+    margin-top: 8px;
+
+    text-align: right;
+}
+
+.macro-card canvas {
+    height: 200px !important;
+    width: 100% !important;
+}
+
+
+/* =========================================================
+   DATO DEL MES
+   ========================================================= */
+
+.dato-box {
+    background: white;
+
+    border-radius: 10px;
+
+    padding: 1.6rem 2rem;
+
+    box-shadow: 0 1px 6px rgba(0,0,0,0.07);
+
+    text-align: center;
+}
+
+.dato-fecha {
+    font-family: 'IBM Plex Mono', monospace;
+
+    font-size: 0.7rem;
+
+    text-transform: uppercase;
+
+    letter-spacing: 0.12em;
+
+    color: #a9825c;
+
+    font-weight: bold;
+
+    margin-bottom: 8px;
+}
+
+.dato-headline {
+    font-size: 1.5rem;
+
+    font-weight: bold;
+
+    color: #0a2342;
+
+    line-height: 1.35;
+
+    margin-bottom: 8px;
+}
+
+.dato-descripcion {
+    font-size: 0.9rem;
+
+    color: #666;
+}
+
+
+/* =========================================================
+   DOLLAR BOX
+   ========================================================= */
+
+.dolar-box {
+    background: white;
+
+    border-radius: 10px;
+
+    padding: 1.2rem 1.6rem;
+
+    box-shadow: 0 1px 6px rgba(0,0,0,0.07);
+
+    margin-top: 1rem;
+
+    font-size: 0.9rem;
+
+    color: #333;
+
+    line-height: 1.6;
+
+    border-left: 4px solid #a9825c;
+}
+
+
+/* =========================================================
+   DISCLAIMER
+   ========================================================= */
+
+.disclaimer {
+    font-size: 0.68rem;
+
+    color: #555;
+
+    line-height: 1.6;
+
+    text-align: justify;
+
+    max-width: 900px;
+
+    margin: 2rem auto 0;
+
+    padding: 1.2rem 1.5rem;
+
+    border-top: 1px solid #e5e5e5;
+}
+
+
+/* =========================================================
+   FOOTER
+   ========================================================= */
+
+footer {
+    text-align: center;
+
+    padding: 2rem;
+
+    font-size: 0.7rem;
+
+    color: #bbb;
+
+    border-top: 1px solid #eee;
+
+    margin-top: 2rem;
+}
+
+
+/* =========================================================
+   PRINT / PDF — FULL PAGE
+   ========================================================= */
+
+@page {
+    size: A4 portrait;
+    margin: 0;
+}
 
 @media print {
-  body { font-size: 0.78rem; }
-  header { padding: 0.6rem 1.2rem; }
-  header h1 { font-size: 0.85rem; }
-  header span { font-size: 0.65rem; }
-  .container { padding: 0.6rem 0.8rem; max-width: 100%; }
-  .section-title { font-size: 0.68rem; margin: 0.7rem 0 0.4rem; padding-bottom: 2px; }
-  .news-list { gap: 1px; }
-  .news-item { padding: 0.18rem 0.6rem; }
-  .news-item .title { font-size: 0.7rem; }
-  .tag { font-size: 0.55rem; padding: 1px 6px; min-width: 80px; }
-  .cal-grid { gap: 6px; }
-  .cal-country { padding: 0.4rem 0.6rem; }
-  .cal-country-name { font-size: 0.6rem; margin-bottom: 4px; padding-bottom: 3px; }
-  .cal-event { font-size: 0.62rem; padding: 2px 0; }
-  .macro-grid { gap: 8px; }
-  .macro-card { padding: 0.5rem 0.6rem 0.6rem; }
-  .macro-card h3 { font-size: 0.58rem; margin-bottom: 0.3rem; }
-  .macro-card canvas { max-height: 130px !important; }
-  .macro-note { font-size: 0.52rem; margin-top: 4px; }
-  .dato-box { padding: 0.6rem 0.8rem; }
-  .dato-fecha { font-size: 0.58rem; margin-bottom: 4px; }
-  .dato-headline { font-size: 1rem; margin-bottom: 4px; }
-  .dato-descripcion { font-size: 0.68rem; }
-  .dolar-box { padding: 0.5rem 0.7rem; margin-top: 0.5rem; font-size: 0.68rem; }
-  .disclaimer { font-size: 0.48rem; margin: 0.8rem auto 0; padding: 0.5rem 0.7rem; }
-  footer { padding: 0.6rem; font-size: 0.55rem; margin-top: 0.6rem; }
-  .section-title, .dato-box, .cal-grid, .macro-grid, .dolar-box { page-break-inside: avoid; }
+
+    html,
+    body {
+        width: 100% !important;
+        min-height: 100% !important;
+
+        margin: 0 !important;
+        padding: 0 !important;
+
+        background: #f4f3f0 !important;
+
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+
+    body {
+        font-size: 0.78rem;
+    }
+
+
+    /* HEADER */
+
+    header {
+        width: 100% !important;
+
+        margin: 0 !important;
+
+        padding: 0.6rem 1.2rem !important;
+
+        border: none !important;
+        box-shadow: none !important;
+    }
+
+    header h1 {
+        font-size: 0.85rem;
+    }
+
+    header span {
+        font-size: 0.65rem;
+    }
+
+
+    /* MAIN CONTENT */
+
+    .container {
+        width: 100% !important;
+
+        max-width: none !important;
+
+        margin: 0 !important;
+
+        padding: 0.6rem 0.8rem !important;
+    }
+
+
+    /* TITLES */
+
+    .section-title {
+        font-size: 0.68rem;
+
+        margin: 0.7rem 0 0.4rem;
+
+        padding-bottom: 2px;
+    }
+
+
+    /* NEWS */
+
+    .news-list {
+        gap: 1px;
+    }
+
+    .news-item {
+        padding: 0.18rem 0.6rem;
+    }
+
+    .news-item .title {
+        font-size: 0.7rem;
+    }
+
+    .tag {
+        font-size: 0.55rem;
+
+        padding: 1px 6px;
+
+        min-width: 80px;
+    }
+
+
+    /* CALENDAR */
+
+    .cal-grid {
+        gap: 6px;
+    }
+
+    .cal-country {
+        padding: 0.4rem 0.6rem;
+    }
+
+    .cal-country-name {
+        font-size: 0.6rem;
+
+        margin-bottom: 4px;
+
+        padding-bottom: 3px;
+    }
+
+    .cal-event {
+        font-size: 0.62rem;
+
+        padding: 2px 0;
+    }
+
+
+    /* MACRO */
+
+    .macro-grid {
+        gap: 8px;
+    }
+
+    .macro-card {
+        padding: 0.5rem 0.6rem 0.6rem;
+    }
+
+    .macro-card h3 {
+        font-size: 0.58rem;
+
+        margin-bottom: 0.3rem;
+    }
+
+    .macro-card canvas {
+        max-height: 130px !important;
+    }
+
+    .macro-note {
+        font-size: 0.52rem;
+
+        margin-top: 4px;
+    }
+
+
+    /* DATO DEL MES */
+
+    .dato-box {
+        padding: 0.6rem 0.8rem;
+    }
+
+    .dato-fecha {
+        font-size: 0.58rem;
+
+        margin-bottom: 4px;
+    }
+
+    .dato-headline {
+        font-size: 1rem;
+
+        margin-bottom: 4px;
+    }
+
+    .dato-descripcion {
+        font-size: 0.68rem;
+    }
+
+
+    /* DOLLAR */
+
+    .dolar-box {
+        padding: 0.5rem 0.7rem;
+
+        margin-top: 0.5rem;
+
+        font-size: 0.68rem;
+    }
+
+
+    /* DISCLAIMER */
+
+    .disclaimer {
+        width: 100% !important;
+
+        max-width: none !important;
+
+        font-size: 0.48rem;
+
+        margin: 0.8rem auto 0;
+
+        padding: 0.5rem 0.7rem;
+    }
+
+
+    /* FOOTER */
+
+    footer {
+        width: 100% !important;
+
+        margin: 0.6rem 0 0 !important;
+
+        padding: 0.6rem !important;
+
+        font-size: 0.55rem;
+    }
+
+
+    /* PREVENT PAGE BREAKS */
+
+    .section-title,
+    .dato-box,
+    .cal-grid,
+    .macro-grid,
+    .dolar-box {
+        break-inside: avoid;
+        page-break-inside: avoid;
+    }
 }
+
 </style>
+
 </head>
+
 <body>
+
+
+<!-- ======================================================
+     HEADER
+     ====================================================== -->
+
 <header>
-<h1>MARKET BRIEF &nbsp;|&nbsp; PANORAMA ECONÓMICO</h1>
-<span>BCP Miami &nbsp;·&nbsp; Mes de {{ month }}</span>
+
+<h1>
+MARKET BRIEF &nbsp;|&nbsp; PANORAMA ECONÓMICO
+</h1>
+
+<span>
+BCP Miami &nbsp;·&nbsp; Mes de {{ month }}
+</span>
+
 </header>
+
+
+<!-- ======================================================
+     MAIN CONTENT
+     ====================================================== -->
+
 <div class="container">
 
-<div class="section-title">Dato del Mes<span class="badge-auto">✦ Automático</span></div>
+
+<!-- ======================================================
+     DATO DEL MES
+     ====================================================== -->
+
+<div class="section-title">
+Dato del Mes
+<span class="badge-auto">✦ Automático</span>
+</div>
+
+
 <div class="dato-box">
+
 {% if dato_semana %}
-<div class="dato-fecha">{{ dato_semana.fecha }}</div>
-<div class="dato-headline">{{ dato_semana.headline }}</div>
-<div class="dato-descripcion">{{ dato_semana.descripcion }}</div>
-{% else %}
-<div style="color:#bbb;font-style:italic">Sin datos suficientes este mes.</div>
-{% endif %}
+
+<div class="dato-fecha">
+{{ dato_semana.fecha }}
 </div>
 
-<div class="section-title">Calendario Económico del Mes<span class="badge-auto">✦ Automático</span></div>
+<div class="dato-headline">
+{{ dato_semana.headline }}
+</div>
+
+<div class="dato-descripcion">
+{{ dato_semana.descripcion }}
+</div>
+
+{% else %}
+
+<div style="color:#bbb;font-style:italic">
+Sin datos suficientes este mes.
+</div>
+
+{% endif %}
+
+</div>
+
+
+<!-- ======================================================
+     CALENDARIO
+     ====================================================== -->
+
+<div class="section-title">
+Calendario Económico del Mes
+<span class="badge-auto">✦ Automático</span>
+</div>
+
+
 <div class="cal-grid">
+
 {% for country, events in calendar.items() %}
+
 <div class="cal-country">
-<div class="cal-country-name">{{ country }}</div>
+
+<div class="cal-country-name">
+{{ country }}
+</div>
+
 {% if events %}
+
 {% for event in events %}
-<div class="cal-event">{{ event }}</div>
-{% endfor %}
-{% else %}
-<div class="cal-empty">Sin eventos de alto impacto</div>
-{% endif %}
-</div>
-{% endfor %}
+
+<div class="cal-event">
+{{ event }}
 </div>
 
-<div class="section-title">Noticias Relevantes<span class="badge-auto">✦ Automático</span></div>
+{% endfor %}
+
+{% else %}
+
+<div class="cal-empty">
+Sin eventos de alto impacto
+</div>
+
+{% endif %}
+
+</div>
+
+{% endfor %}
+
+</div>
+
+
+<!-- ======================================================
+     NEWS
+     ====================================================== -->
+
+<div class="section-title">
+Noticias Relevantes
+<span class="badge-auto">✦ Automático</span>
+</div>
+
+
 <div class="news-list">
+
 {% if news %}
+
 {% for n in news %}
+
 <div class="news-item">
-<div class="title"><a href="{{ n.link }}" target="_blank">{{ n.title }}</a></div>
+
+<div class="title">
+
+<a
+href="{{ n.link }}"
+target="_blank"
+>
+{{ n.title }}
+</a>
+
 </div>
+
+</div>
+
 {% endfor %}
+
 {% else %}
-<div class="news-item"><div class="title" style="color:#bbb;font-style:italic">No se encontraron noticias relevantes este mes.</div></div>
-{% endif %}
+
+<div class="news-item">
+
+<div
+class="title"
+style="color:#bbb;font-style:italic"
+>
+No se encontraron noticias relevantes este mes.
 </div>
 
-<div class="section-title">Indicadores Clave<span class="badge-auto">✦ Automático</span></div>
+</div>
+
+{% endif %}
+
+</div>
+
+
+<!-- ======================================================
+     INDICADORES
+     ====================================================== -->
+
+<div class="section-title">
+Indicadores Clave
+<span class="badge-auto">✦ Automático</span>
+</div>
+
+
 <div class="macro-grid">
+
+
 <div class="macro-card">
-<h3>Inflación %</h3>
-<canvas id="chart-inflacion" height="200"></canvas>
+
+<h3>
+Inflación %
+</h3>
+
+<canvas
+id="chart-inflacion"
+height="200"
+></canvas>
+
 </div>
+
+
 <div class="macro-card">
-<h3>Tasa de Referencia %</h3>
-<canvas id="chart-tasa" height="200"></canvas>
+
+<h3>
+Tasa de Referencia %
+</h3>
+
+<canvas
+id="chart-tasa"
+height="200"
+></canvas>
+
 </div>
+
+
 <div class="macro-card">
-<h3>Crecimiento del PBI %</h3>
-<canvas id="chart-pbi" height="200"></canvas>
+
+<h3>
+Crecimiento del PBI %
+</h3>
+
+<canvas
+id="chart-pbi"
+height="200"
+></canvas>
+
 </div>
+
+
 </div>
-<div class="macro-note">Tasa EE.UU.: proyección oficial de la Fed (dot-plot) &nbsp;·&nbsp; Tasa Perú/Europa: extrapolación de tendencia &nbsp;·&nbsp; Inflación y PBI: proyección oficial del FMI (World Economic Outlook)</div>
+
+
+<div class="macro-note">
+Tasa EE.UU.: proyección oficial de la Fed (dot-plot)
+&nbsp;·&nbsp;
+Tasa Perú/Europa: extrapolación de tendencia
+&nbsp;·&nbsp;
+Inflación y PBI: proyección oficial del FMI (World Economic Outlook)
+</div>
+
+
 {% if conclusion_dolar %}
-<div class="dolar-box">{{ conclusion_dolar }}</div>
+
+<div class="dolar-box">
+{{ conclusion_dolar }}
+</div>
+
 {% endif %}
 
-<div class="disclaimer"><strong>Disclaimer:</strong> Este documento es propiedad confidencial del BCP Miami y no puede ser reproducido, alterado ni distribuido a terceros sin autorización previa y por escrito. Su contenido es únicamente informativo y no constituye asesoría financiera, legal ni una recomendación de inversión. La información proviene de fuentes consideradas confiables, pero BCP Miami no garantiza su exactitud y recomienda obtener asesoría profesional antes de tomar cualquier decisión basada en este contenido.</div>
+
+<!-- ======================================================
+     DISCLAIMER
+     ====================================================== -->
+
+<div class="disclaimer">
+
+<strong>Disclaimer:</strong>
+
+Este documento es propiedad confidencial del BCP Miami y no puede ser reproducido, alterado ni distribuido a terceros sin autorización previa y por escrito.
+
+Su contenido es únicamente informativo y no constituye asesoría financiera, legal ni una recomendación de inversión.
+
+La información proviene de fuentes consideradas confiables, pero BCP Miami no garantiza su exactitud y recomienda obtener asesoría profesional antes de tomar cualquier decisión basada en este contenido.
 
 </div>
-<footer>Panorama Económico &nbsp;·&nbsp; BCP Miami &nbsp;·&nbsp; Generado automáticamente el primer día de cada mes</footer>
+
+
+</div>
+
+
+<!-- ======================================================
+     FOOTER
+     ====================================================== -->
+
+<footer>
+
+Panorama Económico
+&nbsp;·&nbsp;
+BCP Miami
+&nbsp;·&nbsp;
+Generado automáticamente el primer día de cada mes
+
+</footer>
+
+
+<!-- ======================================================
+     JAVASCRIPT
+     ====================================================== -->
 
 <script>
+
 const macroTrend = {{ macro_trend | tojson }};
 
+
 if (window.ChartDataLabels) {
-  Chart.register(window.ChartDataLabels);
+
+    Chart.register(
+        window.ChartDataLabels
+    );
+
 }
 
-const MONO_FONT = "'IBM Plex Mono', 'Courier New', monospace";
-const PERIODO_LABELS = {{ periodo_labels | tojson }};
+
+const MONO_FONT =
+    "'IBM Plex Mono', 'Courier New', monospace";
+
+
+const PERIODO_LABELS =
+    {{ periodo_labels | tojson }};
+
 
 const REGIONS = [
-  { key: 'peru', label: 'Perú 🇵🇪', color: '#0a2342' },
-  { key: 'usa', label: 'Estados Unidos 🇺🇸', color: '#2e6fad' },
-  { key: 'europa', label: 'Europa 🇪🇺', color: '#a9825c' }
+
+    {
+        key: 'peru',
+        label: 'Perú 🇵🇪',
+        color: '#0a2342'
+    },
+
+    {
+        key: 'usa',
+        label: 'Estados Unidos 🇺🇸',
+        color: '#2e6fad'
+    },
+
+    {
+        key: 'europa',
+        label: 'Europa 🇪🇺',
+        color: '#a9825c'
+    }
+
 ];
+
 
 const chartInstances = [];
 
-function makeTrendChart(id, dataByRegion, labels) {
-  const ctx = document.getElementById(id);
-  if (!ctx) { return; }
-  try {
-    const datasets = [];
-    for (let i = 0; i < REGIONS.length; i++) {
-      const r = REGIONS[i];
-      const d = dataByRegion ? dataByRegion[r.key] : null;
-      const values = d ? [d.anterior, d.actual, d.proyectada] : [null, null, null];
-      datasets.push({
-        label: r.label,
-        data: values,
-        borderColor: r.color,
-        backgroundColor: r.color,
-        borderWidth: 2,
-        tension: 0.25,
-        pointRadius: 4,
-        pointBackgroundColor: r.color
-      });
+
+/* =========================================================
+   CHART FUNCTION
+   ========================================================= */
+
+function makeTrendChart(
+    id,
+    dataByRegion,
+    labels
+) {
+
+    const ctx =
+        document.getElementById(id);
+
+
+    if (!ctx) {
+        return;
     }
 
-    const chart = new Chart(ctx, {
-      type: 'line',
-      data: { labels: labels, datasets: datasets },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        layout: { padding: { top: 24, right: 10 } },
-        plugins: {
-          legend: {
-            position: 'bottom',
-            labels: { font: { size: 9, family: MONO_FONT }, color: '#555', boxWidth: 10, boxHeight: 10 }
-          },
-          datalabels: {
-            anchor: 'end',
-            align: function(context) {
-              const idx = context.dataIndex;
-              const values = context.chart.data.datasets.map(function(ds) { return ds.data[idx]; });
-              const thisValue = context.dataset.data[idx];
-              if (thisValue === null || thisValue === undefined) { return 'top'; }
-              const sorted = values.filter(function(v) { return v !== null && v !== undefined; }).slice().sort(function(a, b) { return a - b; });
-              const rank = sorted.indexOf(thisValue);
-              if (rank === sorted.length - 1) { return 'top'; }
-              if (rank === 0) { return 'bottom'; }
-              return 'right';
-            },
-            offset: function(context) {
-              const idx = context.dataIndex;
-              const values = context.chart.data.datasets.map(function(ds) { return ds.data[idx]; });
-              const thisValue = context.dataset.data[idx];
-              if (thisValue === null || thisValue === undefined) { return 5; }
-              const sorted = values.filter(function(v) { return v !== null && v !== undefined; }).slice().sort(function(a, b) { return a - b; });
-              const rank = sorted.indexOf(thisValue);
-              if (rank === sorted.length - 1 || rank === 0) { return 5; }
-              return 8;
-            },
-            clamp: true,
-            color: function(context) { return context.dataset.borderColor; },
-            font: { size: 7, weight: 'bold', family: MONO_FONT },
-            formatter: function(value) {
-              if (value === null || value === undefined) { return ''; }
-              return value.toFixed(2) + '%';
-            }
-          }
-        },
-        scales: {
-          x: {
-            ticks: { font: { size: 9, family: MONO_FONT }, color: '#777', maxRotation: 0, minRotation: 0, autoSkip: false },
-            grid: { display: false },
-            border: { color: '#ccc' }
-          },
-          y: {
-            ticks: { font: { size: 9, family: MONO_FONT }, color: '#aaa' },
-            grid: { display: false },
-            border: { display: false }
-          }
+
+    try {
+
+        const datasets = [];
+
+
+        for (
+            let i = 0;
+            i < REGIONS.length;
+            i++
+        ) {
+
+            const r =
+                REGIONS[i];
+
+
+            const d =
+                dataByRegion
+                    ? dataByRegion[r.key]
+                    : null;
+
+
+            const values =
+                d
+                    ? [
+                        d.anterior,
+                        d.actual,
+                        d.proyectada
+                    ]
+                    : [
+                        null,
+                        null,
+                        null
+                    ];
+
+
+            datasets.push({
+
+                label: r.label,
+
+                data: values,
+
+                borderColor: r.color,
+
+                backgroundColor: r.color,
+
+                borderWidth: 2,
+
+                tension: 0.25,
+
+                pointRadius: 4,
+
+                pointBackgroundColor:
+                    r.color
+
+            });
+
         }
-      }
-    });
-    chartInstances.push(chart);
-  } catch (err) {
-    const msg = document.createElement('div');
-    msg.style.cssText = 'color:#b91c1c;font-size:11px;font-family:monospace;padding:8px;';
-    msg.textContent = 'Error grafico: ' + err.message;
-    ctx.parentNode.appendChild(msg);
-  }
+
+
+        const chart =
+            new Chart(
+                ctx,
+                {
+
+                    type: 'line',
+
+
+                    data: {
+
+                        labels: labels,
+
+                        datasets: datasets
+
+                    },
+
+
+                    options: {
+
+                        responsive: true,
+
+                        maintainAspectRatio: false,
+
+
+                        layout: {
+
+                            padding: {
+
+                                top: 24,
+
+                                right: 10
+
+                            }
+
+                        },
+
+
+                        plugins: {
+
+
+                            legend: {
+
+                                position: 'bottom',
+
+                                labels: {
+
+                                    font: {
+
+                                        size: 9,
+
+                                        family:
+                                            MONO_FONT
+
+                                    },
+
+                                    color:
+                                        '#555',
+
+                                    boxWidth:
+                                        10,
+
+                                    boxHeight:
+                                        10
+
+                                }
+
+                            },
+
+
+                            datalabels: {
+
+
+                                anchor:
+                                    'end',
+
+
+                                align:
+                                    function(context) {
+
+                                        const idx =
+                                            context.dataIndex;
+
+
+                                        const values =
+                                            context.chart.data.datasets.map(
+                                                function(ds) {
+
+                                                    return ds.data[idx];
+
+                                                }
+                                            );
+
+
+                                        const thisValue =
+                                            context.dataset.data[idx];
+
+
+                                        if (
+                                            thisValue === null ||
+                                            thisValue === undefined
+                                        ) {
+
+                                            return 'top';
+
+                                        }
+
+
+                                        const sorted =
+                                            values
+                                                .filter(
+                                                    function(v) {
+
+                                                        return (
+                                                            v !== null &&
+                                                            v !== undefined
+                                                        );
+
+                                                    }
+                                                )
+                                                .slice()
+                                                .sort(
+                                                    function(a, b) {
+
+                                                        return a - b;
+
+                                                    }
+                                                );
+
+
+                                        const rank =
+                                            sorted.indexOf(
+                                                thisValue
+                                            );
+
+
+                                        if (
+                                            rank ===
+                                            sorted.length - 1
+                                        ) {
+
+                                            return 'top';
+
+                                        }
+
+
+                                        if (
+                                            rank === 0
+                                        ) {
+
+                                            return 'bottom';
+
+                                        }
+
+
+                                        return 'right';
+
+                                    },
+
+
+                                offset:
+                                    function(context) {
+
+                                        const idx =
+                                            context.dataIndex;
+
+
+                                        const values =
+                                            context.chart.data.datasets.map(
+                                                function(ds) {
+
+                                                    return ds.data[idx];
+
+                                                }
+                                            );
+
+
+                                        const thisValue =
+                                            context.dataset.data[idx];
+
+
+                                        if (
+                                            thisValue === null ||
+                                            thisValue === undefined
+                                        ) {
+
+                                            return 5;
+
+                                        }
+
+
+                                        const sorted =
+                                            values
+                                                .filter(
+                                                    function(v) {
+
+                                                        return (
+                                                            v !== null &&
+                                                            v !== undefined
+                                                        );
+
+                                                    }
+                                                )
+                                                .slice()
+                                                .sort(
+                                                    function(a, b) {
+
+                                                        return a - b;
+
+                                                    }
+                                                );
+
+
+                                        const rank =
+                                            sorted.indexOf(
+                                                thisValue
+                                            );
+
+
+                                        if (
+                                            rank ===
+                                                sorted.length - 1 ||
+                                            rank === 0
+                                        ) {
+
+                                            return 5;
+
+                                        }
+
+
+                                        return 8;
+
+                                    },
+
+
+                                clamp:
+                                    true,
+
+
+                                color:
+                                    function(context) {
+
+                                        return (
+                                            context
+                                                .dataset
+                                                .borderColor
+                                        );
+
+                                    },
+
+
+                                font: {
+
+                                    size: 7,
+
+                                    weight:
+                                        'bold',
+
+                                    family:
+                                        MONO_FONT
+
+                                },
+
+
+                                formatter:
+                                    function(value) {
+
+                                        if (
+                                            value === null ||
+                                            value === undefined
+                                        ) {
+
+                                            return '';
+
+                                        }
+
+
+                                        return (
+                                            value.toFixed(2) +
+                                            '%'
+                                        );
+
+                                    }
+
+                            }
+
+                        },
+
+
+                        scales: {
+
+
+                            x: {
+
+                                ticks: {
+
+                                    font: {
+
+                                        size: 9,
+
+                                        family:
+                                            MONO_FONT
+
+                                    },
+
+                                    color:
+                                        '#777',
+
+                                    maxRotation:
+                                        0,
+
+                                    minRotation:
+                                        0,
+
+                                    autoSkip:
+                                        false
+
+                                },
+
+
+                                grid: {
+
+                                    display:
+                                        false
+
+                                },
+
+
+                                border: {
+
+                                    color:
+                                        '#ccc'
+
+                                }
+
+                            },
+
+
+                            y: {
+
+                                ticks: {
+
+                                    font: {
+
+                                        size: 9,
+
+                                        family:
+                                            MONO_FONT
+
+                                    },
+
+                                    color:
+                                        '#aaa'
+
+                                },
+
+
+                                grid: {
+
+                                    display:
+                                        false
+
+                                },
+
+
+                                border: {
+
+                                    display:
+                                        false
+
+                                }
+
+                            }
+
+                        }
+
+                    }
+
+                }
+            );
+
+
+        chartInstances.push(
+            chart
+        );
+
+
+    } catch (err) {
+
+
+        const msg =
+            document.createElement(
+                'div'
+            );
+
+
+        msg.style.cssText =
+            'color:#b91c1c;' +
+            'font-size:11px;' +
+            'font-family:monospace;' +
+            'padding:8px;';
+
+
+        msg.textContent =
+            'Error grafico: ' +
+            err.message;
+
+
+        ctx.parentNode.appendChild(
+            msg
+        );
+
+    }
+
 }
 
-makeTrendChart('chart-inflacion', macroTrend.inflacion, PERIODO_LABELS.inflacion);
-makeTrendChart('chart-tasa', macroTrend.tasa, PERIODO_LABELS.tasa);
-makeTrendChart('chart-pbi', macroTrend.pbi, PERIODO_LABELS.pbi);
 
-window.addEventListener('beforeprint', function() {
-  chartInstances.forEach(function(c) { c.resize(); c.update(); });
-});
-window.addEventListener('afterprint', function() {
-  chartInstances.forEach(function(c) { c.resize(); c.update(); });
-});
+/* =========================================================
+   CREATE CHARTS
+   ========================================================= */
+
+makeTrendChart(
+    'chart-inflacion',
+    macroTrend.inflacion,
+    PERIODO_LABELS.inflacion
+);
+
+
+makeTrendChart(
+    'chart-tasa',
+    macroTrend.tasa,
+    PERIODO_LABELS.tasa
+);
+
+
+makeTrendChart(
+    'chart-pbi',
+    macroTrend.pbi,
+    PERIODO_LABELS.pbi
+);
+
+
+/* =========================================================
+   PRINT HANDLING
+   ========================================================= */
+
+window.addEventListener(
+    'beforeprint',
+    function() {
+
+        chartInstances.forEach(
+            function(c) {
+
+                c.resize();
+
+                c.update();
+
+            }
+        );
+
+    }
+);
+
+
+window.addEventListener(
+    'afterprint',
+    function() {
+
+        chartInstances.forEach(
+            function(c) {
+
+                c.resize();
+
+                c.update();
+
+            }
+        );
+
+    }
+);
+
 </script>
+
+
 </body>
 </html>
