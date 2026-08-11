@@ -87,6 +87,16 @@ def get_rss_news():
         "acquisition", "merger", "lowers its", "raises its", "lifts outlook",
     ]
 
+    def _match_kw(title_lower, keywords):
+        for k in keywords:
+            if " " in k:
+                if k in title_lower:
+                    return True
+            else:
+                if re.search(r"\b" + re.escape(k) + r"\b", title_lower):
+                    return True
+        return False
+
     for source, url in feeds:
         for item in _fetch_feed_items(url, limit=40):
             title = item["title"]
@@ -95,9 +105,9 @@ def get_rss_news():
                 continue
             if TICKER_PATTERN.search(title):
                 continue
-            if any(k in title_lower for k in keywords_high):
+            if _match_kw(title_lower, keywords_high):
                 relevance = "Alta relevancia"
-            elif any(k in title_lower for k in keywords_med):
+            elif _match_kw(title_lower, keywords_med):
                 relevance = "Media relevancia"
             else:
                 continue
