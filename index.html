@@ -338,15 +338,17 @@ header span {
 }
 
 .macro-note {
-    font-size: 0.65rem;
+    font-size: 0.52rem;
 
-    color: #777;
+    color: #888;
 
     font-style: italic;
 
-    margin-top: 8px;
+    margin-top: 5px;
 
-    text-align: right;
+    text-align: center;
+
+    line-height: 1.25;
 }
 
 .macro-card canvas {
@@ -1259,7 +1261,7 @@ function makeTrendChart(
 
                                     font: {
 
-                                        size: 10,
+                                        size: 9,
 
                                         family:
                                             MONO_FONT,
@@ -1270,16 +1272,16 @@ function makeTrendChart(
                                     },
 
                                     color:
-                                        '#444',
+                                        '#555',
 
                                     boxWidth:
-                                        11,
+                                        9,
 
                                     boxHeight:
-                                        11,
+                                        9,
 
                                     padding:
-                                        12
+                                        7
 
                                 }
 
@@ -1382,7 +1384,6 @@ function makeTrendChart(
                                         const idx =
                                             context.dataIndex;
 
-
                                         const values =
                                             context.chart.data.datasets.map(
                                                 function(ds) {
@@ -1392,10 +1393,8 @@ function makeTrendChart(
                                                 }
                                             );
 
-
                                         const thisValue =
                                             context.dataset.data[idx];
-
 
                                         if (
                                             thisValue === null ||
@@ -1405,7 +1404,6 @@ function makeTrendChart(
                                             return 5;
 
                                         }
-
 
                                         const sorted =
                                             values
@@ -1428,25 +1426,29 @@ function makeTrendChart(
                                                     }
                                                 );
 
-
                                         const rank =
                                             sorted.indexOf(
                                                 thisValue
                                             );
 
-
                                         if (
                                             rank ===
-                                                sorted.length - 1 ||
-                                            rank === 0
+                                            sorted.length - 1
                                         ) {
 
-                                            return 5;
+                                            return 6;
 
                                         }
 
+                                        if (
+                                            rank === 0
+                                        ) {
 
-                                        return 8;
+                                            return 8;
+
+                                        }
+
+                                        return 6;
 
                                     },
 
