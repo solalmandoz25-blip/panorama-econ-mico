@@ -115,7 +115,6 @@ footer { text-align: center; padding: 2rem; font-size: 0.7rem; color: #bbb; bord
 {% if news %}
 {% for n in news %}
 <div class="news-item">
-<span class="tag {% if n.relevance == 'Alta relevancia' %}tag-high{% else %}tag-med{% endif %}">{{ n.relevance }}</span>
 <div class="title"><a href="{{ n.link }}" target="_blank">{{ n.title }}</a></div>
 </div>
 {% endfor %}
