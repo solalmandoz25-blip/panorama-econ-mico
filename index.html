@@ -36,6 +36,7 @@ header span { font-size: 0.8rem; opacity: 0.65; color: white; }
 .macro-card::before { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: #0a2342; }
 .macro-card h3 { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.12em; color: #0a2342; margin-bottom: 0.9rem; font-weight: bold; font-family: 'IBM Plex Mono', monospace; }
 .macro-note { font-size: 0.65rem; color: #999; font-style: italic; margin-top: 8px; text-align: right; }
+.macro-card canvas { height: 200px !important; width: 100% !important; }
 .dato-box { background: white; border-radius: 10px; padding: 1.6rem 2rem; box-shadow: 0 1px 6px rgba(0,0,0,0.07); text-align: center; }
 .dato-fecha { font-family: 'IBM Plex Mono', monospace; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.12em; color: #a9825c; font-weight: bold; margin-bottom: 8px; }
 .dato-headline { font-size: 1.5rem; font-weight: bold; color: #0a2342; line-height: 1.35; margin-bottom: 8px; }
@@ -43,6 +44,36 @@ header span { font-size: 0.8rem; opacity: 0.65; color: white; }
 .dolar-box { background: white; border-radius: 10px; padding: 1.2rem 1.6rem; box-shadow: 0 1px 6px rgba(0,0,0,0.07); margin-top: 1rem; font-size: 0.9rem; color: #333; line-height: 1.6; border-left: 4px solid #a9825c; }
 .disclaimer { font-size: 0.68rem; color: #999; line-height: 1.6; text-align: justify; max-width: 900px; margin: 2rem auto 0; padding: 1.2rem 1.5rem; border-top: 1px solid #e5e5e5; }
 footer { text-align: center; padding: 2rem; font-size: 0.7rem; color: #bbb; border-top: 1px solid #eee; margin-top: 2rem; }
+
+@media print {
+  body { font-size: 0.78rem; }
+  header { padding: 0.6rem 1.2rem; }
+  header h1 { font-size: 0.85rem; }
+  header span { font-size: 0.65rem; }
+  .container { padding: 0.6rem 0.8rem; max-width: 100%; }
+  .section-title { font-size: 0.68rem; margin: 0.7rem 0 0.4rem; padding-bottom: 2px; }
+  .news-list { gap: 1px; }
+  .news-item { padding: 0.18rem 0.6rem; }
+  .news-item .title { font-size: 0.7rem; }
+  .tag { font-size: 0.55rem; padding: 1px 6px; min-width: 80px; }
+  .cal-grid { gap: 6px; }
+  .cal-country { padding: 0.4rem 0.6rem; }
+  .cal-country-name { font-size: 0.6rem; margin-bottom: 4px; padding-bottom: 3px; }
+  .cal-event { font-size: 0.62rem; padding: 2px 0; }
+  .macro-grid { gap: 8px; }
+  .macro-card { padding: 0.5rem 0.6rem 0.6rem; }
+  .macro-card h3 { font-size: 0.58rem; margin-bottom: 0.3rem; }
+  .macro-card canvas { max-height: 130px !important; }
+  .macro-note { font-size: 0.52rem; margin-top: 4px; }
+  .dato-box { padding: 0.6rem 0.8rem; }
+  .dato-fecha { font-size: 0.58rem; margin-bottom: 4px; }
+  .dato-headline { font-size: 1rem; margin-bottom: 4px; }
+  .dato-descripcion { font-size: 0.68rem; }
+  .dolar-box { padding: 0.5rem 0.7rem; margin-top: 0.5rem; font-size: 0.68rem; }
+  .disclaimer { font-size: 0.48rem; margin: 0.8rem auto 0; padding: 0.5rem 0.7rem; }
+  footer { padding: 0.6rem; font-size: 0.55rem; margin-top: 0.6rem; }
+  .section-title, .dato-box, .cal-grid, .macro-grid, .dolar-box { page-break-inside: avoid; }
+}
 </style>
 </head>
 <body>
@@ -113,27 +144,27 @@ footer { text-align: center; padding: 2rem; font-size: 0.7rem; color: #bbb; bord
 
 <div class="news-item">
 <span class="tag tag-high">Alta relevancia</span>
-<div class="title"><a href="https://www.bloomberg.com/news/articles/2026-08-10/fed-s-hammack-says-some-number-of-rate-hikes-may-be-needed" target="_blank">Hammack de la Reserva Federal dice que podría ser necesario "un cierto número" de subidas de tipos</a></div>
+<div class="title"><a href="https://www.bloomberg.com/news/videos/2026-08-11/fed-to-take-wait-and-see-stance-on-rates-laura-cooper-video" target="_blank">La Reserva Federal adoptará una postura de esperar y ver qué pasa con las tasas: Laura Cooper</a></div>
 </div>
 
 <div class="news-item">
 <span class="tag tag-high">Alta relevancia</span>
-<div class="title"><a href="https://www.bloomberg.com/news/articles/2026-08-10/hassett-hopes-cook-innocent-rules-out-taking-her-place-at-fed" target="_blank">Hassett espera que Cook sea inocente y descarta ocupar su lugar en la Reserva Federal</a></div>
+<div class="title"><a href="https://www.bloomberg.com/news/articles/2026-08-11/yen-slides-toward-160-per-dollar-raising-intervention-concerns" target="_blank">El yen cae hacia 160 por dólar, lo que genera preocupaciones sobre la intervención</a></div>
 </div>
 
 <div class="news-item">
 <span class="tag tag-high">Alta relevancia</span>
-<div class="title"><a href="https://www.bloomberg.com/news/articles/2026-08-10/norway-core-inflation-surprise-tempers-bets-on-rate-hike" target="_blank">La sorpresa de la inflación básica de Noruega modera las apuestas sobre una subida de tipos</a></div>
+<div class="title"><a href="https://www.bloomberg.com/news/videos/2026-08-11/bloomberg-brief-08-11-2026-video" target="_blank">Los bonos caen en medio de preocupaciones sobre la inflación a medida que el petróleo aumenta ante las perspectivas del acuerdo de Ormuz | Informe Bloomberg 11/08/2026</a></div>
 </div>
 
 <div class="news-item">
 <span class="tag tag-high">Alta relevancia</span>
-<div class="title"><a href="https://www.bloomberg.com/news/articles/2026-08-10/warsh-says-he-sold-all-promised-stakes-agency-filing-shows" target="_blank">Warsh dice que vendió todas las apuestas prometidas, según muestra la presentación de la agencia</a></div>
+<div class="title"><a href="https://www.bloomberg.com/news/articles/2026-08-10/gold-touches-4-400-as-traders-turn-focus-to-us-inflation-data" target="_blank">El oro retrocede desde su máximo de dos meses a medida que la atención se centra en la inflación</a></div>
 </div>
 
 <div class="news-item">
 <span class="tag tag-high">Alta relevancia</span>
-<div class="title"><a href="https://www.bloomberg.com/news/articles/2026-08-10/bank-of-russia-urges-lenders-aid-firms-hurt-by-warehouse-strikes" target="_blank">El Banco de Rusia insta a los prestamistas a ayudar a las empresas afectadas por las huelgas en los almacenes</a></div>
+<div class="title"><a href="https://www.bloomberg.com/news/videos/2026-08-11/retail-footfall-fell-on-lower-tourism-says-spinneys-ceo-video" target="_blank">El tráfico minorista de Spinneys aumenta después del golpe inicial de la guerra con Irán</a></div>
 </div>
 
 
@@ -180,6 +211,8 @@ const REGIONS = [
   { key: 'europa', label: 'Europa 🇪🇺', color: '#a9825c' }
 ];
 
+const chartInstances = [];
+
 function makeTrendChart(id, dataByRegion, labels) {
   const ctx = document.getElementById(id);
   if (!ctx) { return; }
@@ -201,11 +234,12 @@ function makeTrendChart(id, dataByRegion, labels) {
       });
     }
 
-    new Chart(ctx, {
+    const chart = new Chart(ctx, {
       type: 'line',
       data: { labels: labels, datasets: datasets },
       options: {
         responsive: true,
+        maintainAspectRatio: false,
         layout: { padding: { top: 24, right: 10 } },
         plugins: {
           legend: {
@@ -258,6 +292,7 @@ function makeTrendChart(id, dataByRegion, labels) {
         }
       }
     });
+    chartInstances.push(chart);
   } catch (err) {
     const msg = document.createElement('div');
     msg.style.cssText = 'color:#b91c1c;font-size:11px;font-family:monospace;padding:8px;';
@@ -269,6 +304,13 @@ function makeTrendChart(id, dataByRegion, labels) {
 makeTrendChart('chart-inflacion', macroTrend.inflacion, PERIODO_LABELS.inflacion);
 makeTrendChart('chart-tasa', macroTrend.tasa, PERIODO_LABELS.tasa);
 makeTrendChart('chart-pbi', macroTrend.pbi, PERIODO_LABELS.pbi);
+
+window.addEventListener('beforeprint', function() {
+  chartInstances.forEach(function(c) { c.resize(); c.update(); });
+});
+window.addEventListener('afterprint', function() {
+  chartInstances.forEach(function(c) { c.resize(); c.update(); });
+});
 </script>
 </body>
 </html>
